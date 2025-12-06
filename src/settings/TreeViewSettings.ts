@@ -44,7 +44,7 @@ export const _add_settings_tree_view = (
 		props: {
 			show_attributes: plugin.settings.views.side.tree.show_attributes,
 			select_cb: async (value: EdgeAttribute[]) => {
-				plugin.settings.views.side.tree.show_attributes = value;
+				plugin.settings.views.side.tree.show_attributes = [...value];
 
 				plugin.refreshViews();
 				await plugin.saveSettings();

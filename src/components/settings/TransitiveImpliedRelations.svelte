@@ -8,7 +8,10 @@
 	} from "lucide-svelte";
 	import { Menu, Notice } from "obsidian";
 	import { ICON_SIZE } from "src/const";
-	import type { EdgeField } from "src/interfaces/settings";
+	import type {
+		EdgeField,
+		BreadcrumbsSettings,
+	} from "src/interfaces/settings";
 	import { log } from "src/logger";
 	import type BreadcrumbsPlugin from "src/main";
 	import { Mermaid } from "src/utils/mermaid";
@@ -18,7 +21,6 @@
 		input_transitive_rule_schema,
 		parse_transitive_relation,
 		stringify_transitive_relation,
-		// transitive_rule_to_edges,
 	} from "src/utils/transitive_rules";
 	import ChevronOpener from "../button/ChevronOpener.svelte";
 	import RenderExternalCodeblock from "../obsidian/RenderExternalCodeblock.svelte";
@@ -31,12 +33,104 @@
 
 	let { plugin = $bindable() }: Props = $props();
 
-	const settings = $state(plugin.settings);
+	let _cloned_settings: BreadcrumbsSettings;
+	try {
+		// Sanitize arrays that might have been proxied by reactive state before cloning
+		const s = plugin.settings;
+		const sanitized: BreadcrumbsSettings = {
+			...s,
+			views: {
+				...s.views,
+				side: {
+					...s.views.side,
+					matrix: {
+						...s.views.side.matrix,
+						show_attributes: [
+							...s.views.side.matrix.show_attributes,
+						],
+					},
+					tree: {
+						...s.views.side.tree,
+						show_attributes: [...s.views.side.tree.show_attributes],
+					},
+				},
+			},
+		};
+		_cloned_settings = structuredClone(sanitized);
+	} catch (e) {
+		// <<< debug <<<
+		type UncloneableDetail = {
+			path: (string | number)[];
+			type: string;
+			error: string;
+		} | null;
+		function find_uncloneable(
+			value: unknown,
+			path: (string | number)[] = [],
+		): UncloneableDetail {
+			try {
+				// @ts-ignore
+				structuredClone(value);
+				return null;
+			} catch (err) {
+				if (Array.isArray(value)) {
+					for (let i = 0; i < value.length; i++) {
+						const res: UncloneableDetail = find_uncloneable(
+							value[i],
+							path.concat(i),
+						);
+						if (res) return res;
+					}
+					return {
+						path,
+						type: Object.prototype.toString.call(value),
+						error: (err as Error).message,
+					};
+				} else if (value && typeof value === "object") {
+					for (const [k, v] of Object.entries(
+						value as Record<string, unknown>,
+					)) {
+						const res: UncloneableDetail = find_uncloneable(
+							v,
+							path.concat(k),
+						);
+						if (res) return res;
+					}
+					return {
+						path,
+						type: Object.prototype.toString.call(value),
+						error: (err as Error).message,
+					};
+				} else {
+					return {
+						path,
+						type: typeof value,
+						error: (err as Error).message,
+					};
+				}
+			}
+		}
+		const detail: UncloneableDetail = find_uncloneable(plugin.settings);
+		log.error(
+			"TransitiveImpliedRelations structuredClone(plugin.settings) failed >",
+			e,
+			detail,
+		);
+		// >>> debug >>>
+		_cloned_settings = plugin.settings;
+	}
+	const settings = $state(_cloned_settings);
+	$effect(() => {
+		plugin.settings = $state.snapshot(settings);
+	});
 
 	let filter = $state("");
 	let transitives = $state([...settings.implied_relations.transitive]);
 	// svelte-ignore state_referenced_locally
 	const opens = $state(transitives.map(() => false));
+	$effect(() => {
+		settings.implied_relations.transitive = $state.snapshot(transitives);
+	});
 
 	const actions = {
 		save: async () => {
@@ -46,7 +140,7 @@
 				}
 			}
 
-			settings.implied_relations.transitive = transitives;
+			settings.is_dirty = false;
 
 			await Promise.all([plugin.saveSettings(), plugin.rebuildGraph()]);
 
@@ -250,7 +344,7 @@
 		</code>. In other words, your spouse's sibling is your sibling-in-law.
 	</p>
 
-	<div class="my-2 flex items-center gap-2">
+	<div class="sticky-top my-2 flex items-center gap-2">
 		<button class="flex items-center gap-1" onclick={actions.save}>
 			<SaveIcon size={ICON_SIZE} />
 			Save
@@ -487,5 +581,11 @@
 		border-radius: var(--radius-m);
 		border: var(--modal-border-width) solid
 			var(--background-modifier-border);
+	}
+
+	.sticky-top {
+		position: sticky;
+		top: -2rem;
+		background-color: var(--background-secondary);
 	}
 </style>

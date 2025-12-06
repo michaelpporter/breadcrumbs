@@ -45,7 +45,7 @@ export const _add_settings_matrix = (
 			exclude_attributes: ["field", "explicit"],
 			show_attributes: plugin.settings.views.side.matrix.show_attributes,
 			select_cb: async (value: EdgeAttribute[]) => {
-				plugin.settings.views.side.matrix.show_attributes = value;
+				plugin.settings.views.side.matrix.show_attributes = [...value];
 
 				plugin.refreshViews();
 				await plugin.saveSettings();
