@@ -186,3 +186,32 @@ fn test_field_arrows_disable_collapse() {
         "expected unchanged 'down' edge, got:\n{body}"
     );
 }
+
+#[wasm_bindgen_test]
+fn test_field_arrows_empty_is_default() {
+    let graph = get_test_graph();
+
+    let mut options = MermaidGraphOptions::default();
+    options.field_arrows = std::collections::HashMap::new();
+
+    let mermaid = graph
+        .generate_mermaid_graph(get_traversal_options(), options)
+        .unwrap();
+
+    assert_eq!(
+        mermaid.mermaid.trim(),
+        indoc! {
+            r#"
+            %%{ init: { "flowchart": {} } }%%
+            graph LR
+                0("a.md")
+                2("c.md")
+                1("b.md")
+                2 -.-|"same"| 0
+                0 -->|"up"| 1
+                1 -->|"down"| 2
+            "#
+        }
+        .trim()
+    );
+}
