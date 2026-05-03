@@ -2,10 +2,12 @@
 	import { ArrowDown, PlusIcon, SaveIcon } from "lucide-svelte";
 	import { Menu, Notice } from "obsidian";
 	import { ICON_SIZE } from "src/const";
-	import type {
-		BreadcrumbsSettings,
-		EdgeField,
-		EdgeFieldGroup,
+	import {
+		MERMAID_ARROW_TYPES,
+		type BreadcrumbsSettings,
+		type EdgeField,
+		type EdgeFieldGroup,
+		type MermaidArrowType,
 	} from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
 	import Tag from "../obsidian/tag.svelte";
@@ -172,6 +174,18 @@
 
 				// NOTE: Only rename the field after updating the groups
 				edge_field.label = new_label;
+
+				settings.is_dirty = true;
+			},
+
+			set_arrow: (edge_field: EdgeField, value: string) => {
+				const target = settings.edge_fields.find(
+					(f) => f.label === edge_field.label,
+				);
+				if (!target) return;
+
+				target.mermaid_arrow =
+					value === "" ? undefined : (value as MermaidArrowType);
 
 				settings.is_dirty = true;
 			},
@@ -379,6 +393,21 @@
 					>
 						X
 					</button>
+					<select
+						class="dropdown"
+						title="Mermaid arrow shape for this field"
+						value={field.mermaid_arrow ?? ""}
+						onchange={(e) =>
+							actions.fields.set_arrow(
+								field,
+								e.currentTarget.value,
+							)}
+					>
+						<option value="">Default arrow</option>
+						{#each MERMAID_ARROW_TYPES as arrow}
+							<option value={arrow}>{arrow}</option>
+						{/each}
+					</select>
 				</div>
 
 				<!-- TODO: I don't think this key even does what I'm looking for
