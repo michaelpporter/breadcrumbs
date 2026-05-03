@@ -72,6 +72,12 @@
 			options.sort.order === -1,
 		);
 
+		const field_arrow_entries = plugin.settings.edge_fields
+			.filter((f) => !!f.mermaid_arrow)
+			.map((f) => [f.label, f.mermaid_arrow!] as const);
+		const field_arrow_keys = field_arrow_entries.map(([k]) => k);
+		const field_arrow_values = field_arrow_entries.map(([, v]) => v);
+
 		const mermaid_options = new MermaidGraphOptions(
 			file_path,
 			`%%{ init: { "flowchart": ${JSON.stringify(flowchart_init)} } }%%`,
@@ -100,6 +106,8 @@
 			},
 			true,
 			options["mermaid-arrow"] ?? false,
+			field_arrow_keys,
+			field_arrow_values,
 		);
 
 		try {
