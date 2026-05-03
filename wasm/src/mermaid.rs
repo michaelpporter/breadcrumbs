@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use indexmap::IndexMap;
 use itertools::{EitherOrBoth, Itertools};
 use petgraph::stable_graph::NodeIndex;
@@ -51,6 +53,8 @@ pub struct MermaidGraphOptions {
     pub link_nodes: bool,
     #[wasm_bindgen(skip)]
     pub show_arrow_points: bool,
+    #[wasm_bindgen(skip)]
+    pub field_arrows: HashMap<String, String>,
 }
 
 #[wasm_bindgen]
@@ -67,7 +71,14 @@ impl MermaidGraphOptions {
         node_label_fn: Option<js_sys::Function>,
         link_nodes: bool,
         show_arrow_points: bool,
+        field_arrow_keys: Vec<String>,
+        field_arrow_values: Vec<String>,
     ) -> MermaidGraphOptions {
+        let field_arrows = field_arrow_keys
+            .into_iter()
+            .zip(field_arrow_values)
+            .collect::<HashMap<String, String>>();
+
         MermaidGraphOptions {
             active_node,
             init_line,
@@ -79,6 +90,7 @@ impl MermaidGraphOptions {
             node_label_fn,
             link_nodes,
             show_arrow_points,
+            field_arrows,
         }
     }
 
@@ -101,6 +113,7 @@ impl Default for MermaidGraphOptions {
             node_label_fn: None,
             link_nodes: false,
             show_arrow_points: false,
+            field_arrows: HashMap::new(),
         }
     }
 }
