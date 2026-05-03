@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.8.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.8.1...4.8.2) (2026-05-03)
+
+### Bug Fixes
+
+* Fix page view alignment when sticky is disabled and readable line length is enabled
+
 ### [4.8.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.8.0...4.8.1) (2026-05-02)
 
 ### Features

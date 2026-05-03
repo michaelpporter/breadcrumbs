@@ -19,7 +19,7 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 
 		// Ensure the container exists _on the current page_, leaving other pages' containers alone
 		const page_views_el =
-			markdown_view.containerEl.querySelector(".BC-page-views") ??
+			markdown_view.containerEl.querySelector<HTMLElement>(".BC-page-views") ??
 			markdown_view.containerEl.createDiv({
 				cls: "BC-page-views w-full mx-auto",
 			});
@@ -55,6 +55,9 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			}
 
 			view_parent.insertBefore(page_views_el, view_parent.firstChild);
+
+			page_views_el.style.removeProperty("margin-left");
+			page_views_el.style.removeProperty("margin-right");
 
 			// Source mode may have left these on .cm-scroller in older versions.
 			const preview_scroller = markdown_view.containerEl.querySelector(
@@ -101,6 +104,8 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					}
 					host.insertBefore(page_views_el, cm_scroller);
 				}
+				page_views_el.style.removeProperty("margin-left");
+				page_views_el.style.removeProperty("margin-right");
 			} else {
 				// Inside the scroller so the trail scrolls with the note; layout class wraps a full-width row.
 				// Insert as the first child so BC-page-views occupies row 1 (flex: 0 0 100%),
@@ -110,6 +115,23 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					page_views_el,
 					cm_scroller.firstChild,
 				);
+
+				// Obsidian centers text via .cm-sizer (max-width + margin:auto), so text
+				// starts at (scroller_w - file_line_w) / 2 + gutter_w. Shift BC's
+				// margin-left by the gutter width to match.
+				if (plugin.settings.views.page.all.readable_line_width) {
+					requestAnimationFrame(() => {
+						if (!page_views_el.isConnected) return;
+						const gutters =
+							cm_scroller.querySelector<HTMLElement>(".cm-gutters");
+						const G = gutters?.getBoundingClientRect().width ?? 0;
+						page_views_el.style.marginLeft = `calc((100% - var(--file-line-width)) / 2 + ${G}px)`;
+						page_views_el.style.marginRight = "auto";
+					});
+				} else {
+					page_views_el.style.removeProperty("margin-left");
+					page_views_el.style.removeProperty("margin-right");
+				}
 			}
 		}
 
