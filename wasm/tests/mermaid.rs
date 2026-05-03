@@ -154,3 +154,35 @@ fn test_collapse_edges() {
         .trim()
     );
 }
+
+#[wasm_bindgen_test]
+fn test_field_arrows_disable_collapse() {
+    let graph = get_test_graph();
+
+    let mut options = MermaidGraphOptions::default();
+    options.field_arrows = std::collections::HashMap::from([
+        ("same".to_string(), "==>".to_string()),
+    ]);
+
+    let mermaid = graph
+        .generate_mermaid_graph(get_traversal_options(), options)
+        .unwrap();
+
+    let body = mermaid.mermaid.trim();
+    assert!(
+        body.contains(r#"2 ==>|"same"| 0"#),
+        "expected custom thick arrow for 'same' edge, got:\n{body}"
+    );
+    assert!(
+        body.contains(r#"0 ==>|"same"| 2"#),
+        "expected custom thick arrow for the reverse 'same' edge, got:\n{body}"
+    );
+    assert!(
+        body.contains(r#"0 -->|"up"| 1"#),
+        "expected unchanged 'up' edge, got:\n{body}"
+    );
+    assert!(
+        body.contains(r#"1 -->|"down"| 2"#),
+        "expected unchanged 'down' edge, got:\n{body}"
+    );
+}
