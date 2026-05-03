@@ -183,6 +183,7 @@ impl NoteGraph {
             self,
             edge_structs,
             diagram_options.collapse_opposing_edges,
+            &diagram_options.field_arrows,
         )?;
 
         let mut unresolved_nodes = Vec::new();
@@ -337,11 +338,12 @@ impl NoteGraph {
         }
     }
 
-    pub fn int_accumulate_edges(
-        graph: &NoteGraph,
+    pub fn int_accumulate_edges<'a>(
+        graph: &'a NoteGraph,
         edges: Vec<EdgeStruct>,
         collapse_opposing_edges: bool,
-    ) -> Result<AccumulatedEdgeHashMap<'_>> {
+        field_arrows: &HashMap<String, String>,
+    ) -> Result<AccumulatedEdgeHashMap<'a>> {
         let mut accumulated_edges = AccumulatedEdgeHashMap::default();
 
         // sorting the two node indices in the edge tuple could be a speedup, since then
@@ -350,11 +352,32 @@ impl NoteGraph {
         for edge_struct in edges {
             edge_struct.check_revision(graph)?;
 
+            let edge_data = edge_struct.edge_data_ref(graph).unwrap();
+            let has_custom_arrow = field_arrows.contains_key(edge_data.edge_type.as_ref());
+
+            // Edges with custom arrows must never merge into another entry.
+            // Insert each under a synthetic key that is guaranteed unique so
+            // it never collides with another entry, real or synthetic.
+            if has_custom_arrow {
+                let unique_key_target =
+                    NodeIndex::new(usize::MAX - accumulated_edges.map.len());
+                accumulated_edges.map.insert(
+                    (edge_struct.source_index, unique_key_target),
+                    (
+                        edge_struct.source_index,
+                        edge_struct.target_index,
+                        vec![edge_data],
+                        Vec::new(),
+                    ),
+                );
+                continue;
+            }
+
             let forward_dir = (edge_struct.source_index, edge_struct.target_index);
 
             let entry1 = accumulated_edges.map.get_mut(&forward_dir);
             if let Some((_, _, forward, _)) = entry1 {
-                forward.push(edge_struct.edge_data_ref(graph).unwrap());
+                forward.push(edge_data);
                 continue;
             }
 
@@ -362,7 +385,7 @@ impl NoteGraph {
                 let backward_dir = (edge_struct.target_index, edge_struct.source_index);
 
                 if let Some((_, _, _, backward)) = accumulated_edges.map.get_mut(&backward_dir) {
-                    backward.push(edge_struct.edge_data_ref(graph).unwrap());
+                    backward.push(edge_data);
                     continue;
                 }
             }
@@ -372,7 +395,7 @@ impl NoteGraph {
                 (
                     edge_struct.source_index,
                     edge_struct.target_index,
-                    vec![edge_struct.edge_data_ref(graph).unwrap()],
+                    vec![edge_data],
                     Vec::new(),
                 ),
             );
