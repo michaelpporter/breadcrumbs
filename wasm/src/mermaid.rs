@@ -271,6 +271,15 @@ impl NoteGraph {
     }
 }
 
+fn forward_has_no_custom_arrow(
+    field_arrows: &HashMap<String, String>,
+    forward: &[&EdgeData],
+) -> bool {
+    !forward
+        .iter()
+        .any(|e| field_arrows.contains_key(e.edge_type.as_ref()))
+}
+
 impl NoteGraph {
     fn generate_mermaid_edge(
         &self,
@@ -282,26 +291,36 @@ impl NoteGraph {
     ) -> String {
         let mut label = String::new();
 
-        let same_elements = forward
+        let custom_arrow = forward
             .iter()
-            .zip(backward.iter())
-            .all(|(a, b)| a.edge_type == b.edge_type);
-        let all_implied = !forward
-            .iter()
-            .zip_longest(backward.iter())
-            .any(|pair| match pair {
-                EitherOrBoth::Both(a, b) => a.explicit || b.explicit,
-                EitherOrBoth::Left(a) => a.explicit,
-                EitherOrBoth::Right(b) => b.explicit,
-            });
+            .find_map(|e| diagram_options.field_arrows.get(e.edge_type.as_ref()))
+            .cloned();
 
-        let arrow_type = match (backward.is_empty(), all_implied, diagram_options.show_arrow_points) {
-            (true, true, _) => "-.->",
-            (true, false, _) => "-->",
-            (false, true, true) => "<-.->",
-            (false, false, true) => "<--->",
-            (false, true, false) => "-.-",
-            (false, false, false) => "---",
+        let arrow_type: String = if let Some(s) = custom_arrow {
+            s
+        } else {
+            let all_implied = !forward
+                .iter()
+                .zip_longest(backward.iter())
+                .any(|pair| match pair {
+                    EitherOrBoth::Both(a, b) => a.explicit || b.explicit,
+                    EitherOrBoth::Left(a) => a.explicit,
+                    EitherOrBoth::Right(b) => b.explicit,
+                });
+
+            match (
+                backward.is_empty(),
+                all_implied,
+                diagram_options.show_arrow_points,
+            ) {
+                (true, true, _) => "-.->",
+                (true, false, _) => "-->",
+                (false, true, true) => "<-.->",
+                (false, false, true) => "<--->",
+                (false, true, false) => "-.-",
+                (false, false, false) => "---",
+            }
+            .to_string()
         };
 
         label.push_str(
@@ -313,16 +332,24 @@ impl NoteGraph {
                 .as_str(),
         );
 
-        if !same_elements && !backward.is_empty() {
-            label.push_str(" | ");
-            label.push_str(
-                backward
-                    .iter()
-                    .map(|edge| edge.attribute_label(&diagram_options.edge_label_attributes))
-                    .collect::<Vec<String>>()
-                    .join(", ")
-                    .as_str(),
-            );
+        if forward_has_no_custom_arrow(&diagram_options.field_arrows, forward)
+            && !backward.is_empty()
+        {
+            let same_elements = forward
+                .iter()
+                .zip(backward.iter())
+                .all(|(a, b)| a.edge_type == b.edge_type);
+            if !same_elements {
+                label.push_str(" | ");
+                label.push_str(
+                    backward
+                        .iter()
+                        .map(|edge| edge.attribute_label(&diagram_options.edge_label_attributes))
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                        .as_str(),
+                );
+            }
         }
 
         if label.is_empty() {
