@@ -280,6 +280,17 @@ fn forward_has_no_custom_arrow(
         .any(|e| field_arrows.contains_key(e.edge_type.as_ref()))
 }
 
+fn bidirectional_arrow(arrow: &str) -> String {
+    match arrow {
+        "-->" => "<-->".to_string(),
+        "-.->" => "<-.->".to_string(),
+        "==>" => "<==>".to_string(),
+        "--o" => "o--o".to_string(),
+        "--x" => "x--x".to_string(),
+        other => other.to_string(),
+    }
+}
+
 impl NoteGraph {
     fn generate_mermaid_edge(
         &self,
@@ -297,7 +308,11 @@ impl NoteGraph {
             .cloned();
 
         let arrow_type: String = if let Some(s) = custom_arrow {
-            s
+            if backward.is_empty() {
+                s
+            } else {
+                bidirectional_arrow(&s)
+            }
         } else {
             let all_implied = !forward
                 .iter()
@@ -380,16 +395,60 @@ impl NoteGraph {
             edge_struct.check_revision(graph)?;
 
             let edge_data = edge_struct.edge_data_ref(graph).unwrap();
-            let has_custom_arrow = field_arrows.contains_key(edge_data.edge_type.as_ref());
+            let new_custom_arrow = field_arrows.get(edge_data.edge_type.as_ref()).cloned();
 
-            // Edges with custom arrows must never merge into another entry.
-            // Insert each under a synthetic key that is guaranteed unique so
-            // it never collides with another entry, real or synthetic.
-            if has_custom_arrow {
-                let unique_key_target =
-                    NodeIndex::new(usize::MAX - accumulated_edges.map.len());
+            // Custom-arrow rule:
+            // - same custom on both directions  -> collapse as bidirectional
+            // - different custom (or vs default)-> unique forward-only entry
+            if let Some(new_arrow) = new_custom_arrow.clone() {
+                let backward_dir =
+                    (edge_struct.target_index, edge_struct.source_index);
+
+                if let Some(existing) =
+                    accumulated_edges.map.get_mut(&backward_dir)
+                {
+                    let existing_arrow = existing
+                        .2
+                        .iter()
+                        .find_map(|e| field_arrows.get(e.edge_type.as_ref()))
+                        .cloned();
+                    if existing_arrow.as_deref() == Some(new_arrow.as_str()) {
+                        existing.3.push(edge_data);
+                        continue;
+                    }
+                }
+
+                let forward_dir =
+                    (edge_struct.source_index, edge_struct.target_index);
+                if let Some(existing) =
+                    accumulated_edges.map.get_mut(&forward_dir)
+                {
+                    let existing_arrow = existing
+                        .2
+                        .iter()
+                        .find_map(|e| field_arrows.get(e.edge_type.as_ref()))
+                        .cloned();
+                    if existing_arrow.as_deref() == Some(new_arrow.as_str()) {
+                        existing.2.push(edge_data);
+                        continue;
+                    }
+
+                    let unique_target =
+                        NodeIndex::new(usize::MAX - accumulated_edges.map.len());
+                    accumulated_edges.map.insert(
+                        (edge_struct.source_index, unique_target),
+                        (
+                            edge_struct.source_index,
+                            edge_struct.target_index,
+                            vec![edge_data],
+                            Vec::new(),
+                        ),
+                    );
+                    continue;
+                }
+
                 accumulated_edges.map.insert(
-                    (edge_struct.source_index, unique_key_target),
+                    forward_dir,
                     (
                         edge_struct.source_index,
                         edge_struct.target_index,

@@ -169,13 +169,23 @@ fn test_field_arrows_disable_collapse() {
         .unwrap();
 
     let body = mermaid.mermaid.trim();
-    assert!(
-        body.contains(r#"2 ==>|"same"| 0"#),
-        "expected custom thick arrow for 'same' edge, got:\n{body}"
+    // forward + backward 'same' edges share the same custom arrow ==> they
+    // collapse into one bidirectional <==> edge.
+    let bidir_count = body
+        .lines()
+        .filter(|l| l.contains("<==>") && l.contains(r#""same""#))
+        .count();
+    assert_eq!(
+        bidir_count, 1,
+        "expected exactly one bidirectional <==> 'same' line, got {bidir_count}:\n{body}"
     );
-    assert!(
-        body.contains(r#"0 ==>|"same"| 2"#),
-        "expected custom thick arrow for the reverse 'same' edge, got:\n{body}"
+    let one_way_same = body
+        .lines()
+        .filter(|l| l.contains(r#""same""#) && !l.contains("<==>"))
+        .count();
+    assert_eq!(
+        one_way_same, 0,
+        "expected zero one-way 'same' lines when both sides share the arrow, got {one_way_same}:\n{body}"
     );
     assert!(
         body.contains(r#"0 -->|"up"| 1"#),
