@@ -287,6 +287,7 @@ fn bidirectional_arrow(arrow: &str) -> String {
         "==>" => "<==>".to_string(),
         "--o" => "o--o".to_string(),
         "--x" => "x--x".to_string(),
+        // No-arrow forms (---) stay as-is — bidirectional has no extra heads.
         other => other.to_string(),
     }
 }

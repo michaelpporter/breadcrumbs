@@ -11,7 +11,6 @@ export const MERMAID_ARROW_TYPES = [
 	"--o",
 	"--x",
 	"---",
-	"-.-",
 ] as const;
 
 export type MermaidArrowType = (typeof MERMAID_ARROW_TYPES)[number];
