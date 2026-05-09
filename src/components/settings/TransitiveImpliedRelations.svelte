@@ -11,6 +11,7 @@
 	import type { BreadcrumbsSettings, EdgeField } from "src/interfaces/settings";
 	import { log } from "src/logger";
 	import type BreadcrumbsPlugin from "src/main";
+	import { reactive_settings } from "src/stores/reactive_settings.svelte";
 	import { Mermaid } from "src/utils/mermaid";
 	import { split_and_trim } from "src/utils/strings";
 	import {
@@ -34,22 +35,25 @@
 	type TransitiveRule =
 		BreadcrumbsSettings["implied_relations"]["transitive"][number];
 
-	let last_plugin: BreadcrumbsPlugin | null = null;
-	// svelte-ignore state_referenced_locally — seed valid $state for bindings; `$effect.pre` resyncs if `plugin` changes
-	let settings = $state<BreadcrumbsSettings>(plugin.settings);
-	let transitives = $state<TransitiveRule[]>([]);
+	const settings = $derived(reactive_settings.current);
+	const transitives = $derived<TransitiveRule[]>(
+		settings.implied_relations.transitive,
+	);
 	let opens = $state<boolean[]>([]);
 
 	$effect.pre(() => {
-		if (last_plugin !== plugin) {
-			last_plugin = plugin;
-			settings = plugin.settings;
-			transitives = [...settings.implied_relations.transitive];
+		if (opens.length !== transitives.length) {
 			opens = transitives.map(() => false);
 		}
 	});
 
 	let filter = $state("");
+
+	const autosave = () => {
+		settings.is_dirty = true;
+		plugin.saveSettingsDebounced();
+		plugin.rebuildGraphDebounced();
+	};
 
 	const actions = {
 		save: async () => {
@@ -59,18 +63,7 @@
 				}
 			}
 
-			settings.implied_relations.transitive = transitives;
-
-			// WORKAROUND: `settings` is a reactive proxy around plugin.settings
-			// that, most importantly, does not pass through mutations. We have
-			// to manually reassign it an un-reactified copy to ensure that
-			// `plugin.saveSettings()` actually uses our updated settings.
-			plugin.settings = $state.snapshot(settings);
-
-			await Promise.all([plugin.saveSettings(), plugin.rebuildGraph()]);
-
-			// NOTE: saveSettings() resets the dirty flag, but now we have to tell Svelte to react
-			settings = plugin.settings;
+			await plugin.flushPendingSettings();
 		},
 
 		make_id: (rule_i: number) => `BC-transitive-rule-${rule_i}`,
@@ -95,8 +88,7 @@
 
 			setTimeout(() => actions.scroll_to(new_length - 1), 0);
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		add_bulk: () => {
@@ -152,8 +144,7 @@
 
 			new Notice(`Bulk added ${validated.length} rules ✅`);
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		copy_transitive: (i: number) => {
@@ -166,14 +157,17 @@
 
 			setTimeout(() => actions.scroll_to(new_length - 1), 0);
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		remove_transitive: (i: number) => {
-			transitives = transitives.filter((_, j) => j !== i);
+			settings.implied_relations.transitive =
+				settings.implied_relations.transitive.filter(
+					(_, j) => j !== i,
+				);
+			opens = opens.filter((_, j) => j !== i);
 
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		rename_transitive: (i: number, new_name: string) => {
@@ -181,8 +175,7 @@
 
 			transitives[i].name = new_name;
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		reorder_transitive: (i: number, j: number) => {
@@ -190,8 +183,7 @@
 			transitives[i] = transitives[j];
 			transitives[j] = temp;
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		add_chain_field: (i: number, field: EdgeField | undefined) => {
@@ -199,8 +191,7 @@
 
 			transitives[i].chain.push({ field: field.label });
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		remove_chain_field: (i: number, j: number) => {
@@ -208,8 +199,7 @@
 				(_, k) => k !== j,
 			);
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		set_close_field: (i: number, field: EdgeField | undefined) => {
@@ -217,8 +207,7 @@
 
 			transitives[i].close_field = field.label;
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		set_rounds: (i: number, rounds: number) => {
@@ -226,15 +215,13 @@
 
 			transitives[i].rounds = rounds;
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 
 		set_close_reversed: (i: number, reversed: boolean) => {
 			transitives[i].close_reversed = reversed;
 
-			transitives = transitives;
-			settings.is_dirty = true;
+			autosave();
 		},
 	};
 

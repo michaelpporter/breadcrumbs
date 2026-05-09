@@ -1,5 +1,5 @@
 import type { App } from "obsidian";
-import { Notice, PluginSettingTab } from "obsidian";
+import { PluginSettingTab } from "obsidian";
 import type BreadcrumbsPlugin from "src/main";
 import { mount, unmount } from "svelte";
 import EdgeFieldSettings from "../components/settings/EdgeFieldSettings.svelte";
@@ -213,11 +213,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	}
 
 	hide() {
-		if (this.plugin.settings.is_dirty) {
-			new Notice(
-				"⚠️ Exited without saving settings. Your changes are still in effect, but were not saved. Go back and click 'Save' if you want them to persist. Otherwise, reload Obsidian to revert to the last saved settings.",
-			);
-		}
+		void this.plugin.flushPendingSettings();
 
 		for (const c of this.components) void unmount(c);
 		this.components = [];
