@@ -24,13 +24,9 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 				cls: "BC-page-views w-full mx-auto",
 			});
 
-		// Set the max width
-		// NOTE: Do this _after_ getting the element
-		//   So that if it existed already, it gets updated
-		const max_width = plugin.settings.views.page.all.readable_line_width
-			? "var(--file-line-width)"
-			: "none";
-		page_views_el.setAttribute("style", `max-width: ${max_width};`);
+		// Reset inline styles from any prior render. Width is handled by CSS
+		// (source modes) or by the parent .markdown-preview-sizer (preview).
+		page_views_el.setAttribute("style", "max-width: none;");
 
 		// Stickyness
 		page_views_el.classList.toggle(
@@ -41,13 +37,19 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		// Clear out any old content
 		page_views_el.empty();
 
+		// Determines what we mount the Svelte component into. For source-unpinned with
+		// readable_line_width, we wrap with an inner div so the outer can stay full-row
+		// (otherwise flex wrap mis-computes and BC ends up sharing row 1 with gutters).
+		let mount_target: HTMLElement = page_views_el;
+
 		// Move it to the right place
 		if (mode === "preview") {
-			// NOTE: Embedded notes also match ".markdown-preview-view", so instead
-			//   we ensure the immediate parent is ".markdown-reading-view", which doesn't
-			//   exist on embedded notes
+			// NOTE: Embedded notes also match ".markdown-preview-view", so we anchor
+			//   on ".markdown-reading-view", which doesn't exist on embedded notes.
+			//   Insert inside .markdown-preview-sizer so we inherit Obsidian's
+			//   readable-line-width centering instead of fighting it with margin math.
 			const view_parent = markdown_view.containerEl.querySelector(
-				".markdown-reading-view > .markdown-preview-view",
+				".markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer",
 			);
 			if (!view_parent) {
 				log.info("redraw_page_views > No view_parent (mode=preview)");
@@ -56,8 +58,10 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 
 			view_parent.insertBefore(page_views_el, view_parent.firstChild);
 
+			// Clear any stale inline margins/padding left over from a prior source-mode render.
 			page_views_el.style.removeProperty("margin-left");
 			page_views_el.style.removeProperty("margin-right");
+			page_views_el.style.removeProperty("padding-left");
 
 			// Source mode may have left these on .cm-scroller in older versions.
 			const preview_scroller = markdown_view.containerEl.querySelector(
@@ -104,8 +108,16 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					}
 					host.insertBefore(page_views_el, cm_scroller);
 				}
-				page_views_el.style.removeProperty("margin-left");
-				page_views_el.style.removeProperty("margin-right");
+				if (plugin.settings.views.page.all.readable_line_width) {
+					page_views_el.style.maxWidth = "var(--file-line-width)";
+					page_views_el.style.marginLeft = "auto";
+					page_views_el.style.marginRight = "auto";
+				} else {
+					page_views_el.style.removeProperty("margin-left");
+					page_views_el.style.removeProperty("margin-right");
+					page_views_el.style.removeProperty("padding-left");
+					page_views_el.style.removeProperty("max-width");
+				}
 			} else {
 				// Inside the scroller so the trail scrolls with the note; layout class wraps a full-width row.
 				// Insert as the first child so BC-page-views occupies row 1 (flex: 0 0 100%),
@@ -116,28 +128,28 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					cm_scroller.firstChild,
 				);
 
-				// Obsidian centers text via .cm-sizer (max-width + margin:auto), so text
-				// starts at (scroller_w - file_line_w) / 2 + gutter_w. Shift BC's
-				// margin-left by the gutter width to match.
+				// Inner wrapper holds the visible content and gets the readable-line-width
+				// constraint + offset. The outer stays full-row so flex always wraps it.
 				if (plugin.settings.views.page.all.readable_line_width) {
-					requestAnimationFrame(() => {
-						if (!page_views_el.isConnected) return;
-						const gutters =
-							cm_scroller.querySelector<HTMLElement>(".cm-gutters");
-						const G = gutters?.getBoundingClientRect().width ?? 0;
-						page_views_el.style.marginLeft = `calc((100% - var(--file-line-width)) / 2 + ${G}px)`;
-						page_views_el.style.marginRight = "auto";
+					const inner = page_views_el.createDiv({
+						cls: "BC-page-views-inner",
 					});
+					inner.style.maxWidth = "var(--file-line-width)";
+					inner.style.marginLeft = "auto";
+					inner.style.marginRight = "auto";
+					mount_target = inner;
 				} else {
 					page_views_el.style.removeProperty("margin-left");
 					page_views_el.style.removeProperty("margin-right");
+					page_views_el.style.removeProperty("padding-left");
+					page_views_el.style.removeProperty("max-width");
 				}
 			}
 		}
 
 		// Render the component into the container
 		mount(PageViewsComponent, {
-			target: page_views_el,
+			target: mount_target,
 			props: { plugin, file_path: markdown_view.file?.path ?? "" },
 		});
 	});
