@@ -196,8 +196,7 @@
 	"views": {
 		"page": {
 			"all": {
-				"sticky": false,
-				"readable_line_width": true
+				"sticky": false
 			},
 			"trail": {
 				"enabled": true,

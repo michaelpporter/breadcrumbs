@@ -26,7 +26,7 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 
 		// Reset inline styles from any prior render. Width is handled by CSS
 		// (source modes) or by the parent .markdown-preview-sizer (preview).
-		page_views_el.setAttribute("style", "max-width: none;");
+		page_views_el.removeAttribute("style");
 
 		// Stickyness
 		page_views_el.classList.toggle(
@@ -37,9 +37,10 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		// Clear out any old content
 		page_views_el.empty();
 
-		// Determines what we mount the Svelte component into. For source-unpinned with
-		// readable_line_width, we wrap with an inner div so the outer can stay full-row
-		// (otherwise flex wrap mis-computes and BC ends up sharing row 1 with gutters).
+		// Determines what we mount the Svelte component into. For source-unpinned we
+		// wrap with an inner div so the outer can stay full-row (otherwise flex wrap
+		// mis-computes and BC ends up sharing row 1 with gutters). The inner inherits
+		// readable-line-width sizing via CSS keyed on Obsidian's .is-readable-line-width.
 		let mount_target: HTMLElement = page_views_el;
 
 		// Move it to the right place
@@ -108,16 +109,6 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					}
 					host.insertBefore(page_views_el, cm_scroller);
 				}
-				if (plugin.settings.views.page.all.readable_line_width) {
-					page_views_el.style.maxWidth = "var(--file-line-width)";
-					page_views_el.style.marginLeft = "auto";
-					page_views_el.style.marginRight = "auto";
-				} else {
-					page_views_el.style.removeProperty("margin-left");
-					page_views_el.style.removeProperty("margin-right");
-					page_views_el.style.removeProperty("padding-left");
-					page_views_el.style.removeProperty("max-width");
-				}
 			} else {
 				// Inside the scroller so the trail scrolls with the note; layout class wraps a full-width row.
 				// Insert as the first child so BC-page-views occupies row 1 (flex: 0 0 100%),
@@ -128,22 +119,12 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					cm_scroller.firstChild,
 				);
 
-				// Inner wrapper holds the visible content and gets the readable-line-width
-				// constraint + offset. The outer stays full-row so flex always wraps it.
-				if (plugin.settings.views.page.all.readable_line_width) {
-					const inner = page_views_el.createDiv({
-						cls: "BC-page-views-inner",
-					});
-					inner.style.maxWidth = "var(--file-line-width)";
-					inner.style.marginLeft = "auto";
-					inner.style.marginRight = "auto";
-					mount_target = inner;
-				} else {
-					page_views_el.style.removeProperty("margin-left");
-					page_views_el.style.removeProperty("margin-right");
-					page_views_el.style.removeProperty("padding-left");
-					page_views_el.style.removeProperty("max-width");
-				}
+				// Inner wrapper holds the visible content; outer stays full-row so flex
+				// always wraps it. Width follows Obsidian's readable-line-length via CSS.
+				const inner = page_views_el.createDiv({
+					cls: "BC-page-views-inner",
+				});
+				mount_target = inner;
 			}
 		}
 

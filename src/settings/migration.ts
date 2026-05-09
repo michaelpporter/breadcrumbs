@@ -331,9 +331,6 @@ export function migrate_old_settings(settings: BreadcrumbsSettings) {
 	// SECTION: Views
 	/// Page
 	if (old.respectReadableLineLength !== undefined) {
-		settings.views.page.all.readable_line_width =
-			old.respectReadableLineLength;
-
 		delete old.respectReadableLineLength;
 	}
 

@@ -44,6 +44,27 @@ Outputs to /styles.css, for Obsidian to use.
 	max-width: 100%;
 }
 
+/*
+ * Follow Obsidian's "Readable line length" setting. When on, Obsidian adds
+ * .is-readable-line-width to .markdown-source-view. Constrain the pinned strip
+ * and the unpinned inner wrapper to match note body width, so BC views stay
+ * aligned with the content rather than spanning the full editor.
+ */
+.markdown-source-view.is-readable-line-width > .BC-page-views,
+.markdown-source-view.is-readable-line-width .BC-page-views-inner {
+	max-width: var(--file-line-width);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Readable line length OFF + sticky ON: cap pinned strip at 700px so it
+ * doesn't span full editor width. */
+.markdown-source-view:not(.is-readable-line-width) > .BC-page-views.BC-page-views-sticky {
+	max-width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 /* Obsidian */
 
 .text-faint {
