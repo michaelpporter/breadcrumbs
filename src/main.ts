@@ -86,9 +86,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 		await this.backup_old_settings();
 
 		/// Migrations
-		const migrated = migrate_old_settings(this.settings);
-		reactive_settings.init(migrated);
-		this.settings = reactive_settings.current;
+		migrate_old_settings(this.settings);
 		await this.saveSettings();
 
 		// Logger
@@ -303,13 +301,12 @@ export default class BreadcrumbsPlugin extends Plugin {
 	onunload() {}
 
 	async loadSettings() {
-		const loaded = deep_merge_objects<BreadcrumbsSettings>(
+		this.settings = deep_merge_objects<BreadcrumbsSettings>(
 			((await this.loadData()) ?? {}) as BreadcrumbsSettings,
 			DEFAULT_SETTINGS,
 		);
 
-		reactive_settings.init(loaded);
-		this.settings = reactive_settings.current;
+		reactive_settings.init(this.settings);
 	}
 
 	private handleFileMenu(menu: Menu, file: TAbstractFile): void {
@@ -323,7 +320,8 @@ export default class BreadcrumbsPlugin extends Plugin {
 	}
 
 	async saveSettings() {
-		this.settings.is_dirty = false;
+		reactive_settings.current.is_dirty = false;
+		this.settings = reactive_settings.snapshot();
 
 		await this.saveData(this.settings);
 	}

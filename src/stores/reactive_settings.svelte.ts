@@ -13,4 +13,11 @@ export const reactive_settings = {
 	init(value: BreadcrumbsSettings) {
 		_settings = value;
 	},
+
+	snapshot(): BreadcrumbsSettings {
+		if (!_settings) {
+			throw new Error("reactive_settings accessed before init");
+		}
+		return $state.snapshot(_settings) as BreadcrumbsSettings;
+	},
 };

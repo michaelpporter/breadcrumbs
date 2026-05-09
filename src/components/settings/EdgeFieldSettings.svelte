@@ -24,7 +24,6 @@
 	const autosave = () => {
 		settings.is_dirty = true;
 		plugin.saveSettingsDebounced();
-		plugin.rebuildGraphDebounced();
 	};
 
 	const actions = {
