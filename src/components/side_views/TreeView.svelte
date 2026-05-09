@@ -26,24 +26,38 @@
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
 
-	function walk_to_root(
+	function walk_to_roots(
 		graph: NoteGraph,
 		start: string,
 		up_field_labels: string[],
-	): string {
+	): string[] {
 		const visited = new Set<string>([start]);
-		let current = start;
-		for (let i = 0; i < 50; i++) {
-			const edges = graph
-				.get_filtered_outgoing_edges(current, up_field_labels)
-				.to_array();
-			if (edges.length === 0) break;
-			const next = edges[0].target_path(graph);
-			if (visited.has(next)) break;
-			visited.add(next);
-			current = next;
+		let frontier: string[] = [start];
+		const roots: string[] = [];
+
+		for (let depth = 0; depth < 50; depth++) {
+			if (frontier.length === 0) break;
+			const next_frontier: string[] = [];
+			for (const current of frontier) {
+				const edges = graph
+					.get_filtered_outgoing_edges(current, up_field_labels)
+					.to_array();
+				if (edges.length === 0) {
+					if (!roots.includes(current)) roots.push(current);
+				} else {
+					for (const edge of edges) {
+						const target = edge.target_path(graph);
+						if (!visited.has(target)) {
+							visited.add(target);
+							next_frontier.push(target);
+						}
+					}
+				}
+			}
+			frontier = next_frontier;
 		}
-		return current;
+
+		return roots.length > 0 ? roots : [start];
 	}
 
 	let {
@@ -103,18 +117,22 @@
 		depth = settings.default_depth;
 	});
 
-	let entry_path = $derived.by(() => {
+	let entry_paths = $derived.by(() => {
 		if (!active_file || !plugin.graph.has_node(active_file.path)) return undefined;
 		if (settings.lock_view && plugin.graph.has_node(settings.lock_path!)) {
 			log.debug("Using locked path for TreeView:", settings.lock_path);
-			return settings.lock_path!;
+			return [settings.lock_path!];
 		} else if (settings.find_root && find_root_field_labels.length > 0) {
-			const root = walk_to_root(plugin.graph, active_file.path, find_root_field_labels);
-			log.debug("find_root: walked up to", root);
-			return root;
+			const roots = walk_to_roots(plugin.graph, active_file.path, find_root_field_labels);
+			log.debug("find_root: walked up to roots", roots);
+			return roots;
 		}
-		return active_file.path;
+		return [active_file.path];
 	});
+
+	let entry_path = $derived(
+		entry_paths?.length === 1 ? entry_paths[0] : undefined,
+	);
 
 	let entry_node_data = $derived(
 		entry_path ? plugin.graph.get_node(entry_path) : undefined,
@@ -126,10 +144,10 @@
 	});
 
 	let tree: FlatTraversalResult | undefined = $derived.by(() => {
-		if (entry_path) {
+		if (entry_paths && entry_paths.length > 0) {
 			return plugin.graph.rec_traverse_and_process(
 				new TraversalOptions(
-					[entry_path],
+					entry_paths,
 					edge_field_labels,
 					depth,
 					100,
