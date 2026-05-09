@@ -132,8 +132,8 @@
 				style="border-radius: var(--radius-m) 0 0 var(--radius-m)"
 			>
 				{#each grouped_out_edges?.prev ?? [] as edge}
-					<div class="BC-next-prev-item flex gap-3 p-1 text-left">
-						<span class="BC-field pl-2">{edge.edge_type}</span>
+					<div class="BC-next-prev-item flex gap-3 py-1 pl-2 pr-1 text-left">
+						<span class="BC-field px-2">{edge.edge_type}</span>
 
 						<EdgeLink
 							cls="grow"
@@ -150,7 +150,7 @@
 				style="border-radius:  0 var(--radius-m) var(--radius-m) 0"
 			>
 				{#each grouped_out_edges?.next ?? [] as edge}
-					<div class="BC-next-prev-item flex gap-3 p-1 text-right">
+					<div class="BC-next-prev-item flex gap-3 py-1 pl-1 pr-2 text-right">
 						<EdgeLink
 							cls="grow"
 							{edge}
@@ -158,7 +158,7 @@
 							{node_stringify_options}
 						/>
 
-						<span class="BC-field pr-2">{edge.edge_type}</span>
+						<span class="BC-field px-2">{edge.edge_type}</span>
 					</div>
 				{/each}
 			</div>
@@ -166,7 +166,7 @@
 	{/if}
 
 	{#each period_rows as row}
-		<div class="BC-period-row flex items-center gap-1 p-1">
+		<div class="BC-period-row flex items-center gap-1 py-1 px-2">
 			<span class="BC-period-kind text-xs opacity-60">{row.kind}</span>
 
 			<div class="flex grow items-center justify-between">
@@ -212,5 +212,12 @@
 		background-color: var(--background-primary);
 		border: 1px solid var(--background-modifier-border);
 		border-radius: var(--radius-m);
+	}
+	:global(.BC-next-prev-item) {
+		padding: 0.25rem 0.25rem !important;
+	}
+	:global(.BC-next-prev-item .BC-field) {
+		padding-left: 0.25rem !important;
+		padding-right: 0.25rem !important;
 	}
 </style>

@@ -203,7 +203,6 @@ describe("migration", () => {
 				page: {
 					all: {
 						sticky: false,
-						readable_line_width: true,
 					},
 					trail: {
 						enabled: true,
@@ -430,7 +429,6 @@ describe("migration", () => {
 				page: {
 					all: {
 						sticky: false,
-						readable_line_width: true,
 					},
 					trail: {
 						enabled: true,

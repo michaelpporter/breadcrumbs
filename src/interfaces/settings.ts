@@ -107,8 +107,6 @@ export interface BreadcrumbsSettings {
 		page: {
 			all: {
 				sticky: boolean;
-				/** Constrain max-width to var(--file-line-width) */
-				readable_line_width: boolean;
 			};
 
 			trail: {
@@ -291,8 +289,6 @@ export interface BreadcrumbsSettingsWithDirection {
 		page: {
 			all: {
 				sticky: boolean;
-				/** Constrain max-width to var(--file-line-width) */
-				readable_line_width: boolean;
 			};
 			trail: {
 				enabled: boolean;

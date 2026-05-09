@@ -155,7 +155,6 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 		page: {
 			all: {
 				sticky: false,
-				readable_line_width: true,
 			},
 
 			trail: {

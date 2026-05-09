@@ -20,17 +20,4 @@ export const _add_settings_page_views = (
 		},
 	});
 
-	new_setting(container_el, {
-		name: "Readable line width",
-		desc: "Limit to the width of the text in the editor",
-		toggle: {
-			value: plugin.settings.views.page.all.readable_line_width,
-			cb: async (value) => {
-				plugin.settings.views.page.all.readable_line_width = value;
-
-				await plugin.saveSettings();
-				redraw_page_views(plugin);
-			},
-		},
-	});
 };
