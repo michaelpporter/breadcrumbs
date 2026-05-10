@@ -2,12 +2,9 @@
 	import { ArrowDown, PlusIcon, SaveIcon } from "lucide-svelte";
 	import { Menu, Notice } from "obsidian";
 	import { ICON_SIZE } from "src/const";
-	import type {
-		BreadcrumbsSettings,
-		EdgeField,
-		EdgeFieldGroup,
-	} from "src/interfaces/settings";
+	import type { EdgeField, EdgeFieldGroup } from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
+	import { reactive_settings } from "src/stores/reactive_settings.svelte";
 	import Tag from "../obsidian/tag.svelte";
 	import EdgeFieldSelector from "../selector/EdgeFieldSelector.svelte";
 
@@ -17,34 +14,21 @@
 
 	let { plugin }: Props = $props();
 
-	let last_plugin: BreadcrumbsPlugin | null = null;
-	// svelte-ignore state_referenced_locally — seed valid $state for bindings; `$effect.pre` resyncs if `plugin` changes
-	let settings = $state<BreadcrumbsSettings>(plugin.settings);
-
-	$effect.pre(() => {
-		if (last_plugin !== plugin) {
-			last_plugin = plugin;
-			settings = plugin.settings;
-		}
-	});
+	const settings = $derived(reactive_settings.current);
 
 	let filters = $state({
 		fields: "",
 		groups: "",
 	});
 
+	const autosave = () => {
+		settings.is_dirty = true;
+		plugin.saveSettingsDebounced();
+	};
+
 	const actions = {
 		save: async () => {
-			// WORKAROUND: `settings` is a reactive proxy around plugin.settings
-			// that, most importantly, does not pass through mutations. We have
-			// to manually reassign it an un-reactified copy to ensure that
-			// `plugin.saveSettings()` actually uses our updated settings.
-			plugin.settings = $state.snapshot(settings);
-
-			await Promise.all([plugin.saveSettings(), plugin.rebuildGraph()]);
-
-			// NOTE: saveSettings() resets the dirty flag, but now we have to tell Svelte to react
-			settings = plugin.settings;
+			await plugin.flushPendingSettings();
 		},
 
 		fields: {
@@ -71,7 +55,7 @@
 				// Wait for Svelte to render the new item
 				setTimeout(() => actions.fields.scroll_to(field.label), 0);
 
-				settings.is_dirty = true;
+				autosave();
 			},
 			remove: (edge_field: EdgeField) => {
 				settings.edge_fields = settings.edge_fields.filter(
@@ -89,7 +73,7 @@
 					);
 				});
 
-				settings.is_dirty = true;
+				autosave();
 			},
 
 			rename: (edge_field: EdgeField, new_label: string) => {
@@ -173,7 +157,7 @@
 				// NOTE: Only rename the field after updating the groups
 				edge_field.label = new_label;
 
-				settings.is_dirty = true;
+				autosave();
 			},
 		},
 
@@ -202,7 +186,7 @@
 				// Wait for Svelte to render the new item
 				setTimeout(() => actions.groups.scroll_to(group.label), 0);
 
-				settings.is_dirty = true;
+				autosave();
 			},
 
 			remove: (group: EdgeFieldGroup) => {
@@ -210,7 +194,7 @@
 					(g) => g.label !== group.label,
 				);
 
-				settings.is_dirty = true;
+				autosave();
 			},
 
 			rename: (group: EdgeFieldGroup, new_label: string) => {
@@ -243,7 +227,7 @@
 
 				group.label = new_label;
 
-				settings.is_dirty = true;
+				autosave();
 			},
 
 			add_field: (
@@ -254,7 +238,7 @@
 
 				group.fields.push(field_label);
 
-				settings.is_dirty = true;
+				autosave();
 			},
 
 			remove_field: (
@@ -265,7 +249,7 @@
 
 				group.fields = group.fields.filter((f) => f !== field_label);
 
-				settings.is_dirty = true;
+				autosave();
 			},
 		},
 	};
