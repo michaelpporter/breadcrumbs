@@ -34,7 +34,7 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				$state.snapshot(plugin.settings.views.side.matrix),
+				untrack(() => $state.snapshot(plugin.settings.views.side.matrix)),
 			);
 		}
 	});
@@ -42,11 +42,11 @@
 	let is_initial_mount = true;
 
 	$effect(() => {
-		plugin.settings.views.side.matrix = $state.snapshot(settings);
-		untrack(() => void plugin.saveSettings());
-		// We only want to run this when *we* have changed `settings`,
-		// and not when the component is initially mounted into the DOM,
-		// or when the settings have been updated externally.
+		const matrix_snapshot = $state.snapshot(settings);
+		untrack(() => {
+			plugin.settings.views.side.matrix = matrix_snapshot;
+			void plugin.saveSettings();
+		});
 		if (is_initial_mount) {
 			is_initial_mount = false;
 			return;

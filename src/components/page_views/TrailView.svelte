@@ -32,7 +32,7 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				$state.snapshot(plugin.settings.views.page.trail),
+				untrack(() => $state.snapshot(plugin.settings.views.page.trail)),
 			);
 		}
 	});
@@ -44,9 +44,10 @@
 	let is_initial_mount = true;
 
 	$effect(() => {
-		// Keep `plugin.settings.views.page.trail` aligned with the local `settings`
-		// clone (same pattern as Matrix). Skip persisting on the first run only.
-		plugin.settings.views.page.trail = $state.snapshot(settings);
+		const trail_snapshot = $state.snapshot(settings);
+		untrack(() => {
+			plugin.settings.views.page.trail = trail_snapshot;
+		});
 		if (is_initial_mount) {
 			is_initial_mount = false;
 		} else {

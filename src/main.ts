@@ -43,7 +43,12 @@ export enum BCEvent {
 }
 
 export default class BreadcrumbsPlugin extends Plugin {
-	settings!: BreadcrumbsSettings;
+	get settings(): BreadcrumbsSettings {
+		return reactive_settings.current;
+	}
+	set settings(value: BreadcrumbsSettings) {
+		reactive_settings.init(value);
+	}
 	graph!: NoteGraph;
 	api!: BCAPI;
 	events!: Events;
@@ -305,8 +310,6 @@ export default class BreadcrumbsPlugin extends Plugin {
 			((await this.loadData()) ?? {}) as BreadcrumbsSettings,
 			DEFAULT_SETTINGS,
 		);
-
-		reactive_settings.init(this.settings);
 	}
 
 	private handleFileMenu(menu: Menu, file: TAbstractFile): void {
@@ -321,9 +324,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 
 	async saveSettings() {
 		reactive_settings.current.is_dirty = false;
-		this.settings = reactive_settings.snapshot();
-
-		await this.saveData(this.settings);
+		await this.saveData(reactive_settings.snapshot());
 	}
 
 	async backup_old_settings(): Promise<void> {
