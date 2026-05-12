@@ -2,7 +2,23 @@ import { MarkdownView } from "obsidian";
 import PageViewsComponent from "src/components/page_views/index.svelte";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
-import { mount } from "svelte";
+import { mount, unmount } from "svelte";
+
+type MountedPageView = ReturnType<typeof mount>;
+
+const mounted_page_views = new WeakMap<MarkdownView, MountedPageView>();
+
+export function cleanup_page_views(plugin: BreadcrumbsPlugin) {
+	const markdown_views = plugin.app.workspace.getLeavesOfType("markdown");
+	markdown_views.forEach((leaf) => {
+		if (!(leaf.view instanceof MarkdownView)) return;
+		const existing = mounted_page_views.get(leaf.view);
+		if (existing) {
+			mounted_page_views.delete(leaf.view);
+			void unmount(existing);
+		}
+	});
+}
 
 export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 	const markdown_views = plugin.app.workspace.getLeavesOfType("markdown");
@@ -16,6 +32,12 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 
 		const markdown_view = leaf.view;
 		const mode = markdown_view.getMode();
+
+		const existing = mounted_page_views.get(markdown_view);
+		if (existing) {
+			mounted_page_views.delete(markdown_view);
+			void unmount(existing);
+		}
 
 		// Ensure the container exists _on the current page_, leaving other pages' containers alone
 		const page_views_el =
@@ -129,9 +151,10 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		}
 
 		// Render the component into the container
-		mount(PageViewsComponent, {
+		const mounted = mount(PageViewsComponent, {
 			target: mount_target,
 			props: { plugin, file_path: markdown_view.file?.path ?? "" },
 		});
+		mounted_page_views.set(markdown_view, mounted);
 	});
 }

@@ -33,6 +33,12 @@ export class TreeView extends ItemView {
 	}
 
 	async onOpen() {
+		if (this.component) {
+			const old = this.component;
+			this.component = undefined;
+			await unmount(old);
+		}
+
 		const container = this.containerEl.children[1];
 		container.empty();
 
