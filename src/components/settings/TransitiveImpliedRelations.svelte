@@ -12,6 +12,7 @@
 	import { log } from "src/logger";
 	import type BreadcrumbsPlugin from "src/main";
 	import { reactive_settings } from "src/stores/reactive_settings.svelte";
+	import { effect_counter } from "src/utils/perf";
 	import { Mermaid } from "src/utils/mermaid";
 	import { split_and_trim } from "src/utils/strings";
 	import {
@@ -41,7 +42,9 @@
 	);
 	let opens = $state<boolean[]>([]);
 
+	const tick_opens_sync = effect_counter("TransitiveImpliedRelations.opens_sync");
 	$effect.pre(() => {
+		tick_opens_sync();
 		if (opens.length !== transitives.length) {
 			opens = transitives.map(() => false);
 		}

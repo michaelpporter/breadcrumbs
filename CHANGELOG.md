@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3) (2026-05-12)
+
+### Bug Fixes
+
+* Fix Settings tab freezing Obsidian on Windows in 4.9.2 — the freeze had two stacked causes. (1) `reactive_settings.current` assigned to its own `$state` variable when read before init, which Svelte 5 detected as a derivation self-mutating its own dependency. (2) Three settings sub-components (`ShowAttributesSettingItem`, `EdgeSortIdSettingItem`, `FieldGroupLabelsSettingItem`) had a `$effect` that watched a `$bindable` prop and called `select_cb(value)` on every read; the callback writes back into `plugin.settings.X`, which re-notifies the same `$bindable` (Svelte 5 deep proxies fire on any property assignment, even with an identical reference), re-runs the effect, and so on until `effect_update_depth_exceeded` triggered after ~38s of awaited `saveData` calls. The store now initialises eagerly with `DEFAULT_SETTINGS` and the three sub-components cache the previously-emitted value to skip self-triggered re-notifications.
+* Add gated perf marks (`debug.level` set to `DEBUG`) around `SettingsTab.display`, each section mount, and reactive-loop counters around the suspect `$effect` bodies. Active only at `DEBUG` log level so default users see nothing.
+
+### [4.9.3-beta.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.5...4.9.3-beta.6) (2026-05-12)
+
+### Bug Fixes
+
+* Fix the Windows Settings-tab freeze (`effect_update_depth_exceeded` + ~38s click hang). Three settings sub-components — `ShowAttributesSettingItem`, `EdgeSortIdSettingItem`, `FieldGroupLabelsSettingItem` — had a `$effect` that watched a `$bindable` prop and invoked `select_cb(value)` on every read. The callback writes back into `plugin.settings.X`, which re-notifies the same `$bindable` prop (Svelte 5 deep proxies fire on any property assignment, even with an identical reference), re-runs the effect, and so on until Svelte's update-depth limit triggers. Each iteration awaits an async `saveData` disk write, which is why the hang stretched to ~38s. Each effect now caches the previously-emitted value and skips the callback when the prop reads back as the same reference, breaking the cycle.
+
+### [4.9.3-beta.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.4...4.9.3-beta.5) (2026-05-12)
+
+### Diagnostics
+
+* Rework `effect_counter` to track cumulative runs (no 250ms reset window) and log at thresholds 1/10/50/200/1000. Beta.4's window-based counter missed slow loops — the 38-second hang on Windows ran ~2 iterations/second, never hitting 50 in any 250ms window. Also extend coverage to remaining $effects in `TrailView.log`, `TrailView.depth`, `TreeView.depth`, `TreeView.root_open`, `LockViewButton`, `RenderMarkdown`.
+
+### [4.9.3-beta.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.3...4.9.3-beta.4) (2026-05-12)
+
+### Diagnostics
+
+* Extend reactive-loop counters to the four settings sub-components most likely to fire on tab open (`MatrixFieldOrderSettingItem`, `FieldGroupLabelsSettingItem`, `ShowAttributesSettingItem`, `EdgeSortIdSettingItem`) plus `ShowAttributesSelectorMenu.strip`. Beta.3 timings showed `SettingsTab.display` completed in 27ms but the `effect_update_depth_exceeded` error still fired on the next microtask, so the looping `$effect` lives in a sub-component that beta.3 did not instrument.
+
+### [4.9.3-beta.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.2...4.9.3-beta.3) (2026-05-12)
+
+### Diagnostics
+
+* Add gated perf marks and reactive-loop counters around the Settings tab (per-section timings, mount durations, `effect-storm` warnings on TrailView/Matrix/TreeView/TransitiveImpliedRelations/NestedEdgeList) to diagnose the remaining few-second Settings-open freeze on Windows. Active only when `debug.level` is set to `DEBUG`; no effect at default log level.
+
+### [4.9.3-beta.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3-beta.2) (2026-05-12)
+
+### Bug Fixes
+
+* Fix settings tab freezing Obsidian on Windows in 4.9.2 — the `reactive_settings.current` getter assigned to its own `$state` variable when read before init, which Svelte 5 detected as a derivation self-mutating its own dependency and looped to `effect_update_depth_exceeded`. The store now initialises `_settings` eagerly with `DEFAULT_SETTINGS` so the getter is a pure read and `init()` simply swaps in the real settings.
+
 ### [4.9.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.1...4.9.2) (2026-05-12)
 
 ### Bug Fixes

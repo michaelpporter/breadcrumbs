@@ -375,10 +375,16 @@ impl FlatTraversalResult {
         str_opt: &NodeStringifyOptions,
         attributes: Vec<String>,
     ) -> Result<JsValue> {
-        self.data
-            .get(index)
-            .map(|datum| datum.to_js_rendering_obj(graph, str_opt, attributes))
-            .unwrap_or(Ok(JsValue::UNDEFINED))
+        let Some(datum) = self.data.get(index) else {
+            return Ok(JsValue::UNDEFINED);
+        };
+        // Render paths can race with `apply_update`. If the edge predates the
+        // current graph revision, return undefined so the Svelte template
+        // skips this row instead of throwing a revision-mismatch error.
+        if !datum.edge.is_current_revision(graph) {
+            return Ok(JsValue::UNDEFINED);
+        }
+        datum.to_js_rendering_obj(graph, str_opt, attributes)
     }
 
     /// Sorts the flat traversal data with a given edge sorter.

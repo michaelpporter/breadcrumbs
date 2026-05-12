@@ -9,6 +9,7 @@
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import type { EdgeAttribute } from "src/graph/utils";
 	import ObsidianLink from "./ObsidianLink.svelte";
+	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -30,7 +31,9 @@
 
 	let opens = $state<boolean[]>([]);
 
+	const tick_nested_opens = effect_counter("NestedEdgeList.opens_sync");
 	$effect(() => {
+		tick_nested_opens();
 		const n = items.length;
 		if (opens.length !== n) {
 			opens = Array(n).fill(true);

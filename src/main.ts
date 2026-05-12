@@ -32,7 +32,7 @@ import { reactive_settings } from "./stores/reactive_settings.svelte";
 import { EdgeFieldSuggestor } from "./suggestor/edge_fields";
 import { deep_merge_objects } from "./utils/objects";
 import { Timer } from "./utils/timer";
-import { redraw_page_views } from "./views/page";
+import { cleanup_page_views, redraw_page_views } from "./views/page";
 import { TreeView } from "./views/tree";
 
 export enum BCEvent {
@@ -303,7 +303,9 @@ export default class BreadcrumbsPlugin extends Plugin {
 		log.debug("loaded Breadcrumbs plugin");
 	}
 
-	onunload() {}
+	onunload() {
+		cleanup_page_views(this);
+	}
 
 	async loadSettings() {
 		this.settings = deep_merge_objects<BreadcrumbsSettings>(
