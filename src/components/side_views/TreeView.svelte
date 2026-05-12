@@ -65,14 +65,17 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				$state.snapshot(plugin.settings.views.side.tree),
+				untrack(() => $state.snapshot(plugin.settings.views.side.tree)),
 			);
 		}
 	});
 
 	$effect(() => {
-		plugin.settings.views.side.tree = $state.snapshot(settings);
-		untrack(() => void plugin.saveSettings());
+		const tree_snapshot = $state.snapshot(settings);
+		untrack(() => {
+			plugin.settings.views.side.tree = tree_snapshot;
+			void plugin.saveSettings();
+		});
 	});
 
 	let edge_field_labels = $derived(

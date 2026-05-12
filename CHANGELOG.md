@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.0...4.9.1) (2026-05-11)
+
+### Bug Fixes
+
+* Fix view settings (trail enabled, prev/next enabled, matrix collapse) reverting on reload — settings written by TypeScript callbacks were lost because the Svelte 5 reactive proxy did not propagate plain-object mutations back to its internal signal sources. Converted `plugin.settings` to a getter/setter so all writes route through the proxy.
+* Fix infinite reactive loop (`effect_update_depth_exceeded`) triggered when toggling trail or side view settings — `$effect` bodies in Matrix, TreeView, and TrailView were writing back to `plugin.settings` without `untrack()`, causing the proxy signal sources to re-trigger the same effects endlessly. Wrapped all proxy writes in `untrack()`.
+* Fix `$effect.pre` in Matrix, TreeView, and TrailView re-running on every proxy write — the effects tracked proxy signal sources when reading `plugin.settings.views.*` to initialise local settings state, creating a feedback loop with the write-back `$effect`. Wrapped the snapshot call in `untrack()` so `$effect.pre` only re-runs when the `plugin` prop itself changes.
+* Fix `lifecycle_double_unmount` error — concurrent `REDRAW_SIDE_VIEWS` events caused multiple `onOpen()` calls to race; both saw the same live component and both tried to unmount it. Debounced the event-driven `onOpen()` calls (100 ms trailing) so burst events collapse to a single remount.
+* Fix Matrix and Tree side views remounting on every graph update or active-leaf change — debounced `REDRAW_SIDE_VIEWS` handler collapses rapid-fire workspace events into one remount per burst.
+* Fix codeblock fatal-error log entries showing unexpandable `{…}` objects in the Obsidian developer console — errors are now logged as a formatted plain-text string with one line per error.
+
 ### [4.8.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.8.1...4.8.2) (2026-05-03)
 
 ### Bug Fixes

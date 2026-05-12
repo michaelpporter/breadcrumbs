@@ -68,7 +68,10 @@ export class CodeblockMDRC extends MarkdownRenderChild {
 		log.debug(timer_inner.elapsedMessage("Codeblocks.parse_source", true));
 
 		if (!parsed) {
-			log.warn("fatal codeblock errors", errors);
+			log.warn(
+				"fatal codeblock errors\n" +
+				errors.map((e) => `  [${e.code}] ${e.path}: ${e.message}`).join("\n"),
+			);
 
 			mount(CodeblockErrors, {
 				target: this.containerEl,
