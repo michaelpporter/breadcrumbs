@@ -17,8 +17,11 @@
 	}: Props = $props();
 
 	const tick_sa = effect_counter("ShowAttributesSettingItem");
+	let prev_sa: EdgeAttribute[] | undefined;
 	$effect(() => {
 		tick_sa();
+		if (show_attributes === prev_sa) return;
+		prev_sa = show_attributes;
 		if (show_attributes) {
 			select_cb(show_attributes);
 		}

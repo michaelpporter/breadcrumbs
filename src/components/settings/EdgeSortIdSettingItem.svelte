@@ -12,8 +12,11 @@
 	let { edge_sort_id = $bindable(), select_cb = () => {} }: Props = $props();
 
 	const tick_esi = effect_counter("EdgeSortIdSettingItem");
+	let prev_esi: EdgeSortId | undefined;
 	$effect(() => {
 		tick_esi();
+		if (edge_sort_id === prev_esi) return;
+		prev_esi = edge_sort_id;
 		if (edge_sort_id) {
 			select_cb(edge_sort_id);
 		}

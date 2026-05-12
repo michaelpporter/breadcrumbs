@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.3-beta.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.5...4.9.3-beta.6) (2026-05-12)
+
+### Bug Fixes
+
+* Fix the Windows Settings-tab freeze (`effect_update_depth_exceeded` + ~38s click hang). Three settings sub-components — `ShowAttributesSettingItem`, `EdgeSortIdSettingItem`, `FieldGroupLabelsSettingItem` — had a `$effect` that watched a `$bindable` prop and invoked `select_cb(value)` on every read. The callback writes back into `plugin.settings.X`, which re-notifies the same `$bindable` prop (Svelte 5 deep proxies fire on any property assignment, even with an identical reference), re-runs the effect, and so on until Svelte's update-depth limit triggers. Each iteration awaits an async `saveData` disk write, which is why the hang stretched to ~38s. Each effect now caches the previously-emitted value and skips the callback when the prop reads back as the same reference, breaking the cycle.
+
 ### [4.9.3-beta.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.4...4.9.3-beta.5) (2026-05-12)
 
 ### Diagnostics
