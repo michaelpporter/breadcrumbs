@@ -46,7 +46,12 @@ jobs:
               run: |
                   tag="${GITHUB_REF#refs/tags/}"
 
+                  prerelease_flag=""
+                  if [[ "$tag" == *beta* ]]; then
+                    prerelease_flag="--prerelease"
+                  fi
+
                   gh release create "$tag" \
                     --title="$tag" \
-                    --prerelease \
+                    $prerelease_flag \
                     main.js manifest.json styles.css
