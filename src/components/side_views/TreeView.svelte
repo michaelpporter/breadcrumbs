@@ -105,7 +105,9 @@
 	let active_file = $derived($active_file_store);
 
 	let depth = $state(0);
+	const tick_tree_depth = effect_counter("TreeView.depth");
 	$effect(() => {
+		tick_tree_depth();
 		depth = settings.default_depth;
 	});
 
@@ -127,7 +129,9 @@
 	);
 
 	let root_open = $state(true);
+	const tick_tree_root_open = effect_counter("TreeView.root_open");
 	$effect(() => {
+		tick_tree_root_open();
 		root_open = !settings.collapse;
 	});
 

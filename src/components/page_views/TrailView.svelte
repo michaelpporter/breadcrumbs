@@ -38,7 +38,9 @@
 		}
 	});
 
+	const tick_trail_log = effect_counter("TrailView.log");
 	$effect(() => {
+		tick_trail_log();
 		log.debug("Rendering Trail page view for file:", file_path);
 	});
 
@@ -90,7 +92,9 @@
 		Math.max(0, data.selected_paths?.max_depth() ?? 0),
 	);
 	let depth = $state(0);
+	const tick_trail_depth = effect_counter("TrailView.depth");
 	$effect(() => {
+		tick_trail_depth();
 		depth = Math.min(MAX_DEPTH, settings.default_depth);
 	});
 

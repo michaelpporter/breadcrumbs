@@ -32,23 +32,26 @@ export function perf_sync<T>(label: string, fn: () => T): T {
 	}
 }
 
-export function effect_counter(label: string, threshold = 50) {
+const EFFECT_LOG_THRESHOLDS = [1, 10, 50, 200, 1000];
+
+export function effect_counter(label: string) {
 	let count = 0;
-	let warned = false;
-	let window_start = 0;
+	let idx = 0;
 	return () => {
-		const now = performance.now();
-		if (now - window_start > 250) {
-			window_start = now;
-			count = 0;
-			warned = false;
-		}
 		count++;
-		if (!warned && count > threshold) {
-			warned = true;
-			log.error(
-				`effect-storm: "${label}" ran ${count}x in <250ms — likely reactive loop`,
-			);
+		while (
+			idx < EFFECT_LOG_THRESHOLDS.length &&
+			count >= EFFECT_LOG_THRESHOLDS[idx]
+		) {
+			const threshold = EFFECT_LOG_THRESHOLDS[idx];
+			idx++;
+			if (threshold === 1) {
+				log.debug(`effect-tick "${label}" first-run`);
+			} else {
+				log.error(
+					`effect-storm "${label}" reached ${threshold} runs — likely reactive loop`,
+				);
+			}
 		}
 	};
 }

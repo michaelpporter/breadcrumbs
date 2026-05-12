@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.3-beta.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.4...4.9.3-beta.5) (2026-05-12)
+
+### Diagnostics
+
+* Rework `effect_counter` to track cumulative runs (no 250ms reset window) and log at thresholds 1/10/50/200/1000. Beta.4's window-based counter missed slow loops — the 38-second hang on Windows ran ~2 iterations/second, never hitting 50 in any 250ms window. Also extend coverage to remaining $effects in `TrailView.log`, `TrailView.depth`, `TreeView.depth`, `TreeView.root_open`, `LockViewButton`, `RenderMarkdown`.
+
 ### [4.9.3-beta.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.3...4.9.3-beta.4) (2026-05-12)
 
 ### Diagnostics
