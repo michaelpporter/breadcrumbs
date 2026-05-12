@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.3-beta.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3-beta.2) (2026-05-12)
+
+### Bug Fixes
+
+* Fix settings tab freezing Obsidian on Windows in 4.9.2 — the `reactive_settings.current` getter assigned to its own `$state` variable when read before init, which Svelte 5 detected as a derivation self-mutating its own dependency and looped to `effect_update_depth_exceeded`. The store now initialises `_settings` eagerly with `DEFAULT_SETTINGS` so the getter is a pure read and `init()` simply swaps in the real settings.
+
 ### [4.9.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.1...4.9.2) (2026-05-12)
 
 ### Bug Fixes
