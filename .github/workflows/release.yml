@@ -30,6 +30,9 @@ jobs:
             - name: Set stable
               run: cd wasm && rustup override set stable && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu && cd ..
 
+            - name: Install wasm-bindgen-cli
+              run: cargo install wasm-bindgen-cli --version 0.2.100 --locked
+
             - name: Build plugin
               run: |
                   bun install
