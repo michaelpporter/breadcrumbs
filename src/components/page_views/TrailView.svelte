@@ -12,6 +12,7 @@
 	import { untrack } from "svelte";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
+	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -42,8 +43,10 @@
 	});
 
 	let is_initial_mount = true;
+	const tick_trail_writeback = effect_counter("TrailView.writeback");
 
 	$effect(() => {
+		tick_trail_writeback();
 		const trail_snapshot = $state.snapshot(settings);
 		untrack(() => {
 			plugin.settings.views.page.trail = trail_snapshot;

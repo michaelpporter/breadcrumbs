@@ -22,6 +22,7 @@
 		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { untrack } from "svelte";
+	import { effect_counter } from "src/utils/perf";
 	import { to_node_stringify_options } from "src/graph/utils";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
@@ -70,7 +71,9 @@
 		}
 	});
 
+	const tick_tree_writeback = effect_counter("TreeView.writeback");
 	$effect(() => {
+		tick_tree_writeback();
 		const tree_snapshot = $state.snapshot(settings);
 		untrack(() => {
 			plugin.settings.views.side.tree = tree_snapshot;

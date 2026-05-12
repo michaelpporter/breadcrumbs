@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.3-beta.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.2...4.9.3-beta.3) (2026-05-12)
+
+### Diagnostics
+
+* Add gated perf marks and reactive-loop counters around the Settings tab (per-section timings, mount durations, `effect-storm` warnings on TrailView/Matrix/TreeView/TransitiveImpliedRelations/NestedEdgeList) to diagnose the remaining few-second Settings-open freeze on Windows. Active only when `debug.level` is set to `DEBUG`; no effect at default log level.
+
 ### [4.9.3-beta.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3-beta.2) (2026-05-12)
 
 ### Bug Fixes
