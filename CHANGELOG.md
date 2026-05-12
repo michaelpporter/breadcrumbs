@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.1...4.9.2) (2026-05-12)
+
+### Bug Fixes
+
+* Fix [#686](https://github.com/SkepticMystic/breadcrumbs/issues/686) — opening the Breadcrumbs settings tab on some Android/Windows installs could freeze Obsidian's settings modal. The settings tab now wraps its render in a try/catch, logs the underlying error to the developer console, and shows a recoverable fallback UI with a "Reload settings" button instead of bricking the modal. Also serialised Svelte component teardown so `containerEl.empty()` no longer races pending `unmount()` promises, and `reactive_settings.current` falls back to defaults (with a warning) if read before init.
+
 ### [4.9.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.0...4.9.1) (2026-05-11)
 
 ### Bug Fixes

@@ -1,5 +1,6 @@
 import type { App } from "obsidian";
-import { PluginSettingTab } from "obsidian";
+import { Notice, PluginSettingTab } from "obsidian";
+import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { mount, unmount } from "svelte";
 import EdgeFieldSettings from "../components/settings/EdgeFieldSettings.svelte";
@@ -60,13 +61,50 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl, plugin } = this;
 
-		for (const c of this.components) void unmount(c);
+		const old_components = this.components;
 		this.components = [];
 
-		containerEl.empty();
+		void Promise.all(old_components.map((c) => unmount(c))).catch(
+			(error) => {
+				log.error("BreadcrumbsSettingTab.unmount threw >", error);
+			},
+		);
 
+		containerEl.empty();
 		containerEl.addClass("BC-settings-tab");
 
+		try {
+			this._build(containerEl, plugin);
+		} catch (error) {
+			log.error("BreadcrumbsSettingTab.display threw >", error);
+			new Notice(
+				"Breadcrumbs: failed to render settings tab. See developer console and report at https://github.com/SkepticMystic/breadcrumbs/issues",
+			);
+
+			containerEl.empty();
+			containerEl.addClass("BC-settings-tab");
+
+			const fallback = containerEl.createDiv({ cls: "p-4" });
+			fallback.createEl("h3", {
+				text: "Breadcrumbs settings failed to load",
+			});
+			fallback.createEl("p", {
+				text: String(
+					(error as Error)?.stack ??
+						(error as Error)?.message ??
+						error,
+				),
+				cls: "text-muted",
+			});
+
+			const retry = fallback.createEl("button", {
+				text: "Reload settings",
+			});
+			retry.onclick = () => this.display();
+		}
+	}
+
+	private _build(containerEl: HTMLElement, plugin: BreadcrumbsPlugin): void {
 		this.components.push(
 			mount(EdgeFieldSettings, {
 				props: { plugin },
@@ -215,7 +253,13 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	hide() {
 		void this.plugin.flushPendingSettings();
 
-		for (const c of this.components) void unmount(c);
+		const old_components = this.components;
 		this.components = [];
+
+		void Promise.all(old_components.map((c) => unmount(c))).catch(
+			(error) => {
+				log.error("BreadcrumbsSettingTab.unmount threw >", error);
+			},
+		);
 	}
 }
