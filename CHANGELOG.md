@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.3-beta.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.3...4.9.3-beta.4) (2026-05-12)
+
+### Diagnostics
+
+* Extend reactive-loop counters to the four settings sub-components most likely to fire on tab open (`MatrixFieldOrderSettingItem`, `FieldGroupLabelsSettingItem`, `ShowAttributesSettingItem`, `EdgeSortIdSettingItem`) plus `ShowAttributesSelectorMenu.strip`. Beta.3 timings showed `SettingsTab.display` completed in 27ms but the `effect_update_depth_exceeded` error still fired on the next microtask, so the looping `$effect` lives in a sub-component that beta.3 did not instrument.
+
 ### [4.9.3-beta.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.2...4.9.3-beta.3) (2026-05-12)
 
 ### Diagnostics

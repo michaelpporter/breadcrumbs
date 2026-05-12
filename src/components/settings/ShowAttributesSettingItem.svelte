@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { EdgeAttribute } from "src/graph/utils";
+	import { effect_counter } from "src/utils/perf";
 	import ShowAttributesSelectorMenu from "../selector/ShowAttributesSelectorMenu.svelte";
 	import SettingItem from "./SettingItem.svelte";
 
@@ -15,7 +16,9 @@
 		select_cb = () => {},
 	}: Props = $props();
 
+	const tick_sa = effect_counter("ShowAttributesSettingItem");
 	$effect(() => {
+		tick_sa();
 		if (show_attributes) {
 			select_cb(show_attributes);
 		}

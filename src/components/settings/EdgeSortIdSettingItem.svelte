@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type EdgeSortId } from "src/const/graph";
+	import { effect_counter } from "src/utils/perf";
 	import EdgeSortIdSelector from "../selector/EdgeSortIdSelector.svelte";
 	import SettingItem from "./SettingItem.svelte";
 
@@ -10,7 +11,9 @@
 
 	let { edge_sort_id = $bindable(), select_cb = () => {} }: Props = $props();
 
+	const tick_esi = effect_counter("EdgeSortIdSettingItem");
 	$effect(() => {
+		tick_esi();
 		if (edge_sort_id) {
 			select_cb(edge_sort_id);
 		}
