@@ -25,7 +25,18 @@ Outputs to /styles.css, for Obsidian to use.
  * Unpinned page views live inside .cm-scroller (scroll with note, #660).
  * BC-page-views is injected as first child; force it to a full-width row so it
  * sits above .cm-sizer in the scroller's flex layout (row or column).
+ *
+ * Default Obsidian scroller is flex-direction: row (gutters | sizer). Without
+ * wrap, BC-page-views becomes a third flex child sitting beside .cm-sizer
+ * (left column with crumbs, right column with note). Enable wrap only when
+ * banners-reloaded is NOT active — banner-active path flips the scroller to
+ * column where wrap is a no-op and has its own width overrides below.
  */
+.cm-scroller.BC-cm-scroller-inline-page-views:not(.banner-view-active) {
+	flex-wrap: wrap;
+	align-content: flex-start;
+}
+
 .cm-scroller.BC-cm-scroller-inline-page-views > .BC-page-views {
 	box-sizing: border-box;
 	width: 100%;
@@ -59,7 +70,9 @@ Outputs to /styles.css, for Obsidian to use.
 	margin-right: auto;
 }
 
-.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .banner-image {
+/* Always pull .banner-image out of flex flow — even without .banner-view-active
+ * the element can still exist as a scroller child and consume a flex column. */
+.cm-scroller.BC-cm-scroller-inline-page-views > .banner-image {
 	position: absolute;
 	pointer-events: none;
 }
@@ -101,7 +114,7 @@ Outputs to /styles.css, for Obsidian to use.
 }
 
 .markdown-source-view.is-readable-line-width
-	.cm-scroller.BC-cm-scroller-inline-page-views
+	.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active
 	> .BC-page-views {
 	max-width: 700px;
 	margin-left: auto;
