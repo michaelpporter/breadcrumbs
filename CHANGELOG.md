@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3...4.9.4) (2026-05-13)
+
+### Bug Fixes
+
+* Fix inline page views (`.BC-page-views`) being pushed off-viewport when the Banners Reloaded plugin is active. Banners Reloaded flips `.cm-scroller` to `flex-direction: column` and applies negative horizontal margins to `.banner-wrapper`, which inflates `scrollWidth` and causes CodeMirror to assign an oversized inline width to `.cm-sizer`. Forced `.BC-page-views` to a full-width row so it stacks above `.cm-sizer` in either flex direction; when `.banner-view-active` is present, hide gutters, neutralize banner-wrapper negative margins, override CM's inline `cm-sizer` width, and absolute-position `.banner-image` so it doesn't push layout. With Obsidian's readable line width enabled, cap `cm-sizer` and unpinned `.BC-page-views` at 700px and center them.
+
 ### [4.9.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3) (2026-05-12)
 
 ### Bug Fixes
