@@ -25,15 +25,7 @@ Outputs to /styles.css, for Obsidian to use.
  * Unpinned page views live inside .cm-scroller (scroll with note, #660).
  * BC-page-views is injected as first child; force it to a full-width row so it
  * sits above .cm-sizer in the scroller's flex layout (row or column).
- * Default Obsidian scroller is flex-direction: row, so wrap is required for
- * BC-page-views to break onto its own line above .cm-sizer; banners-reloaded
- * switches the scroller to column where wrap is a no-op.
  */
-.cm-scroller.BC-cm-scroller-inline-page-views {
-	flex-wrap: wrap;
-	align-content: flex-start;
-}
-
 .cm-scroller.BC-cm-scroller-inline-page-views > .BC-page-views {
 	box-sizing: border-box;
 	width: 100%;
