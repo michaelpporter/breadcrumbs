@@ -23,19 +23,45 @@ Outputs to /styles.css, for Obsidian to use.
 
 /*
  * Unpinned page views live inside .cm-scroller (scroll with note, #660).
- * The scroller is a horizontal flex (gutters | content); without wrap, the
- * trail sits in a narrow column. Wrap and force a full-width row for .BC-page-views.
+ * BC-page-views is injected as first child; force it to a full-width row so it
+ * sits above .cm-sizer in the scroller's flex layout (row or column).
  */
-.cm-scroller.BC-cm-scroller-inline-page-views {
-	flex-wrap: wrap;
-	align-content: flex-start;
-}
-
 .cm-scroller.BC-cm-scroller-inline-page-views > .BC-page-views {
 	box-sizing: border-box;
-	flex: 0 0 100%;
 	width: 100%;
 	max-width: 100%;
+	flex: 0 0 auto;
+	align-self: stretch;
+}
+
+/*
+ * banners-reloaded compat. It flips .cm-scroller to flex-direction: column and
+ * gives .banner-wrapper negative horizontal margins (width: 100% + 2*banner-x).
+ * That inflates scrollWidth, so CodeMirror assigns an oversized inline pixel
+ * width to .cm-sizer and the sizer ends up off-viewport to the right.
+ * Neutralize the negative margins, then override CM's inline width.
+ */
+.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .cm-gutters {
+	display: none;
+}
+
+.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .banner-wrapper {
+	width: 100% !important;
+	max-width: 100%;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .cm-sizer {
+	width: 100% !important;
+	max-width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .banner-image {
+	position: absolute;
+	pointer-events: none;
 }
 
 /* Pinned strip is a sibling before .cm-editor — block-level full width */
@@ -60,6 +86,23 @@ Outputs to /styles.css, for Obsidian to use.
 /* Readable line length OFF + sticky ON: cap pinned strip at 700px so it
  * doesn't span full editor width. */
 .markdown-source-view:not(.is-readable-line-width) > .BC-page-views.BC-page-views-sticky {
+	max-width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Readable line length ON + banners-reloaded + BC sticky=false:
+ * cap and center the cm-sizer and the unpinned BC trail so note content
+ * doesn't hug the left edge under the full-width banner. */
+.markdown-source-view.is-readable-line-width
+	.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active
+	> .cm-sizer {
+	max-width: 700px;
+}
+
+.markdown-source-view.is-readable-line-width
+	.cm-scroller.BC-cm-scroller-inline-page-views
+	> .BC-page-views {
 	max-width: 700px;
 	margin-left: auto;
 	margin-right: auto;
