@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.4...4.9.5) (2026-05-13)
+
+### Bug Fixes
+
+* Fix inline `.BC-page-views` rendering as a left column beside `.cm-sizer` (instead of stacking above it) when the Banners Reloaded plugin is **not** active on the current note. 4.9.4 removed `flex-wrap` from `.cm-scroller.BC-cm-scroller-inline-page-views`; default Obsidian uses `flex-direction: row`, so without wrap `.BC-page-views` became a flex sibling of `.cm-sizer`. Two follow-on issues blocked the wrap from taking effect:
+  - `.banner-image` is injected as a scroller child by Banners Reloaded even when no banner is set on the note (no `.banner-view-active` class), consuming a flex column. The absolute-position rule on `.banner-image` is now ungated so it is always pulled out of flex flow.
+  - The readable-line-width cap of 700px on `> .BC-page-views` applied in default Obsidian too, holding the trail at 700px inside a wide row so `.cm-sizer` still fit beside it. That cap is now scoped to `.banner-view-active` where it was intended.
+  - `flex-wrap` is re-enabled on the scroller only when `.banner-view-active` is absent, so Banners Reloaded's column layout remains untouched.
+
 ### [4.9.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3...4.9.4) (2026-05-13)
 
 ### Bug Fixes
