@@ -198,8 +198,8 @@ export const _add_explicit_edges_johnny_decimal_note: ExplicitEdgeBuilder = (
 				for (let j = i + 1; j < siblings.length; j++) {
 					results.edges.push(
 						new GCEdgeData(
-							siblings[i]!.path,
-							siblings[j]!.path,
+							siblings[i].path,
+							siblings[j].path,
 							sibling_field,
 							"johnny_decimal_note",
 						),

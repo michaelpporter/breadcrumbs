@@ -1,6 +1,6 @@
 import type {WorkspaceLeaf, Menu, TAbstractFile} from "obsidian";
-import {    TFolder } from "obsidian";
 import type { Debouncer } from "obsidian";
+import {    TFolder } from "obsidian";
 import { debounce, Events, Notice, Plugin, TFile } from "obsidian";
 import { DEFAULT_SETTINGS } from "src/const/settings";
 import { VIEW_IDS } from "src/const/views";

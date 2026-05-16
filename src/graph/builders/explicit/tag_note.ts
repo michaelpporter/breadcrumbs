@@ -224,8 +224,8 @@ export const _add_explicit_edges_tag_note: ExplicitEdgeBuilder = (
 				for (let j = i + 1; j < target_paths.length; j++) {
 					results.edges.push(
 						new GCEdgeData(
-							target_paths[i]!,
-							target_paths[j]!,
+							target_paths[i],
+							target_paths[j],
 							tag_note.sibling_field,
 							"tag_note",
 						),
