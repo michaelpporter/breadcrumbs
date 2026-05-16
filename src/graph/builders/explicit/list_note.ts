@@ -61,8 +61,7 @@ const get_list_note_info = (
 		}
 	}
 
-	// TODO: Doesn't this just do what BC-ignore-out-edges does?
-	// UPDATE: No, list-note-exclude-index ignores-out-edges, but _only for list-notes_
+	// list-note-exclude-index ignores out-edges, but _only for list-notes_
 	const exclude_index = Boolean(
 		metadata[META_ALIAS["list-note-exclude-index"]],
 	);
