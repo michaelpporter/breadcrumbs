@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.7](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.6...4.9.7) (2026-05-16)
+
+### Features
+
+* Wire up the **Rebuild Graph → on note save** trigger. The setting had a toggle but no event handler, so enabling it did nothing. A `metadataCache` `changed` listener now rebuilds the graph when the toggle is on, debounced (~1.5s) via the existing `rebuildGraphDebounced` so rapid edits collapse into a single rebuild.
+
+### Code Refactoring
+
+* Differentiate edge-field errors from malformed-value errors. Added an `invalid_edge_field` error code distinct from `invalid_field_value`: the former flags a value naming an unregistered BC edge-field, the latter a malformed metadata value. Applied across the explicit edge builders (`dataview_note`, `dendron_note`, `folder_note`, `johnny_decimal_note`, `list_note`, `regex_note`, `tag_note`).
+
+### Chores
+
+* Remove a stale TODO in the `list_note` builder that was already answered by its own follow-up comment.
+
 ### [4.9.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.5...4.9.6) (2026-05-16)
 
 ### Chores
