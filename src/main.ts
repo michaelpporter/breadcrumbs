@@ -272,6 +272,20 @@ export default class BreadcrumbsPlugin extends Plugin {
 				}),
 			);
 
+			/// MetadataCache
+			this.registerEvent(
+				this.app.metadataCache.on("changed", (file) => {
+					log.debug("on:metadatacache-changed >", file.path);
+
+					if (
+						this.settings.commands.rebuild_graph.trigger
+							.note_save
+					) {
+						this.rebuildGraphDebounced();
+					}
+				}),
+			);
+
 			// Views
 			this.registerView(
 				VIEW_IDS.matrix,
