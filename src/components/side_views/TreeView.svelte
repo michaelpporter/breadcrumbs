@@ -22,10 +22,12 @@
 		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { untrack } from "svelte";
+	import { prepareFuzzySearch } from "obsidian";
 	import { effect_counter } from "src/utils/perf";
 	import { to_node_stringify_options } from "src/graph/utils";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
+	import SearchToggleButton from "../button/SearchToggleButton.svelte";
 
 	function walk_to_root(
 		graph: NoteGraph,
@@ -166,6 +168,48 @@
 	let node_stringify_options = $derived(
 		to_node_stringify_options(plugin.settings, settings.show_node_options),
 	);
+
+	let search_open = $state(false);
+	let search_query = $state("");
+
+	let visible_indices = $derived.by<Set<number> | null>(() => {
+		const query = search_query.trim();
+		const tree = sorted_tree.tree;
+		if (!query || !tree) return null;
+
+		const matcher = prepareFuzzySearch(query);
+		const visible = new Set<number>();
+
+		const walk = (index: number): boolean => {
+			const children = tree.children_at_index(index) ?? new Uint32Array();
+
+			let child_visible = false;
+			for (const child of children) {
+				if (walk(child)) child_visible = true;
+			}
+
+			const render_data = tree.rendering_obj_at_index(
+				index,
+				plugin.graph,
+				node_stringify_options,
+				[],
+			) as EdgeRenderingData | undefined;
+
+			const self_match = render_data
+				? matcher(render_data.link_display) !== null
+				: false;
+
+			if (self_match || child_visible) {
+				visible.add(index);
+				return true;
+			}
+			return false;
+		};
+
+		for (const entry of tree.entry_nodes) walk(entry);
+
+		return visible;
+	});
 </script>
 
 <div class="markdown-rendered BC-tree-view">
@@ -174,6 +218,11 @@
 			<RebuildGraphButton
 				cls="clickable-icon nav-action-button"
 				{plugin}
+			/>
+
+			<SearchToggleButton
+				cls="clickable-icon nav-action-button"
+				bind:active={search_open}
 			/>
 
 			<LockViewButton
@@ -238,9 +287,27 @@
 		</div>
 	</div>
 
+	{#if search_open}
+		<div class="search-input-container BC-search-input-container">
+			<!-- svelte-ignore a11y_autofocus -->
+			<input
+				type="search"
+				placeholder="Search notes..."
+				autofocus
+				bind:value={search_query}
+				onkeydown={(e) => {
+					if (e.key === "Escape") {
+						search_query = "";
+						search_open = false;
+					}
+				}}
+			/>
+		</div>
+	{/if}
+
 	<div class="BC-tree-view-items">
 		{#key sorted_tree}
-			{#if sorted_tree.tree && !sorted_tree.tree.is_empty()}
+			{#if sorted_tree.tree && !sorted_tree.tree.is_empty() && visible_indices?.size !== 0}
 				{#if entry_node_data && entry_path}
 					<details class="tree-item" bind:open={root_open}>
 						<summary class="tree-item-self is-clickable flex items-center">
@@ -262,10 +329,11 @@
 								<NestedEdgeList
 									{plugin}
 									{node_stringify_options}
+									{visible_indices}
 									show_attributes={settings.show_attributes}
 									data={sorted_tree.tree}
 									items={sorted_tree.tree.entry_nodes}
-									open_signal={!settings.collapse}
+									open_signal={visible_indices ? true : !settings.collapse}
 								/>
 							</div>
 						{/if}
@@ -274,10 +342,11 @@
 					<NestedEdgeList
 						{plugin}
 						{node_stringify_options}
+						{visible_indices}
 						show_attributes={settings.show_attributes}
 						data={sorted_tree.tree}
 						items={sorted_tree.tree.entry_nodes}
-						open_signal={!settings.collapse}
+						open_signal={visible_indices ? true : !settings.collapse}
 					/>
 				{/if}
 			{:else}

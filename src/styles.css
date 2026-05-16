@@ -142,3 +142,11 @@ Outputs to /styles.css, for Obsidian to use.
 .BC-field.pl-2 {
 	padding-right: 0.5rem;
 }
+
+.BC-search-input-container {
+	padding: var(--size-2-2) var(--size-4-2);
+}
+
+.BC-search-input-container input[type="search"] {
+	width: 100%;
+}
