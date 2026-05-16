@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.5...4.9.6) (2026-05-16)
+
+### Chores
+
+* Clear all 15 ESLint warnings (0 errors) so `bun run lint` passes under `--max-warnings=0`. Dropped redundant non-null assertions in the sibling-edge builders (`dendron_note`, `johnny_decimal_note`, `tag_note`), fixed import ordering in `main.ts`/`SettingsTab.ts`/`obsidian.ts`, and replaced an `app.plugins` `any` cast with a typed `AppWithPlugins` shim. No runtime behavior change.
+
 ### [4.9.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.4...4.9.5) (2026-05-13)
 
 ### Bug Fixes
