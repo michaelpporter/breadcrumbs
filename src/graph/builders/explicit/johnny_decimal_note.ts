@@ -36,7 +36,7 @@ const get_johnny_decimal_note_info = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `johnny-decimal-note-field is not a valid BC field: '${field}'`,
 		});
 	}

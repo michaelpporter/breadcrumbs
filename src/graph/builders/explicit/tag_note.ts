@@ -64,7 +64,7 @@ const get_tag_note_info = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `tag-note-field is not a valid BC field: '${field}'`,
 		});
 	}
@@ -88,7 +88,7 @@ const get_tag_note_info = (
 		) {
 			return graph_build_fail({
 				path,
-				code: "invalid_field_value",
+				code: "invalid_edge_field",
 				message: `tag-note-sibling-field is not a valid BC field: '${raw_sibling_field}'`,
 			});
 		}

@@ -32,7 +32,7 @@ const get_list_note_info = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `list-note-field is not a valid BC field: '${field}'`,
 		});
 	}
@@ -55,7 +55,7 @@ const get_list_note_info = (
 		) {
 			return graph_build_fail({
 				path,
-				code: "invalid_field_value",
+				code: "invalid_edge_field",
 				message: `list-note-neighbour-field is not a valid BC field: '${neighbour_field}'`,
 			});
 		}
@@ -93,7 +93,7 @@ const resolve_field_override = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `Field override is not a valid BC field: ${field}. Line: ${list_item.position.start.line}`,
 		});
 	} else {
