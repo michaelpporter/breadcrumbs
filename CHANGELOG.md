@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.10.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.10.0...4.10.1) (2026-05-18)
+
+### Chores
+
+* Fix Obsidian community plugin validator warnings: remove `!important` from Banner-compat CSS rules (increase selector specificity with `:root` prefix instead), add trailing punctuation to plugin description, point `authorUrl` to author profile rather than plugin repo, replace deprecated `builtin-modules` package with Node's built-in `module.builtinModules`, and replace `npm-run-all` with the maintained `npm-run-all2` fork.
+
 ### [4.10.0](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.7...4.10.0) (2026-05-18)
 
 ### Features

@@ -1,4 +1,4 @@
-import builtins from "builtin-modules";
+import { builtinModules as builtins } from "module";
 import esbuild from "esbuild";
 import esbuildSvelte from "esbuild-svelte";
 import process from "process";

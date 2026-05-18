@@ -56,15 +56,15 @@ Outputs to /styles.css, for Obsidian to use.
 	display: none;
 }
 
-.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .banner-wrapper {
-	width: 100% !important;
+:root .cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .banner-wrapper {
+	width: 100%;
 	max-width: 100%;
-	margin-left: 0 !important;
-	margin-right: 0 !important;
+	margin-left: 0;
+	margin-right: 0;
 }
 
-.cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .cm-sizer {
-	width: 100% !important;
+:root .cm-scroller.BC-cm-scroller-inline-page-views.banner-view-active > .cm-sizer {
+	width: 100%;
 	max-width: 100%;
 	margin-left: auto;
 	margin-right: auto;
