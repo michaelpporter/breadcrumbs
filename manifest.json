@@ -7,5 +7,6 @@
 	"authorUrl": "https://github.com/SkepticMystic",
 	"fundingUrl": "https://github.com/SkepticMystic/breadcrumbs#donations",
 	"helpUrl": "https://breadcrumbs-docs.michaelpporter.com",
-	"isDesktopOnly": false
+	"isDesktopOnly": false,
+	"version": "4.10.2"
 }
