@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.10.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.10.1...4.10.2) (2026-05-18)
+
+### Bug Fixes
+
+* Fix missing `version` field in `manifest.json`, which caused `"undefined"` to be recorded as the 4.10.1 version key in `versions.json`.
+
 ### [4.10.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.10.0...4.10.1) (2026-05-18)
 
 ### Chores
