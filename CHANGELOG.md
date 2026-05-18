@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.10.0](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.7...4.10.0) (2026-05-18)
+
+### Features
+
+* Add a search box to the Tree and Matrix side views, filtering displayed notes by title ([#691](https://github.com/SkepticMystic/breadcrumbs/pull/691)).
+
+### Chores
+
+* Enhance multi-parent display functionality ([#683](https://github.com/SkepticMystic/breadcrumbs/pull/683)).
+
 ### [4.9.7](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.6...4.9.7) (2026-05-16)
 
 ### Features
