@@ -64,7 +64,7 @@ const get_tag_note_info = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `tag-note-field is not a valid BC field: '${field}'`,
 		});
 	}
@@ -88,7 +88,7 @@ const get_tag_note_info = (
 		) {
 			return graph_build_fail({
 				path,
-				code: "invalid_field_value",
+				code: "invalid_edge_field",
 				message: `tag-note-sibling-field is not a valid BC field: '${raw_sibling_field}'`,
 			});
 		}
@@ -224,8 +224,8 @@ export const _add_explicit_edges_tag_note: ExplicitEdgeBuilder = (
 				for (let j = i + 1; j < target_paths.length; j++) {
 					results.edges.push(
 						new GCEdgeData(
-							target_paths[i]!,
-							target_paths[j]!,
+							target_paths[i],
+							target_paths[j],
 							tag_note.sibling_field,
 							"tag_note",
 						),

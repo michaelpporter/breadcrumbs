@@ -12,6 +12,7 @@
 	import { untrack } from "svelte";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
+	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -32,21 +33,26 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				$state.snapshot(plugin.settings.views.page.trail),
+				untrack(() => $state.snapshot(plugin.settings.views.page.trail)),
 			);
 		}
 	});
 
+	const tick_trail_log = effect_counter("TrailView.log");
 	$effect(() => {
+		tick_trail_log();
 		log.debug("Rendering Trail page view for file:", file_path);
 	});
 
 	let is_initial_mount = true;
+	const tick_trail_writeback = effect_counter("TrailView.writeback");
 
 	$effect(() => {
-		// Keep `plugin.settings.views.page.trail` aligned with the local `settings`
-		// clone (same pattern as Matrix). Skip persisting on the first run only.
-		plugin.settings.views.page.trail = $state.snapshot(settings);
+		tick_trail_writeback();
+		const trail_snapshot = $state.snapshot(settings);
+		untrack(() => {
+			plugin.settings.views.page.trail = trail_snapshot;
+		});
 		if (is_initial_mount) {
 			is_initial_mount = false;
 		} else {
@@ -86,7 +92,9 @@
 		Math.max(0, data.selected_paths?.max_depth() ?? 0),
 	);
 	let depth = $state(0);
+	const tick_trail_depth = effect_counter("TrailView.depth");
 	$effect(() => {
+		tick_trail_depth();
 		depth = Math.min(MAX_DEPTH, settings.default_depth);
 	});
 

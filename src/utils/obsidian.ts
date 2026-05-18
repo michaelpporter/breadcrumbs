@@ -1,23 +1,27 @@
 import type { App } from "obsidian";
 import { Notice, TFile } from "obsidian";
+import { log } from "src/logger";
+import { Links } from "./links";
+import { Paths } from "./paths";
 
 interface NotebookNavigatorPlugin {
 	reveal: (file: TFile) => Promise<boolean>;
 }
 
+type AppWithPlugins = App & {
+	plugins?: { getPlugin: (id: string) => unknown };
+};
+
 export const reveal_in_notebook_navigator = async (
 	app: App,
 	file: TFile,
 ): Promise<void> => {
-	const nn = (app as any).plugins?.getPlugin(
+	const nn = (app as AppWithPlugins).plugins?.getPlugin(
 		"notebook-navigator",
 	) as NotebookNavigatorPlugin | null;
 	if (!nn?.reveal) return;
 	await nn.reveal(file);
 };
-import { log } from "src/logger";
-import { Links } from "./links";
-import { Paths } from "./paths";
 
 /**
  * Try find a given target_path from a source_path. If not found, resolve_to_absolute_path.

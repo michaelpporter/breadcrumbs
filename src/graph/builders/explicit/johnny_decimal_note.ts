@@ -36,7 +36,7 @@ const get_johnny_decimal_note_info = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `johnny-decimal-note-field is not a valid BC field: '${field}'`,
 		});
 	}
@@ -198,8 +198,8 @@ export const _add_explicit_edges_johnny_decimal_note: ExplicitEdgeBuilder = (
 				for (let j = i + 1; j < siblings.length; j++) {
 					results.edges.push(
 						new GCEdgeData(
-							siblings[i]!.path,
-							siblings[j]!.path,
+							siblings[i].path,
+							siblings[j].path,
 							sibling_field,
 							"johnny_decimal_note",
 						),

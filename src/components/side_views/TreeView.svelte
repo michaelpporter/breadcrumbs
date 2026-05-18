@@ -22,6 +22,7 @@
 		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { untrack } from "svelte";
+	import { effect_counter } from "src/utils/perf";
 	import { to_node_stringify_options } from "src/graph/utils";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
@@ -79,14 +80,19 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				$state.snapshot(plugin.settings.views.side.tree),
+				untrack(() => $state.snapshot(plugin.settings.views.side.tree)),
 			);
 		}
 	});
 
+	const tick_tree_writeback = effect_counter("TreeView.writeback");
 	$effect(() => {
-		plugin.settings.views.side.tree = $state.snapshot(settings);
-		untrack(() => void plugin.saveSettings());
+		tick_tree_writeback();
+		const tree_snapshot = $state.snapshot(settings);
+		untrack(() => {
+			plugin.settings.views.side.tree = tree_snapshot;
+			void plugin.saveSettings();
+		});
 	});
 
 	let edge_field_labels = $derived(
@@ -113,7 +119,9 @@
 	let active_file = $derived($active_file_store);
 
 	let depth = $state(0);
+	const tick_tree_depth = effect_counter("TreeView.depth");
 	$effect(() => {
+		tick_tree_depth();
 		depth = settings.default_depth;
 	});
 
@@ -139,7 +147,9 @@
 	);
 
 	let root_open = $state(true);
+	const tick_tree_root_open = effect_counter("TreeView.root_open");
 	$effect(() => {
+		tick_tree_root_open();
 		root_open = !settings.collapse;
 	});
 

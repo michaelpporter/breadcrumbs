@@ -2,6 +2,7 @@
 	import { LockKeyholeIcon, LockKeyholeOpenIcon } from "lucide-svelte";
 	import { ICON_SIZE } from "src/const";
 	import { log } from "src/logger";
+	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
 		cls?: string;
@@ -12,7 +13,9 @@
 
 	let { cls = "", lock_view = $bindable(), lock_path = $bindable(), active_path }: Props = $props();
 
+	const tick_lock = effect_counter("LockViewButton");
 	$effect(() => {
+		tick_lock();
 		if (!lock_view && active_path) {
 			lock_path = active_path;
 		}

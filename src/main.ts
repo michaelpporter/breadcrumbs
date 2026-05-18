@@ -1,6 +1,7 @@
 import type {WorkspaceLeaf, Menu, TAbstractFile} from "obsidian";
+import type { Debouncer } from "obsidian";
 import {    TFolder } from "obsidian";
-import { Events, Notice, Plugin, TFile } from "obsidian";
+import { debounce, Events, Notice, Plugin, TFile } from "obsidian";
 import { DEFAULT_SETTINGS } from "src/const/settings";
 import { VIEW_IDS } from "src/const/views";
 import { rebuild_graph } from "src/graph/builders";
@@ -27,10 +28,11 @@ import { dataview_plugin } from "./external/dataview";
 import type { BreadcrumbsError } from "./interfaces/graph";
 import { log } from "./logger";
 import { migrate_old_settings } from "./settings/migration";
+import { reactive_settings } from "./stores/reactive_settings.svelte";
 import { EdgeFieldSuggestor } from "./suggestor/edge_fields";
 import { deep_merge_objects } from "./utils/objects";
 import { Timer } from "./utils/timer";
-import { redraw_page_views } from "./views/page";
+import { cleanup_page_views, redraw_page_views } from "./views/page";
 import { TreeView } from "./views/tree";
 
 export enum BCEvent {
@@ -41,10 +43,46 @@ export enum BCEvent {
 }
 
 export default class BreadcrumbsPlugin extends Plugin {
-	settings!: BreadcrumbsSettings;
+	get settings(): BreadcrumbsSettings {
+		return reactive_settings.current;
+	}
+	set settings(value: BreadcrumbsSettings) {
+		reactive_settings.init(value);
+	}
 	graph!: NoteGraph;
 	api!: BCAPI;
 	events!: Events;
+
+	private _save_debouncer: Debouncer<[], void> = debounce(
+		() => {
+			void this.saveSettings();
+		},
+		600,
+		true,
+	);
+
+	private _rebuild_debouncer: Debouncer<[], void> = debounce(
+		() => {
+			void this.rebuildGraph();
+		},
+		1500,
+		true,
+	);
+
+	saveSettingsDebounced() {
+		this._save_debouncer();
+	}
+
+	rebuildGraphDebounced() {
+		this._rebuild_debouncer();
+	}
+
+	async flushPendingSettings() {
+		this._save_debouncer.cancel();
+		this._rebuild_debouncer.cancel();
+		await this.saveSettings();
+		await this.rebuildGraph();
+	}
 
 	async onload() {
 		// Settings
@@ -53,7 +91,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 		await this.backup_old_settings();
 
 		/// Migrations
-		this.settings = migrate_old_settings(this.settings);
+		migrate_old_settings(this.settings);
 		await this.saveSettings();
 
 		// Logger
@@ -234,6 +272,20 @@ export default class BreadcrumbsPlugin extends Plugin {
 				}),
 			);
 
+			/// MetadataCache
+			this.registerEvent(
+				this.app.metadataCache.on("changed", (file) => {
+					log.debug("on:metadatacache-changed >", file.path);
+
+					if (
+						this.settings.commands.rebuild_graph.trigger
+							.note_save
+					) {
+						this.rebuildGraphDebounced();
+					}
+				}),
+			);
+
 			// Views
 			this.registerView(
 				VIEW_IDS.matrix,
@@ -265,7 +317,9 @@ export default class BreadcrumbsPlugin extends Plugin {
 		log.debug("loaded Breadcrumbs plugin");
 	}
 
-	onunload() {}
+	onunload() {
+		cleanup_page_views(this);
+	}
 
 	async loadSettings() {
 		this.settings = deep_merge_objects<BreadcrumbsSettings>(
@@ -285,9 +339,8 @@ export default class BreadcrumbsPlugin extends Plugin {
 	}
 
 	async saveSettings() {
-		this.settings.is_dirty = false;
-
-		await this.saveData(this.settings);
+		reactive_settings.current.is_dirty = false;
+		await this.saveData(reactive_settings.snapshot());
 	}
 
 	async backup_old_settings(): Promise<void> {

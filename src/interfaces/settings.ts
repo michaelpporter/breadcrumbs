@@ -176,7 +176,6 @@ export interface BreadcrumbsSettings {
 			notify: boolean;
 
 			trigger: {
-				// TODO: Not actually implemented yet
 				note_save: boolean;
 				layout_change: boolean;
 			};

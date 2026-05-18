@@ -14,6 +14,7 @@
 	import { untrack } from "svelte";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
+	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -34,19 +35,21 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				$state.snapshot(plugin.settings.views.side.matrix),
+				untrack(() => $state.snapshot(plugin.settings.views.side.matrix)),
 			);
 		}
 	});
 
 	let is_initial_mount = true;
+	const tick_matrix_writeback = effect_counter("Matrix.writeback");
 
 	$effect(() => {
-		plugin.settings.views.side.matrix = $state.snapshot(settings);
-		untrack(() => void plugin.saveSettings());
-		// We only want to run this when *we* have changed `settings`,
-		// and not when the component is initially mounted into the DOM,
-		// or when the settings have been updated externally.
+		tick_matrix_writeback();
+		const matrix_snapshot = $state.snapshot(settings);
+		untrack(() => {
+			plugin.settings.views.side.matrix = matrix_snapshot;
+			void plugin.saveSettings();
+		});
 		if (is_initial_mount) {
 			is_initial_mount = false;
 			return;

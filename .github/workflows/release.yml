@@ -24,8 +24,10 @@ jobs:
                   toolchain: stable
                   target: wasm32-unknown-unknown
 
-            - name: Install wasm-pack
-              run: bun install -g wasm-pack
+            - name: Install wasm-pack and wasm-bindgen-cli
+              run: |
+                  cargo install wasm-pack --locked
+                  cargo install wasm-bindgen-cli --version 0.2.100 --locked
 
             - name: Set stable
               run: cd wasm && rustup override set stable && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu && cd ..

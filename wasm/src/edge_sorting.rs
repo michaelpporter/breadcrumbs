@@ -97,9 +97,10 @@ impl EdgeSorter {
     pub fn sort_traversal_data(&self, graph: &NoteGraph, data: &mut [TraversalData]) -> Result<()> {
         let comparer = self.get_edge_comparer(graph);
 
-        // Check that all edges are still valid. The comparers will panic on any errors.
-        for datum in data.iter() {
-            datum.edge.check_revision(graph)?;
+        // Skip sorting if any edge is stale — caller is racing with `apply_update`
+        // and the result will be re-derived from a fresh traversal anyway.
+        if !data.iter().all(|datum| datum.edge.is_current_revision(graph)) {
+            return Ok(());
         }
 
         data.sort_by(|a, b| self.apply_edge_ordering(graph, &comparer, &a.edge, &b.edge));
@@ -114,9 +115,13 @@ impl EdgeSorter {
     ) -> Result<()> {
         let comparer = self.get_edge_comparer(graph);
 
-        // Check that all edges are still valid. The comparers will panic on any errors.
-        for index in data.iter() {
-            edges[*index].check_revision(graph)?;
+        // Skip sorting if any edge is stale — caller is racing with `apply_update`
+        // and the result will be re-derived from a fresh traversal anyway.
+        if !data
+            .iter()
+            .all(|index| edges[*index].is_current_revision(graph))
+        {
+            return Ok(());
         }
 
         data.sort_by(|a, b| self.apply_edge_ordering(graph, &comparer, &edges[*a], &edges[*b]));

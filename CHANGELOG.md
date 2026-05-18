@@ -4,6 +4,95 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.9.7](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.6...4.9.7) (2026-05-16)
+
+### Features
+
+* Wire up the **Rebuild Graph → on note save** trigger. The setting had a toggle but no event handler, so enabling it did nothing. A `metadataCache` `changed` listener now rebuilds the graph when the toggle is on, debounced (~1.5s) via the existing `rebuildGraphDebounced` so rapid edits collapse into a single rebuild.
+
+### Code Refactoring
+
+* Differentiate edge-field errors from malformed-value errors. Added an `invalid_edge_field` error code distinct from `invalid_field_value`: the former flags a value naming an unregistered BC edge-field, the latter a malformed metadata value. Applied across the explicit edge builders (`dataview_note`, `dendron_note`, `folder_note`, `johnny_decimal_note`, `list_note`, `regex_note`, `tag_note`).
+
+### Chores
+
+* Remove a stale TODO in the `list_note` builder that was already answered by its own follow-up comment.
+
+### [4.9.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.5...4.9.6) (2026-05-16)
+
+### Chores
+
+* Clear all 15 ESLint warnings (0 errors) so `bun run lint` passes under `--max-warnings=0`. Dropped redundant non-null assertions in the sibling-edge builders (`dendron_note`, `johnny_decimal_note`, `tag_note`), fixed import ordering in `main.ts`/`SettingsTab.ts`/`obsidian.ts`, and replaced an `app.plugins` `any` cast with a typed `AppWithPlugins` shim. No runtime behavior change.
+
+### [4.9.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.4...4.9.5) (2026-05-13)
+
+### Bug Fixes
+
+* Fix inline `.BC-page-views` rendering as a left column beside `.cm-sizer` (instead of stacking above it) when the Banners Reloaded plugin is **not** active on the current note. 4.9.4 removed `flex-wrap` from `.cm-scroller.BC-cm-scroller-inline-page-views`; default Obsidian uses `flex-direction: row`, so without wrap `.BC-page-views` became a flex sibling of `.cm-sizer`. Two follow-on issues blocked the wrap from taking effect:
+  - `.banner-image` is injected as a scroller child by Banners Reloaded even when no banner is set on the note (no `.banner-view-active` class), consuming a flex column. The absolute-position rule on `.banner-image` is now ungated so it is always pulled out of flex flow.
+  - The readable-line-width cap of 700px on `> .BC-page-views` applied in default Obsidian too, holding the trail at 700px inside a wide row so `.cm-sizer` still fit beside it. That cap is now scoped to `.banner-view-active` where it was intended.
+  - `flex-wrap` is re-enabled on the scroller only when `.banner-view-active` is absent, so Banners Reloaded's column layout remains untouched.
+
+### [4.9.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3...4.9.4) (2026-05-13)
+
+### Bug Fixes
+
+* Fix inline page views (`.BC-page-views`) being pushed off-viewport when the Banners Reloaded plugin is active. Banners Reloaded flips `.cm-scroller` to `flex-direction: column` and applies negative horizontal margins to `.banner-wrapper`, which inflates `scrollWidth` and causes CodeMirror to assign an oversized inline width to `.cm-sizer`. Forced `.BC-page-views` to a full-width row so it stacks above `.cm-sizer` in either flex direction; when `.banner-view-active` is present, hide gutters, neutralize banner-wrapper negative margins, override CM's inline `cm-sizer` width, and absolute-position `.banner-image` so it doesn't push layout. With Obsidian's readable line width enabled, cap `cm-sizer` and unpinned `.BC-page-views` at 700px and center them.
+
+### [4.9.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3) (2026-05-12)
+
+### Bug Fixes
+
+* Fix Settings tab freezing Obsidian on Windows in 4.9.2 — the freeze had two stacked causes. (1) `reactive_settings.current` assigned to its own `$state` variable when read before init, which Svelte 5 detected as a derivation self-mutating its own dependency. (2) Three settings sub-components (`ShowAttributesSettingItem`, `EdgeSortIdSettingItem`, `FieldGroupLabelsSettingItem`) had a `$effect` that watched a `$bindable` prop and called `select_cb(value)` on every read; the callback writes back into `plugin.settings.X`, which re-notifies the same `$bindable` (Svelte 5 deep proxies fire on any property assignment, even with an identical reference), re-runs the effect, and so on until `effect_update_depth_exceeded` triggered after ~38s of awaited `saveData` calls. The store now initialises eagerly with `DEFAULT_SETTINGS` and the three sub-components cache the previously-emitted value to skip self-triggered re-notifications.
+* Add gated perf marks (`debug.level` set to `DEBUG`) around `SettingsTab.display`, each section mount, and reactive-loop counters around the suspect `$effect` bodies. Active only at `DEBUG` log level so default users see nothing.
+
+### [4.9.3-beta.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.5...4.9.3-beta.6) (2026-05-12)
+
+### Bug Fixes
+
+* Fix the Windows Settings-tab freeze (`effect_update_depth_exceeded` + ~38s click hang). Three settings sub-components — `ShowAttributesSettingItem`, `EdgeSortIdSettingItem`, `FieldGroupLabelsSettingItem` — had a `$effect` that watched a `$bindable` prop and invoked `select_cb(value)` on every read. The callback writes back into `plugin.settings.X`, which re-notifies the same `$bindable` prop (Svelte 5 deep proxies fire on any property assignment, even with an identical reference), re-runs the effect, and so on until Svelte's update-depth limit triggers. Each iteration awaits an async `saveData` disk write, which is why the hang stretched to ~38s. Each effect now caches the previously-emitted value and skips the callback when the prop reads back as the same reference, breaking the cycle.
+
+### [4.9.3-beta.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.4...4.9.3-beta.5) (2026-05-12)
+
+### Diagnostics
+
+* Rework `effect_counter` to track cumulative runs (no 250ms reset window) and log at thresholds 1/10/50/200/1000. Beta.4's window-based counter missed slow loops — the 38-second hang on Windows ran ~2 iterations/second, never hitting 50 in any 250ms window. Also extend coverage to remaining $effects in `TrailView.log`, `TrailView.depth`, `TreeView.depth`, `TreeView.root_open`, `LockViewButton`, `RenderMarkdown`.
+
+### [4.9.3-beta.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.3...4.9.3-beta.4) (2026-05-12)
+
+### Diagnostics
+
+* Extend reactive-loop counters to the four settings sub-components most likely to fire on tab open (`MatrixFieldOrderSettingItem`, `FieldGroupLabelsSettingItem`, `ShowAttributesSettingItem`, `EdgeSortIdSettingItem`) plus `ShowAttributesSelectorMenu.strip`. Beta.3 timings showed `SettingsTab.display` completed in 27ms but the `effect_update_depth_exceeded` error still fired on the next microtask, so the looping `$effect` lives in a sub-component that beta.3 did not instrument.
+
+### [4.9.3-beta.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.3-beta.2...4.9.3-beta.3) (2026-05-12)
+
+### Diagnostics
+
+* Add gated perf marks and reactive-loop counters around the Settings tab (per-section timings, mount durations, `effect-storm` warnings on TrailView/Matrix/TreeView/TransitiveImpliedRelations/NestedEdgeList) to diagnose the remaining few-second Settings-open freeze on Windows. Active only when `debug.level` is set to `DEBUG`; no effect at default log level.
+
+### [4.9.3-beta.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.2...4.9.3-beta.2) (2026-05-12)
+
+### Bug Fixes
+
+* Fix settings tab freezing Obsidian on Windows in 4.9.2 — the `reactive_settings.current` getter assigned to its own `$state` variable when read before init, which Svelte 5 detected as a derivation self-mutating its own dependency and looped to `effect_update_depth_exceeded`. The store now initialises `_settings` eagerly with `DEFAULT_SETTINGS` so the getter is a pure read and `init()` simply swaps in the real settings.
+
+### [4.9.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.1...4.9.2) (2026-05-12)
+
+### Bug Fixes
+
+* Fix [#686](https://github.com/SkepticMystic/breadcrumbs/issues/686) — opening the Breadcrumbs settings tab on some Android/Windows installs could freeze Obsidian's settings modal. The settings tab now wraps its render in a try/catch, logs the underlying error to the developer console, and shows a recoverable fallback UI with a "Reload settings" button instead of bricking the modal. Also serialised Svelte component teardown so `containerEl.empty()` no longer races pending `unmount()` promises, and `reactive_settings.current` falls back to defaults (with a warning) if read before init.
+
+### [4.9.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.9.0...4.9.1) (2026-05-11)
+
+### Bug Fixes
+
+* Fix view settings (trail enabled, prev/next enabled, matrix collapse) reverting on reload — settings written by TypeScript callbacks were lost because the Svelte 5 reactive proxy did not propagate plain-object mutations back to its internal signal sources. Converted `plugin.settings` to a getter/setter so all writes route through the proxy.
+* Fix infinite reactive loop (`effect_update_depth_exceeded`) triggered when toggling trail or side view settings — `$effect` bodies in Matrix, TreeView, and TrailView were writing back to `plugin.settings` without `untrack()`, causing the proxy signal sources to re-trigger the same effects endlessly. Wrapped all proxy writes in `untrack()`.
+* Fix `$effect.pre` in Matrix, TreeView, and TrailView re-running on every proxy write — the effects tracked proxy signal sources when reading `plugin.settings.views.*` to initialise local settings state, creating a feedback loop with the write-back `$effect`. Wrapped the snapshot call in `untrack()` so `$effect.pre` only re-runs when the `plugin` prop itself changes.
+* Fix `lifecycle_double_unmount` error — concurrent `REDRAW_SIDE_VIEWS` events caused multiple `onOpen()` calls to race; both saw the same live component and both tried to unmount it. Debounced the event-driven `onOpen()` calls (100 ms trailing) so burst events collapse to a single remount.
+* Fix Matrix and Tree side views remounting on every graph update or active-leaf change — debounced `REDRAW_SIDE_VIEWS` handler collapses rapid-fire workspace events into one remount per burst.
+* Fix codeblock fatal-error log entries showing unexpandable `{…}` objects in the Obsidian developer console — errors are now logged as a formatted plain-text string with one line per error.
+
 ### [4.8.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.8.1...4.8.2) (2026-05-03)
 
 ### Bug Fixes

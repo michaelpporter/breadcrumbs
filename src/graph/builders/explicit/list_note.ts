@@ -32,7 +32,7 @@ const get_list_note_info = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `list-note-field is not a valid BC field: '${field}'`,
 		});
 	}
@@ -55,14 +55,13 @@ const get_list_note_info = (
 		) {
 			return graph_build_fail({
 				path,
-				code: "invalid_field_value",
+				code: "invalid_edge_field",
 				message: `list-note-neighbour-field is not a valid BC field: '${neighbour_field}'`,
 			});
 		}
 	}
 
-	// TODO: Doesn't this just do what BC-ignore-out-edges does?
-	// UPDATE: No, list-note-exclude-index ignores-out-edges, but _only for list-notes_
+	// list-note-exclude-index ignores out-edges, but _only for list-notes_
 	const exclude_index = Boolean(
 		metadata[META_ALIAS["list-note-exclude-index"]],
 	);
@@ -94,7 +93,7 @@ const resolve_field_override = (
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `Field override is not a valid BC field: ${field}. Line: ${list_item.position.start.line}`,
 		});
 	} else {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { EdgeField } from "src/interfaces/settings";
+	import { effect_counter } from "src/utils/perf";
 	import SettingItem from "./SettingItem.svelte";
 
 	interface Props {
@@ -29,7 +30,9 @@
 	let selected_labels = $state(new Set(custom_sort_field_labels));
 	let drag_index = $state<number | null>(null);
 
+	const tick_mfo = effect_counter("MatrixFieldOrderSettingItem");
 	$effect(() => {
+		tick_mfo();
 		ordered_labels = build_ordered_labels();
 		selected_labels = new Set(
 			custom_sort_field_labels.filter((label) =>

@@ -45,7 +45,7 @@ function get_dendron_note_info(
 	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({
 			path,
-			code: "invalid_field_value",
+			code: "invalid_edge_field",
 			message: `dendron-note-field is not a valid field: '${field}'`,
 		});
 	}
@@ -224,13 +224,13 @@ function add_dendron_sibling_edges(
 		if (siblings.length < 2) continue;
 		for (let i = 0; i < siblings.length; i++) {
 			for (let j = i + 1; j < siblings.length; j++) {
-				const k = dendron_edge_key(siblings[i]!, siblings[j]!, sibling_field);
+				const k = dendron_edge_key(siblings[i], siblings[j], sibling_field);
 				if (edge_sig.has(k)) continue;
 				edge_sig.add(k);
 				results.edges.push(
 					new GCEdgeData(
-						siblings[i]!,
-						siblings[j]!,
+						siblings[i],
+						siblings[j],
 						sibling_field,
 						"dendron_note",
 					),

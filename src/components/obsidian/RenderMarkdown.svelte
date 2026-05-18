@@ -6,6 +6,7 @@
 	import type BreadcrumbsPlugin from "src/main";
 	import { active_file_store } from "src/stores/active_file";
 	import { onDestroy } from "svelte";
+	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
 		cls?: string;
@@ -51,7 +52,9 @@
 		);
 	}
 
+	const tick_render_md = effect_counter("RenderMarkdown");
 	$effect(() => {
+		tick_render_md();
 		void render(markdown);
 	});
 

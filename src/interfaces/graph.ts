@@ -5,10 +5,11 @@ import type { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import type { MaybePromise } from ".";
 
 export interface BreadcrumbsError {
-	// TODO: Differentiate between invalid edge-field and invalid metadata-field values
-	// BUT: Some errors might be a metadata field with an invalid edge-field value
+	// `invalid_edge_field`: a value names a BC edge-field that isn't registered.
+	// `invalid_field_value`: a metadata field holds a malformed/wrong-typed value.
 	code:
 		| "deprecated_field"
+		| "invalid_edge_field"
 		| "invalid_field_value"
 		| "invalid_setting_value"
 		| "invalid_yaml"
