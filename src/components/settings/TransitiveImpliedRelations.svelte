@@ -79,9 +79,7 @@
 			const new_length = transitives.push({
 				name: "",
 				chain: [],
-				// NOTE: Max by default, users can lower if needed
-				// It seems to fit with intuition that the implied relations just keep going
-				rounds: 10,
+				rounds: 1,
 				close_reversed: false,
 				close_field: settings.edge_fields[0].label,
 			});
@@ -140,7 +138,7 @@
 
 			validated.forEach((r) => {
 				if (r.success) {
-					transitives.push({ ...r.data, name: "", rounds: 10 });
+					transitives.push({ ...r.data, name: "", rounds: 1 });
 				}
 			});
 
@@ -409,7 +407,7 @@
 							<input
 								type="number"
 								min={0}
-								max={100}
+								max={10}
 								value={rule.rounds}
 								onblur={(e) =>
 									actions.set_rounds(

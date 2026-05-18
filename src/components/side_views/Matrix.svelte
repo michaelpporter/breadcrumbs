@@ -11,9 +11,12 @@
 	import FieldGroupSelector from "../selector/FieldGroupLabelsSelector.svelte";
 	import ShowAttributesSelectorMenu from "../selector/ShowAttributesSelectorMenu.svelte";
 	import MatrixEdgeField from "./MatrixEdgeField.svelte";
+	import SearchToggleButton from "../button/SearchToggleButton.svelte";
 	import { untrack } from "svelte";
+	import { prepareFuzzySearch } from "obsidian";
 	import { log } from "src/logger";
 	import { json_clone } from "src/utils/json_clone";
+	import { to_node_stringify_options } from "src/graph/utils";
 	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
@@ -92,6 +95,18 @@
 		),
 	);
 
+	let node_stringify_options = $derived(
+		to_node_stringify_options(plugin.settings, settings.show_node_options),
+	);
+
+	let search_open = $state(false);
+	let search_query = $state("");
+
+	let matcher = $derived.by(() => {
+		const query = search_query.trim();
+		return query ? prepareFuzzySearch(query) : null;
+	});
+
 	let matrix_fields = $derived.by(() => {
 		const fields = plugin.settings.edge_fields;
 
@@ -123,6 +138,11 @@
 			<RebuildGraphButton
 				cls="clickable-icon nav-action-button"
 				{plugin}
+			/>
+
+			<SearchToggleButton
+				cls="clickable-icon nav-action-button"
+				bind:active={search_open}
 			/>
 
 			<LockViewButton
@@ -158,15 +178,44 @@
 		</div>
 	</div>
 
+	{#if search_open}
+		<div class="search-input-container BC-search-input-container">
+			<!-- svelte-ignore a11y_autofocus -->
+			<input
+				type="search"
+				placeholder="Search notes..."
+				autofocus
+				bind:value={search_query}
+				onkeydown={(e) => {
+					if (e.key === "Escape") {
+						search_query = "";
+						search_open = false;
+					}
+				}}
+			/>
+		</div>
+	{/if}
+
 	{#key grouped_out_edges}
 		{#if grouped_out_edges}
 			<div>
 				{#each matrix_fields as field}
-					{@const edges = grouped_out_edges.get_sorted_edges(
+					{@const all_edges = grouped_out_edges.get_sorted_edges(
 						field.label,
 						plugin.graph,
 						sort,
 					)}
+					{@const edges = matcher
+						? all_edges?.filter(
+								(edge) =>
+									matcher!(
+										edge.stringify_target(
+											plugin.graph,
+											node_stringify_options,
+										),
+									) !== null,
+							)
+						: all_edges}
 
 					{#if edges?.length}
 						<MatrixEdgeField

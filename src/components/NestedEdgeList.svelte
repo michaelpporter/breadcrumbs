@@ -18,6 +18,7 @@
 		open_signal: boolean | null;
 		node_stringify_options: NodeStringifyOptions;
 		show_attributes: EdgeAttribute[] | undefined;
+		visible_indices?: Set<number> | null;
 	}
 
 	let {
@@ -27,14 +28,21 @@
 		open_signal = $bindable(),
 		node_stringify_options,
 		show_attributes,
+		visible_indices = null,
 	}: Props = $props();
+
+	let visible_items = $derived(
+		visible_indices
+			? items.filter((item) => visible_indices!.has(item))
+			: items,
+	);
 
 	let opens = $state<boolean[]>([]);
 
 	const tick_nested_opens = effect_counter("NestedEdgeList.opens_sync");
 	$effect(() => {
 		tick_nested_opens();
-		const n = items.length;
+		const n = visible_items.length;
 		if (opens.length !== n) {
 			opens = Array(n).fill(true);
 		}
@@ -48,7 +56,7 @@
 	});
 </script>
 
-{#each items as item, i}
+{#each visible_items as item, i}
 	{@const children = data.children_at_index(item)}
 	{@const render_data = data.rendering_obj_at_index(
 		item,
@@ -100,6 +108,7 @@
 						{node_stringify_options}
 						{data}
 						{open_signal}
+						{visible_indices}
 						items={children}
 					/>
 				</div>
