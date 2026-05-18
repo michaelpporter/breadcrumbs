@@ -101,6 +101,8 @@ function from_transitive_rule(
 			(node: NodeData) => node.path,
 			false,
 			false,
+			[],
+			[],
 		),
 	);
 }

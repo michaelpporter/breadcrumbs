@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use indexmap::IndexMap;
 use itertools::{EitherOrBoth, Itertools};
 use petgraph::stable_graph::NodeIndex;
@@ -51,6 +53,8 @@ pub struct MermaidGraphOptions {
     pub link_nodes: bool,
     #[wasm_bindgen(skip)]
     pub show_arrow_points: bool,
+    #[wasm_bindgen(skip)]
+    pub field_arrows: HashMap<String, String>,
 }
 
 #[wasm_bindgen]
@@ -67,7 +71,14 @@ impl MermaidGraphOptions {
         node_label_fn: Option<js_sys::Function>,
         link_nodes: bool,
         show_arrow_points: bool,
+        field_arrow_keys: Vec<String>,
+        field_arrow_values: Vec<String>,
     ) -> MermaidGraphOptions {
+        let field_arrows = field_arrow_keys
+            .into_iter()
+            .zip(field_arrow_values)
+            .collect::<HashMap<String, String>>();
+
         MermaidGraphOptions {
             active_node,
             init_line,
@@ -79,6 +90,7 @@ impl MermaidGraphOptions {
             node_label_fn,
             link_nodes,
             show_arrow_points,
+            field_arrows,
         }
     }
 
@@ -101,6 +113,7 @@ impl Default for MermaidGraphOptions {
             node_label_fn: None,
             link_nodes: false,
             show_arrow_points: false,
+            field_arrows: HashMap::new(),
         }
     }
 }
@@ -170,6 +183,7 @@ impl NoteGraph {
             self,
             edge_structs,
             diagram_options.collapse_opposing_edges,
+            &diagram_options.field_arrows,
         )?;
 
         let mut unresolved_nodes = Vec::new();
@@ -257,6 +271,27 @@ impl NoteGraph {
     }
 }
 
+fn forward_has_no_custom_arrow(
+    field_arrows: &HashMap<String, String>,
+    forward: &[&EdgeData],
+) -> bool {
+    !forward
+        .iter()
+        .any(|e| field_arrows.contains_key(e.edge_type.as_ref()))
+}
+
+fn bidirectional_arrow(arrow: &str) -> String {
+    match arrow {
+        "-->" => "<-->".to_string(),
+        "-.->" => "<-.->".to_string(),
+        "==>" => "<==>".to_string(),
+        "--o" => "o--o".to_string(),
+        "--x" => "x--x".to_string(),
+        // No-arrow forms (---, ===, -.-) have no heads — bidirectional is identical.
+        other => other.to_string(),
+    }
+}
+
 impl NoteGraph {
     fn generate_mermaid_edge(
         &self,
@@ -268,26 +303,40 @@ impl NoteGraph {
     ) -> String {
         let mut label = String::new();
 
-        let same_elements = forward
+        let custom_arrow = forward
             .iter()
-            .zip(backward.iter())
-            .all(|(a, b)| a.edge_type == b.edge_type);
-        let all_implied = !forward
-            .iter()
-            .zip_longest(backward.iter())
-            .any(|pair| match pair {
-                EitherOrBoth::Both(a, b) => a.explicit || b.explicit,
-                EitherOrBoth::Left(a) => a.explicit,
-                EitherOrBoth::Right(b) => b.explicit,
-            });
+            .find_map(|e| diagram_options.field_arrows.get(e.edge_type.as_ref()))
+            .cloned();
 
-        let arrow_type = match (backward.is_empty(), all_implied, diagram_options.show_arrow_points) {
-            (true, true, _) => "-.->",
-            (true, false, _) => "-->",
-            (false, true, true) => "<-.->",
-            (false, false, true) => "<--->",
-            (false, true, false) => "-.-",
-            (false, false, false) => "---",
+        let arrow_type: String = if let Some(s) = custom_arrow {
+            if backward.is_empty() {
+                s
+            } else {
+                bidirectional_arrow(&s)
+            }
+        } else {
+            let all_implied = !forward
+                .iter()
+                .zip_longest(backward.iter())
+                .any(|pair| match pair {
+                    EitherOrBoth::Both(a, b) => a.explicit || b.explicit,
+                    EitherOrBoth::Left(a) => a.explicit,
+                    EitherOrBoth::Right(b) => b.explicit,
+                });
+
+            match (
+                backward.is_empty(),
+                all_implied,
+                diagram_options.show_arrow_points,
+            ) {
+                (true, true, _) => "-.->",
+                (true, false, _) => "-->",
+                (false, true, true) => "<-.->",
+                (false, false, true) => "<--->",
+                (false, true, false) => "-.-",
+                (false, false, false) => "---",
+            }
+            .to_string()
         };
 
         label.push_str(
@@ -299,16 +348,24 @@ impl NoteGraph {
                 .as_str(),
         );
 
-        if !same_elements && !backward.is_empty() {
-            label.push_str(" | ");
-            label.push_str(
-                backward
-                    .iter()
-                    .map(|edge| edge.attribute_label(&diagram_options.edge_label_attributes))
-                    .collect::<Vec<String>>()
-                    .join(", ")
-                    .as_str(),
-            );
+        if forward_has_no_custom_arrow(&diagram_options.field_arrows, forward)
+            && !backward.is_empty()
+        {
+            let same_elements = forward
+                .iter()
+                .zip(backward.iter())
+                .all(|(a, b)| a.edge_type == b.edge_type);
+            if !same_elements {
+                label.push_str(" | ");
+                label.push_str(
+                    backward
+                        .iter()
+                        .map(|edge| edge.attribute_label(&diagram_options.edge_label_attributes))
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                        .as_str(),
+                );
+            }
         }
 
         if label.is_empty() {
@@ -324,11 +381,12 @@ impl NoteGraph {
         }
     }
 
-    pub fn int_accumulate_edges(
-        graph: &NoteGraph,
+    pub fn int_accumulate_edges<'a>(
+        graph: &'a NoteGraph,
         edges: Vec<EdgeStruct>,
         collapse_opposing_edges: bool,
-    ) -> Result<AccumulatedEdgeHashMap<'_>> {
+        field_arrows: &HashMap<String, String>,
+    ) -> Result<AccumulatedEdgeHashMap<'a>> {
         let mut accumulated_edges = AccumulatedEdgeHashMap::default();
 
         // sorting the two node indices in the edge tuple could be a speedup, since then
@@ -337,11 +395,70 @@ impl NoteGraph {
         for edge_struct in edges {
             edge_struct.check_revision(graph)?;
 
+            let edge_data = edge_struct.edge_data_ref(graph).unwrap();
+            let new_custom_arrow = field_arrows.get(edge_data.edge_type.as_ref()).cloned();
+
+            // Custom-arrow rule:
+            // - same custom on both directions  -> collapse as bidirectional
+            // - different custom (or vs default)-> unique forward-only entry
+            if let Some(new_arrow) = new_custom_arrow.clone() {
+                let backward_dir = (edge_struct.target_index, edge_struct.source_index);
+
+                if let Some(existing) = accumulated_edges.map.get_mut(&backward_dir) {
+                    let existing_arrow = existing
+                        .2
+                        .iter()
+                        .find_map(|e| field_arrows.get(e.edge_type.as_ref()))
+                        .cloned();
+                    if existing_arrow.as_deref() == Some(new_arrow.as_str()) {
+                        existing.3.push(edge_data);
+                        continue;
+                    }
+                }
+
+                let forward_dir = (edge_struct.source_index, edge_struct.target_index);
+                if let Some(existing) = accumulated_edges.map.get_mut(&forward_dir) {
+                    let existing_arrow = existing
+                        .2
+                        .iter()
+                        .find_map(|e| field_arrows.get(e.edge_type.as_ref()))
+                        .cloned();
+                    if existing_arrow.as_deref() == Some(new_arrow.as_str()) {
+                        existing.2.push(edge_data);
+                        continue;
+                    }
+
+                    let unique_target =
+                        NodeIndex::new(usize::MAX - accumulated_edges.map.len());
+                    accumulated_edges.map.insert(
+                        (edge_struct.source_index, unique_target),
+                        (
+                            edge_struct.source_index,
+                            edge_struct.target_index,
+                            vec![edge_data],
+                            Vec::new(),
+                        ),
+                    );
+                    continue;
+                }
+
+                accumulated_edges.map.insert(
+                    forward_dir,
+                    (
+                        edge_struct.source_index,
+                        edge_struct.target_index,
+                        vec![edge_data],
+                        Vec::new(),
+                    ),
+                );
+                continue;
+            }
+
             let forward_dir = (edge_struct.source_index, edge_struct.target_index);
 
             let entry1 = accumulated_edges.map.get_mut(&forward_dir);
             if let Some((_, _, forward, _)) = entry1 {
-                forward.push(edge_struct.edge_data_ref(graph).unwrap());
+                forward.push(edge_data);
                 continue;
             }
 
@@ -349,7 +466,7 @@ impl NoteGraph {
                 let backward_dir = (edge_struct.target_index, edge_struct.source_index);
 
                 if let Some((_, _, _, backward)) = accumulated_edges.map.get_mut(&backward_dir) {
-                    backward.push(edge_struct.edge_data_ref(graph).unwrap());
+                    backward.push(edge_data);
                     continue;
                 }
             }
@@ -359,7 +476,7 @@ impl NoteGraph {
                 (
                     edge_struct.source_index,
                     edge_struct.target_index,
-                    vec![edge_struct.edge_data_ref(graph).unwrap()],
+                    vec![edge_data],
                     Vec::new(),
                 ),
             );

@@ -4,8 +4,22 @@ import type { BCEdgeAttributes, EdgeAttribute } from "src/graph/utils";
 import type { EdgeAttrFilters } from "src/graph/utils";
 import type { LogLevels } from "src/logger";
 
+export const MERMAID_ARROW_TYPES = [
+	"-->",
+	"---",
+	"==>",
+	"===",
+	"-.->",
+	"-.-",
+	"--o",
+	"--x",
+] as const;
+
+export type MermaidArrowType = (typeof MERMAID_ARROW_TYPES)[number];
+
 export interface EdgeField {
 	label: string;
+	mermaid_arrow?: MermaidArrowType;
 }
 export interface EdgeFieldGroup {
 	label: string;
