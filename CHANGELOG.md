@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.0](https://github.com/SkepticMystic/breadcrumbs/compare/4.10.2...4.11.0) (2026-05-18)
+
+### Features
+
+* **Per-field Mermaid arrow style** — each edge field now has an optional arrow-shape dropdown in Settings → Edge Fields. Choose from `-->`, `---`, `==>`, `===`, `-.->`, `-.-`, `--o`, or `--x`. When set, that field's edges in Mermaid codeblock views render with the chosen arrow instead of the default. Edges with the same custom arrow on both directions collapse into a single bidirectional line (e.g. `==>`→`<==>`). ([#694](https://github.com/SkepticMystic/breadcrumbs/pull/694))
+
 ### [4.10.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.10.1...4.10.2) (2026-05-18)
 
 ### Bug Fixes
