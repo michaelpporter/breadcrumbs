@@ -9,6 +9,10 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            id-token: write
+            attestations: write
 
         steps:
             - uses: actions/checkout@v6
@@ -40,6 +44,14 @@ jobs:
                   bun run test || exit 1
                   bun run build || exit 1
 
+            - name: Attest build artifacts
+              uses: actions/attest-build-provenance@v2
+              with:
+                  subject-path: |
+                      main.js
+                      styles.css
+                      wasm/pkg/breadcrumbs_graph_wasm_bg.wasm
+
             - name: Create release
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,4 +61,4 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     --prerelease \
-                    main.js manifest.json styles.css
+                    main.js manifest.json styles.css wasm/pkg/breadcrumbs_graph_wasm_bg.wasm
