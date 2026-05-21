@@ -8,10 +8,8 @@ import { Paths } from "src/utils/paths";
 import { resolve_templates } from "src/utils/strings";
 import {
 	AddEdgeGraphUpdate,
-	AddNoteGraphUpdate,
 	BatchGraphUpdate,
 	GCEdgeData,
-	GCNodeData,
 } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 export async function thread(
@@ -57,12 +55,9 @@ export async function thread(
 		return;
 	}
 
-	// First add the edge so we can access the struct
+	// vault.create() fires on:create synchronously before resolving,
+	// so the target node is already in the graph — only add the edge.
 	const batch_update = new BatchGraphUpdate();
-
-	new AddNoteGraphUpdate(
-		new GCNodeData(target_file.path, [], true, false, false),
-	).add_to_batch(batch_update);
 
 	new AddEdgeGraphUpdate(
 		new GCEdgeData(source_file.path, target_file.path, field, "typed-link"),

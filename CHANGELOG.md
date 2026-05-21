@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.1...4.11.2) (2026-05-20)
+
+### Bug Fixes
+
+* **Thread by command crashed without injecting edge** — `vault.create()` fires the `on:create` event synchronously before its promise resolves, so the new note's graph node was already registered by the time the thread command ran its `BatchGraphUpdate`. The duplicate `AddNoteGraphUpdate` threw "There already exists a resolved node with the same name", aborting the batch and preventing the breadcrumb link from being written to the source note's metadata ([#696](https://github.com/SkepticMystic/breadcrumbs/issues/696)).
+
 ### [4.11.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.0...4.11.1) (2026-05-20)
 
 ### Bug Fixes
