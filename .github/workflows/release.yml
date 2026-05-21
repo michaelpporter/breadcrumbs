@@ -61,4 +61,4 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     --prerelease \
-                    main.js manifest.json styles.css wasm/pkg/breadcrumbs_graph_wasm_bg.wasm
+                    main.js manifest.json styles.css

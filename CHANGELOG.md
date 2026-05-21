@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.3...4.11.4) (2026-05-21)
+
+### Bug Fixes
+
+* **Release validation** — remove `breadcrumbs_graph_wasm_bg.wasm` from GitHub release assets. Obsidian's community plugin validator only permits `main.js`, `manifest.json`, and `styles.css`; the extra WASM asset caused build verification to fail.
+
 ### [4.11.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.2...4.11.3) (2026-05-20)
 
 ### Chores
