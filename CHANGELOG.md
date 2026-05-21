@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.0...4.11.1) (2026-05-20)
+
+### Bug Fixes
+
+* **Tree view always showed from root** — the Find Root toggle button (`FindRootButton`) was imported but never rendered in the Tree side-view toolbar, giving users no way to turn off the root-anchored behavior that a prior migration had enabled for everyone. The button is now present in the nav bar. A matching toggle and field-group selector are also exposed in Settings → Tree View so the preference is discoverable and configurable without opening the view ([#695](https://github.com/SkepticMystic/breadcrumbs/issues/695)).
+
 ### [4.11.0](https://github.com/SkepticMystic/breadcrumbs/compare/4.10.2...4.11.0) (2026-05-18)
 
 ### Features

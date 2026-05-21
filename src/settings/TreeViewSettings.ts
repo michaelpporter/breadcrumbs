@@ -28,6 +28,39 @@ export const _add_settings_tree_view = (
 	});
 
 	new_setting(containerEl, {
+		name: "Find Root",
+		desc: "Walk up the hierarchy to find the root note, then display the tree from there. When off, the tree starts from the current file.",
+		toggle: {
+			value: plugin.settings.views.side.tree.find_root,
+			cb: async (checked) => {
+				plugin.settings.views.side.tree.find_root = checked;
+
+				plugin.refreshViews();
+				await plugin.saveSettings();
+			},
+		},
+	});
+
+	mount(FieldGroupLabelsSettingItem, {
+		target: containerEl,
+		props: {
+			name: "Find Root Field Groups",
+			description:
+				"Which edge-type groups to follow when walking up to the root. Typically 'ups'.",
+			edge_field_groups: plugin.settings.edge_field_groups,
+			field_group_labels:
+				plugin.settings.views.side.tree.find_root_field_group_labels,
+			select_cb: async (value: string[]) => {
+				plugin.settings.views.side.tree.find_root_field_group_labels =
+					value;
+
+				plugin.refreshViews();
+				await plugin.saveSettings();
+			},
+		},
+	});
+
+	new_setting(containerEl, {
 		name: "Default depth",
 		desc: "Default depth of the tree view",
 		input: {

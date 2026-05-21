@@ -250,6 +250,10 @@
 				active_path={active_file?.path}
 			/>
 
+			<FindRootButton
+				cls="clickable-icon nav-action-button"
+				bind:find_root={settings.find_root}
+			/>
 
 			<EdgeSortIdSelector
 				cls="clickable-icon nav-action-button"
