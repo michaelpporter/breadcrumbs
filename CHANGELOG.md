@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.3](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.2...4.11.3) (2026-05-20)
+
+### Chores
+
+* **CI: add WASM asset and build attestations to releases** — `breadcrumbs_graph_wasm_bg.wasm` is now included as a GitHub release asset (resolves Obsidian scorecard warning "Plugin references 1 unrecognized .wasm file(s)"). Build provenance attestations are generated for `main.js`, `styles.css`, and the WASM file via `actions/attest-build-provenance`. Committed `wasm/Cargo.lock` for reproducible WASM builds.
+
 ### [4.11.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.1...4.11.2) (2026-05-20)
 
 ### Bug Fixes
