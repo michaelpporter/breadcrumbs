@@ -45,7 +45,7 @@ jobs:
                   bun run build || exit 1
 
             - name: Attest build artifacts
-              uses: actions/attest-build-provenance@v2
+              uses: actions/attest-build-provenance@v4
               with:
                   subject-path: |
                       main.js
