@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.5...4.11.6) (2026-05-22)
+
+### Bug Fixes
+
+* **Community build verification** — commit `wasm/pkg/` (generated WASM bindings) so the Obsidian community plugin build checker can run `bun run build` without a Rust/wasm-pack toolchain. `wasm-pack` auto-generates a `pkg/.gitignore` with `*` that previously excluded the entire directory; that file is now overridden so the JS bindings and type declarations are tracked in git.
+
 ### [4.11.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.4...4.11.5) (2026-05-22)
 
 ### Bug Fixes
