@@ -69,6 +69,14 @@ export default class BreadcrumbsPlugin extends Plugin {
 		true,
 	);
 
+	private _redraw_page_views_debouncer: Debouncer<[], void> = debounce(
+		() => {
+			redraw_page_views(this);
+		},
+		150,
+		true,
+	);
+
 	saveSettingsDebounced() {
 		this._save_debouncer();
 	}
@@ -209,7 +217,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 					) {
 						void this.rebuildGraph();
 					} else {
-						this.events.trigger(BCEvent.REDRAW_PAGE_VIEWS);
+						this._redraw_page_views_debouncer();
 					}
 				}),
 			);

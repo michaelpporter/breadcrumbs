@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.5](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.4...4.11.5) (2026-05-22)
+
+### Bug Fixes
+
+* **Scroll performance degradation** — Obsidian's `layout-change` event fires on every scroll tick in newer versions, triggering a full unmount+remount of the page-view (Trail/Prev-Next) Svelte component on each tick. Added a 150 ms leading-edge debounce to the `layout-change` → redraw-page-views path so rapid bursts coalesce into a single redraw. Graph-update-triggered redraws remain immediate ([#698](https://github.com/SkepticMystic/breadcrumbs/issues/698)).
+
 ### [4.11.4](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.3...4.11.4) (2026-05-21)
 
 ### Bug Fixes
