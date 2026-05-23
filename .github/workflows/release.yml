@@ -21,6 +21,8 @@ jobs:
               uses: oven-sh/setup-bun@v2
               with:
                   bun-version: latest
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Install Rust
               uses: actions-rust-lang/setup-rust-toolchain@v1
