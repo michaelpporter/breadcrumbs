@@ -5,8 +5,13 @@ import type BreadcrumbsPlugin from "src/main";
 import { mount, unmount } from "svelte";
 
 type MountedPageView = ReturnType<typeof mount>;
+type PageViewMountState = {
+	view: MountedPageView;
+	mode: string;
+	sticky: boolean;
+};
 
-const mounted_page_views = new WeakMap<MarkdownView, MountedPageView>();
+const mounted_page_views = new WeakMap<MarkdownView, PageViewMountState>();
 
 export function cleanup_page_views(plugin: BreadcrumbsPlugin) {
 	const markdown_views = plugin.app.workspace.getLeavesOfType("markdown");
@@ -15,7 +20,7 @@ export function cleanup_page_views(plugin: BreadcrumbsPlugin) {
 		const existing = mounted_page_views.get(leaf.view);
 		if (existing) {
 			mounted_page_views.delete(leaf.view);
-			void unmount(existing);
+			void unmount(existing.view);
 		}
 	});
 }
@@ -32,11 +37,22 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 
 		const markdown_view = leaf.view;
 		const mode = markdown_view.getMode();
+		const sticky = plugin.settings.views.page.all.sticky;
 
 		const existing = mounted_page_views.get(markdown_view);
+
+		// Skip remount if mode and sticky haven't changed and the element is still in the DOM.
+		// layout-change fires on every CM6 cursor/scroll update; remounting on each one
+		// causes DOM thrash inside .cm-scroller which makes CM6 re-measure and skip cursor positions.
+		if (existing && existing.mode === mode && existing.sticky === sticky) {
+			const page_views_el =
+				markdown_view.containerEl.querySelector<HTMLElement>(".BC-page-views");
+			if (page_views_el?.isConnected) return;
+		}
+
 		if (existing) {
 			mounted_page_views.delete(markdown_view);
-			void unmount(existing);
+			void unmount(existing.view);
 		}
 
 		// Ensure the container exists _on the current page_, leaving other pages' containers alone
@@ -155,6 +171,6 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			target: mount_target,
 			props: { plugin, file_path: markdown_view.file?.path ?? "" },
 		});
-		mounted_page_views.set(markdown_view, mounted);
+		mounted_page_views.set(markdown_view, { view: mounted, mode, sticky });
 	});
 }

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.7-beta.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.6...4.11.7-beta.1) (2026-05-23)
+
+### Bug Fixes
+
+* **Cursor/scroll lag in source mode** — `layout-change` fires on every CM6 cursor movement and scroll tick, causing a full Svelte unmount+remount of the Trail/Prev-Next page view on each tick even when nothing had changed. The DOM thrash inside `.cm-scroller` made CM6 re-measure and skip cursor positions (visible as paragraph jumps in vim mode). Page views are now only remounted when the editor mode (source vs. preview) or the sticky setting actually changes; repeat `layout-change` firings with an already-correct mount are ignored ([#698](https://github.com/SkepticMystic/breadcrumbs/issues/698)).
+
 ### [4.11.6](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.5...4.11.6) (2026-05-22)
 
 ### Bug Fixes
