@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.8](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.7...4.11.8) (2026-05-24)
+
+### Build
+
+* **Reproducible release builds** — restore committed `wasm/pkg` artifacts so CI and Obsidian's build verifier use the same WASM binary; remove `wasm:build` from the release workflow; pin bun to 1.3.14; use `--frozen-lockfile`. Fixes "main.js built from source does not match the release artifact".
+* **Skip electron binary download in CI** — set `ELECTRON_SKIP_BINARY_DOWNLOAD=1` to prevent electron's postinstall from fetching binaries (Obsidian provides electron at runtime; we never need it installed).
+
 ### [4.11.7](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.6...4.11.7) (2026-05-24)
 
 ### Bug Fixes
