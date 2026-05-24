@@ -39,11 +39,10 @@ jobs:
               run: cd wasm && rustup override set stable && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu && cd ..
 
             - name: Build plugin
-              env:
-                  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
               run: |
                   bun install --frozen-lockfile
                   bun run wasm:test || exit 1
+                  bun run wasm:build || exit 1
                   bun run test || exit 1
                   bun run build || exit 1
 
