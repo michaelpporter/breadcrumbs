@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.9](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.8...4.11.9) (2026-05-24)
+
+### Build
+
+* **Restore wasm:build in CI** — revert the 4.11.8 approach of committing `wasm/pkg` artifacts; build WASM from source in CI again. `wasm/pkg/` is back to gitignored; reproducibility ensured by the pinned `wasm-bindgen-cli 0.2.100`.
+* **Remove ELECTRON_SKIP_BINARY_DOWNLOAD** — no longer needed with `--frozen-lockfile`.
+* **Fix TS 6 module augmentation** — `obsidian-typings` 3.16 moved its augmentations into `.d.cts` files; TypeScript 6 does not apply module augmentations from `.d.cts` type-reference entries. Added `src/obsidian-unofficial.d.ts` with local `declare module "obsidian"` augmentations for `metadataTypeManager`, `MetadataCache.initialized`, and `MetadataCache.on("initialized")`.
+* **Pin svelte-preprocess to 6.0.3** — 6.0.4 introduced a broken ESM import (missing `.js` extension on transformer sub-paths).
+* **Add ES2022 to tsconfig lib** — `Array.at()` requires `es2022`; previous lib target caused CI type errors.
+
+### Chores
+
+* **Dependency updates** — `obsidian` → 1.12.3, `obsidian-typings` → 3.16.6, `svelte` → 5.55.9, `tailwindcss`/`@tailwindcss/cli` → 4.3.0, `zod` → 4.4.3, `vitest` → 4.1.7, `eslint` → 10.4.0, plus minor bumps to `luxon`, `lucide-svelte`, `caniuse-lite`, `baseline-browser-mapping`, and several ESLint/Svelte/TypeScript tooling packages.
+
 ### [4.11.9-beta.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.8...4.11.9-beta.1) (2026-05-24)
 
 ### Build
