@@ -428,8 +428,7 @@ impl NoteGraph {
                         continue;
                     }
 
-                    let unique_target =
-                        NodeIndex::new(usize::MAX - accumulated_edges.map.len());
+                    let unique_target = NodeIndex::new(usize::MAX - accumulated_edges.map.len());
                     accumulated_edges.map.insert(
                         (edge_struct.source_index, unique_target),
                         (

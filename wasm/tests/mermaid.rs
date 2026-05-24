@@ -160,9 +160,8 @@ fn test_field_arrows_disable_collapse() {
     let graph = get_test_graph();
 
     let mut options = MermaidGraphOptions::default();
-    options.field_arrows = std::collections::HashMap::from([
-        ("same".to_string(), "==>".to_string()),
-    ]);
+    options.field_arrows =
+        std::collections::HashMap::from([("same".to_string(), "==>".to_string())]);
 
     let mermaid = graph
         .generate_mermaid_graph(get_traversal_options(), options)

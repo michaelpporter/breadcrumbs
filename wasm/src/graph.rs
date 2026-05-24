@@ -2,25 +2,25 @@ use std::rc::Rc;
 
 use hashbrown::HashMap;
 use petgraph::{
+    Directed,
     stable_graph::{Edges, StableGraph},
     visit::{EdgeRef, IntoEdgeReferences, IntoNodeReferences, NodeRef},
-    Directed,
 };
 use vec_collections::{AbstractVecSet, VecSet};
 use wasm_bindgen::prelude::*;
 
 use crate::{
     data::{
+        NGEdgeIndex, NGEdgeRef, NGNodeIndex,
         construction::{GCEdgeData, GCNodeData},
         edge::EdgeData,
         edge_list::{EdgeList, GroupedEdgeList},
         edge_struct::EdgeStruct,
         node::NodeData,
         rules::TransitiveGraphRule,
-        NGEdgeIndex, NGEdgeRef, NGNodeIndex,
     },
-    update::{batch::BatchGraphUpdate, AddEdgeGraphUpdate, AddNoteGraphUpdate},
-    utils::{NoteGraphError, PerfLogger, Result, LOGGER},
+    update::{AddEdgeGraphUpdate, AddNoteGraphUpdate, batch::BatchGraphUpdate},
+    utils::{LOGGER, NoteGraphError, PerfLogger, Result},
 };
 
 pub fn edge_matches_edge_filter(edge: &EdgeData, edge_types: Option<&Vec<Rc<str>>>) -> bool {

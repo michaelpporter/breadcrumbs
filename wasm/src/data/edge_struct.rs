@@ -5,9 +5,9 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{
     data::{
-        edge::EdgeData, node::NodeData, NGEdgeIndex, NGEdgeRef, NGNodeIndex, NodeStringifyOptions,
+        NGEdgeIndex, NGEdgeRef, NGNodeIndex, NodeStringifyOptions, edge::EdgeData, node::NodeData,
     },
-    graph::{edge_matches_edge_filter_string, NoteGraph},
+    graph::{NoteGraph, edge_matches_edge_filter_string},
     utils::{self, NoteGraphError},
 };
 
@@ -207,9 +207,9 @@ impl EdgeStruct {
         }
     }
 
-    /// Non-throwing variant of [`Self::check_revision`]. Render paths (which can
-    /// race with `apply_update`) should prefer this and skip stale edges
-    /// instead of bubbling a `NoteGraphError`.
+    /// Non-throwing variant of [`Self::check_revision`]. Render paths (which
+    /// can race with `apply_update`) should prefer this and skip stale
+    /// edges instead of bubbling a `NoteGraphError`.
     pub fn is_current_revision(&self, graph: &NoteGraph) -> bool {
         graph.get_revision() == self.revision
     }

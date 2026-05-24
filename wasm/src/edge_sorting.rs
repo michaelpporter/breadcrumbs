@@ -99,7 +99,10 @@ impl EdgeSorter {
 
         // Skip sorting if any edge is stale — caller is racing with `apply_update`
         // and the result will be re-derived from a fresh traversal anyway.
-        if !data.iter().all(|datum| datum.edge.is_current_revision(graph)) {
+        if !data
+            .iter()
+            .all(|datum| datum.edge.is_current_revision(graph))
+        {
             return Ok(());
         }
 
@@ -212,16 +215,14 @@ fn natural_cmp(a: &str, b: &str) -> std::cmp::Ordering {
                     other => return other,
                 }
             }
-            (Some(a_ch), Some(b_ch)) => {
-                match a_ch.cmp(&b_ch) {
-                    std::cmp::Ordering::Equal => {
-                        a_chars.next();
-                        b_chars.next();
-                        continue;
-                    }
-                    other => return other,
+            (Some(a_ch), Some(b_ch)) => match a_ch.cmp(&b_ch) {
+                std::cmp::Ordering::Equal => {
+                    a_chars.next();
+                    b_chars.next();
+                    continue;
                 }
-            }
+                other => return other,
+            },
         }
     }
 }

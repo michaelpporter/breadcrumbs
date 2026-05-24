@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
 
 use super::NodeStringifyOptions;
 use crate::{

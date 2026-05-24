@@ -9,7 +9,7 @@ use breadcrumbs_graph_wasm::{
     },
     graph::NoteGraph,
     update::{
-        batch::BatchGraphUpdate, AddEdgeGraphUpdate, AddNoteGraphUpdate, RemoveNoteGraphUpdate,
+        AddEdgeGraphUpdate, AddNoteGraphUpdate, RemoveNoteGraphUpdate, batch::BatchGraphUpdate,
     },
     utils::graph_eq,
 };

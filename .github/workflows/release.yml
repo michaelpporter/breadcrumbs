@@ -20,7 +20,7 @@ jobs:
             - name: Install Bun
               uses: oven-sh/setup-bun@v2
               with:
-                  bun-version: latest
+                  bun-version: 1.3.14
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,9 +40,8 @@ jobs:
 
             - name: Build plugin
               run: |
-                  bun install
+                  bun install --frozen-lockfile
                   bun run wasm:test || exit 1
-                  bun run wasm:build || exit 1
                   bun run test || exit 1
                   bun run build || exit 1
 

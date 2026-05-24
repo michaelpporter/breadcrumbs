@@ -2,13 +2,13 @@ use petgraph::prelude::EdgeRef;
 
 use crate::{
     data::{
+        NGEdgeIndex, NGNodeIndex,
         construction::{GCEdgeData, GCNodeData},
         node::NodeData,
-        NGEdgeIndex, NGNodeIndex,
     },
     graph::NoteGraph,
     utils,
-    utils::{NoteGraphError, LOGGER},
+    utils::{LOGGER, NoteGraphError},
 };
 
 pub(super) trait UpdateableGraph {

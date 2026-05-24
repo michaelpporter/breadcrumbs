@@ -6,11 +6,11 @@ use web_time::Instant;
 
 use crate::{
     data::{
+        NGEdgeIndex, NGEdgeRef, NGNodeIndex,
         edge_struct::EdgeStruct,
         traversal::{FlatTraversalResult, TraversalData, TraversalResult},
-        NGEdgeIndex, NGEdgeRef, NGNodeIndex,
     },
-    graph::{edge_matches_edge_filter, NoteGraph},
+    graph::{NoteGraph, edge_matches_edge_filter},
     traversal::options::{TraversalOptions, TraversalPostprocessOptions},
     utils::{
         BreadthFirstTraversalDataStructure, DepthFirstTraversalDataStructure,
@@ -56,7 +56,9 @@ impl NoteGraph {
 
                 let target = edge.target();
 
-                if let Some(ref allowed) = allowed_targets && !allowed.contains(&target) {
+                if let Some(ref allowed) = allowed_targets
+                    && !allowed.contains(&target)
+                {
                     continue;
                 }
 
@@ -161,7 +163,9 @@ impl NoteGraph {
                 if edge_matches_edge_filter(edge_data, edge_types) {
                     let target = outgoing_edge.target();
 
-                    if let Some(allowed) = allowed_targets && !allowed.contains(&target) {
+                    if let Some(allowed) = allowed_targets
+                        && !allowed.contains(&target)
+                    {
                         continue;
                     }
 
@@ -180,7 +184,9 @@ impl NoteGraph {
                     *traversal_count += 1;
 
                     if *traversal_count > TRAVERSAL_COUNT_LIMIT {
-                        return Err(NoteGraphError::new("Traversal exceeded limit of 10,000 nodes. Try decreasing the max depth."));
+                        return Err(NoteGraphError::new(
+                            "Traversal exceeded limit of 10,000 nodes. Try decreasing the max depth.",
+                        ));
                     }
 
                     visited.insert(target);
