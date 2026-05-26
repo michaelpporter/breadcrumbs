@@ -11,6 +11,7 @@ import type {
 	FlatTraversalData,
 	FlatTraversalResult,
 	NoteGraph,
+	NodeStringifyOptions,
 } from "wasm/pkg/breadcrumbs_graph_wasm";
 import {
 	TraversalOptions,
@@ -67,20 +68,28 @@ export function edge_tree_to_list_index(
 	const current_nodes = Array.from(tree.entry_nodes).map(
 		(node_index) => all_traversal_data[node_index],
 	);
-	return edge_tree_to_list_index_inner(
+
+	// Create NodeStringifyOptions once for the entire traversal instead of per edge.
+	const stringify_options = to_node_stringify_options(
+		plugin_settings,
+		options.show_node_options,
+	);
+	const result = edge_tree_to_list_index_inner(
 		graph,
 		all_traversal_data,
 		current_nodes,
-		plugin_settings,
+		stringify_options,
 		options,
 	);
+	stringify_options.free();
+	return result;
 }
 
 function edge_tree_to_list_index_inner(
 	graph: NoteGraph,
 	all_traversal_data: FlatTraversalData[],
 	current_nodes: FlatTraversalData[],
-	plugin_settings: BreadcrumbsSettings | undefined,
+	stringify_options: NodeStringifyOptions,
 	options: Pick<
 		ListIndexOptions,
 		"link_kind" | "indent" | "show_node_options" | "show_attributes"
@@ -92,13 +101,7 @@ function edge_tree_to_list_index_inner(
 	current_nodes.forEach((datum) => {
 		const { edge, children, depth } = datum;
 
-		const display = edge.stringify_target(
-			graph,
-			to_node_stringify_options(
-				plugin_settings,
-				options.show_node_options,
-			),
-		);
+		const display = edge.stringify_target(graph, stringify_options);
 
 		const link = Links.ify(edge.target_path(graph), display, {
 			link_kind: options.link_kind,
@@ -118,7 +121,7 @@ function edge_tree_to_list_index_inner(
 			graph,
 			all_traversal_data,
 			new_children,
-			plugin_settings,
+			stringify_options,
 			options,
 		);
 	});
@@ -154,10 +157,12 @@ export function build_list_index(
 		postprocess_options,
 	);
 
-	return edge_tree_to_list_index(
+	const result = edge_tree_to_list_index(
 		graph,
 		traversal_result,
 		plugin_settings,
 		options,
 	);
+	traversal_result.free();
+	return result;
 }

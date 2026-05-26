@@ -42,6 +42,11 @@
 		),
 	);
 
+	$effect(() => {
+		const o = node_stringify_options;
+		return () => o.free();
+	});
+
 	let grouped_out_edges = $derived.by(() => {
 		if (!plugin.graph.has_node(file_path)) return null;
 		const efl = edge_field_labels;

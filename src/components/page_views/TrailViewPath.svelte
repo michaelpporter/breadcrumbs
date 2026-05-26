@@ -21,6 +21,11 @@
 		),
 	);
 
+	$effect(() => {
+		const o = node_stringify_options;
+		return () => o.free();
+	});
+
 	let reversed = $derived(all_paths.map((path) => path.reverse_edges));
 </script>
 

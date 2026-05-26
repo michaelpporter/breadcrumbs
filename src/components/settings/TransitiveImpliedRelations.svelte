@@ -446,8 +446,7 @@
 							<RenderExternalCodeblock
 								{plugin}
 								type="mermaid"
-								code={Mermaid.from_transitive_rule(rule)
-									.mermaid}
+								code={Mermaid.from_transitive_rule(rule)}
 							/>
 						{/if}
 					</div>

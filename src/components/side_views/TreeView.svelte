@@ -187,6 +187,16 @@
 		to_node_stringify_options(plugin.settings, settings.show_node_options),
 	);
 
+	// Free WASM objects when derived values change or component unmounts.
+	$effect(() => {
+		const t = tree;
+		return () => t?.free();
+	});
+	$effect(() => {
+		const o = node_stringify_options;
+		return () => o.free();
+	});
+
 	let search_open = $state(false);
 	let search_query = $state("");
 

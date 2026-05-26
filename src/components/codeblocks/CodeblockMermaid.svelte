@@ -111,10 +111,12 @@
 		);
 
 		try {
-			code = plugin.graph.generate_mermaid_graph(
+			const mermaid_data = plugin.graph.generate_mermaid_graph(
 				traversal_options,
 				mermaid_options,
-			).mermaid;
+			);
+			code = mermaid_data.mermaid;
+			mermaid_data.free();
 			error = undefined;
 		} catch (e) {
 			log.error("Error generating mermaid graph", e);

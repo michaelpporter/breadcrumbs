@@ -76,7 +76,7 @@ function from_transitive_rule(
 		BreadcrumbsSettings["implied_relations"]["transitive"][number],
 		"chain" | "close_field" | "close_reversed" | "name"
 	>,
-) {
+): string {
 	const wasm_rule = new TransitiveGraphRule(
 		"",
 		rule.chain.map((attr) => attr.field!),
@@ -87,8 +87,9 @@ function from_transitive_rule(
 	);
 
 	const graph = wasm_rule.create_example_graph();
+	wasm_rule.free();
 
-	return graph.generate_mermaid_graph(
+	const mermaid_data = graph.generate_mermaid_graph(
 		new TraversalOptions(["1"], undefined, 100, 1000, false, undefined),
 		new MermaidGraphOptions(
 			undefined,
@@ -105,6 +106,11 @@ function from_transitive_rule(
 			[],
 		),
 	);
+	graph.free();
+
+	const code = mermaid_data.mermaid;
+	mermaid_data.free();
+	return code;
 }
 
 export const Mermaid = {

@@ -79,13 +79,15 @@
 		);
 
 		let traversal_data = plugin.graph.rec_traverse(traversal_options);
-
+		// Extract primitives before freeing; TraversalResult must be freed explicitly.
+		const hit_depth_limit = traversal_data.hit_depth_limit;
 		let all_paths = traversal_data.to_paths();
+		traversal_data.free();
 
-		return {
-			selected_paths: all_paths.select(settings.selection),
-			hit_depth_limit: traversal_data.hit_depth_limit,
-		};
+		const selected_paths = all_paths.select(settings.selection);
+		all_paths.free();
+
+		return { selected_paths, hit_depth_limit };
 	});
 
 	let MAX_DEPTH = $derived(
@@ -101,6 +103,16 @@
 	let sorted_paths = $derived(
 		data.selected_paths?.process(plugin.graph, depth),
 	);
+
+	// Free WASM objects when the derived values change or the component unmounts.
+	$effect(() => {
+		const p = data.selected_paths;
+		return () => p?.free();
+	});
+	$effect(() => {
+		const paths = sorted_paths;
+		return () => paths?.forEach((p) => p.free());
+	});
 </script>
 
 <div>

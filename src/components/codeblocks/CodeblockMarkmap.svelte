@@ -5,7 +5,7 @@
 	import type { BreadcrumbsError } from "src/interfaces/graph";
 	import type BreadcrumbsPlugin from "src/main";
 	import { active_file_store } from "src/stores/active_file";
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	import CopyToClipboardButton from "../button/CopyToClipboardButton.svelte";
 	import RenderExternalCodeblock from "../obsidian/RenderExternalCodeblock.svelte";
 	import CodeblockErrors from "./CodeblockErrors.svelte";
@@ -72,14 +72,16 @@
 		);
 
 		try {
-			data = plugin.graph.rec_traverse_and_process(
+			const new_data = plugin.graph.rec_traverse_and_process(
 				traversal_options,
 				postprocess_options,
 			);
+			data?.free(); // free previous FlatTraversalResult
+			data = new_data;
 			error = undefined;
 		} catch (e) {
 			log.error("Error updating codeblock tree", e);
-
+			data?.free();
 			data = undefined;
 			if (e instanceof NoteGraphError) {
 				error = e.message;
@@ -107,6 +109,7 @@
 							.link_kind,
 				},
 			);
+			stringify_options.free();
 
 			return (
 				"# " +
@@ -124,6 +127,9 @@
 	});
 
 	$inspect(code);
+
+	// Free final FlatTraversalResult when component unmounts.
+	onDestroy(() => data?.free());
 
 	// export let plugin: BreadcrumbsPlugin;
 	// export let options: ICodeblock["Options"];

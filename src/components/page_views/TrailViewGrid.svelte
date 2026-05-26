@@ -23,6 +23,11 @@
 		),
 	);
 
+	$effect(() => {
+		const o = node_stringify_options;
+		return () => o.free();
+	});
+
 	let trail_grid = $derived.by(() => {
 		// Precompute target-path strings once to avoid repeated WASM calls in sort.
 		const path_keys = all_paths.map((path) =>

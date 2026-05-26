@@ -6,7 +6,7 @@
 	import type BreadcrumbsPlugin from "src/main";
 	import { active_file_store } from "src/stores/active_file";
 	import { Timer } from "src/utils/timer";
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	import {
 		FlatTraversalResult,
 		NoteGraphError,
@@ -37,6 +37,10 @@
 			plugin.settings.views.codeblocks.show_node_options,
 		),
 	);
+	$effect(() => {
+		const o = node_stringify_options;
+		return () => o.free();
+	});
 
 	const DEFAULT_MAX_DEPTH = 5;
 
@@ -75,15 +79,16 @@
 		);
 
 		try {
-			data = plugin.graph.rec_traverse_and_process(
+			const new_data = plugin.graph.rec_traverse_and_process(
 				traversal_options,
 				postprocess_options,
 			);
-
+			data?.free(); // free previous FlatTraversalResult
+			data = new_data;
 			error = undefined;
 		} catch (e) {
 			log.error("Error updating codeblock tree", e);
-
+			data?.free();
 			data = undefined;
 			if (e instanceof NoteGraphError) {
 				error = e.message;
@@ -101,6 +106,9 @@
 
 		log.debug(timer.elapsedMessage("CodeblockTree initial traversal"));
 	});
+
+	// Free final FlatTraversalResult when component unmounts.
+	onDestroy(() => data?.free());
 </script>
 
 <div class="BC-codeblock-tree">

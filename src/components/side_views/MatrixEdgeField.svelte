@@ -36,6 +36,11 @@
 	let node_stringify_options = $derived(
 		to_node_stringify_options(plugin.settings, show_node_options),
 	);
+
+	$effect(() => {
+		const o = node_stringify_options;
+		return () => o.free();
+	});
 </script>
 
 <details

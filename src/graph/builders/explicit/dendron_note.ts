@@ -85,6 +85,10 @@ function handle_dendron_note(
 	//   So we rebuild from `path`
 	const source_basename_splits = Paths.basename(source_id).split(delimiter);
 	if (source_basename_splits.length === 1) return;
+	// Skip Johnny.Decimal-style names (first segment is all digits, e.g. "12.01 Title").
+	// Those use the same delimiter but are handled by the johnny_decimal_note builder;
+	// processing them here would create ghost parent nodes (e.g. "12.md").
+	if (/^\d+$/.test(source_basename_splits[0])) return;
 
 	const dendron_note_info = get_dendron_note_info(
 		plugin,
