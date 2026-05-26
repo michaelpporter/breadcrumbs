@@ -1,0 +1,45 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - master
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Install Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: 1.3.14
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Install Rust
+              uses: actions-rust-lang/setup-rust-toolchain@v1
+              with:
+                  toolchain: stable
+                  target: wasm32-unknown-unknown
+
+            - name: Install wasm-pack
+              run: cargo install wasm-pack --locked
+
+            - name: Set stable toolchain
+              run: cd wasm && rustup override set stable && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu && cd ..
+
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+
+            - name: Rust tests
+              run: bun run wasm:test || exit 1
+
+            - name: TypeScript tests
+              run: bun run test || exit 1
+
+            - name: Build
+              run: bun run build || exit 1
