@@ -6,7 +6,7 @@ export const _add_settings_tag_note = (
 	containerEl: HTMLElement,
 ) => {
 	new_setting(containerEl, {
-		name: "Default Field",
+		name: "Default field",
 		desc: "Field to use if the BC-tag-note-field is not specified",
 		select: {
 			value: plugin.settings.explicit_edge_sources.tag_note.default_field,
@@ -23,7 +23,7 @@ export const _add_settings_tag_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Default Sibling Field",
+		name: "Default sibling field",
 		desc: "Field to use for sibling edges between notes sharing the same tag. Leave empty to disable. Can be overridden per note with BC-tag-note-sibling-field.",
 		select: {
 			value: plugin.settings.explicit_edge_sources.tag_note

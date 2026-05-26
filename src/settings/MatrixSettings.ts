@@ -28,7 +28,7 @@ export const _add_settings_matrix = (
 	});
 
 	new_setting(containerEl, {
-		name: "Custom Field Sorting",
+		name: "Custom field sorting",
 		desc: "Sort matrix edge fields by a custom label order.",
 		toggle: {
 			value: plugin.settings.views.side.matrix.custom_sort_fields,
@@ -99,7 +99,7 @@ export const _add_settings_matrix = (
 	});
 
 	new_setting(containerEl, {
-		name: "Lock View",
+		name: "Lock view",
 		desc: "Lock the matrix view to the current file",
 		toggle: {
 			value: plugin.settings.views.side.matrix.lock_view,
@@ -113,7 +113,7 @@ export const _add_settings_matrix = (
 	});
 
 	new_setting(containerEl, {
-		name: "Lock Path",
+		name: "Lock path",
 		desc: "Path to lock the matrix view to (overrides current file)",
 		input: {
 			value: plugin.settings.views.side.matrix.lock_path,

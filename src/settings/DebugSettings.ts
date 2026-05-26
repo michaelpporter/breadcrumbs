@@ -7,7 +7,7 @@ export const _add_settings_debug = (
 	containerEl: HTMLElement,
 ) => {
 	new_setting(containerEl, {
-		name: "Debug Level",
+		name: "Debug level",
 		desc: "Set the level of debug logging",
 		select: {
 			options: LOG_LEVELS,

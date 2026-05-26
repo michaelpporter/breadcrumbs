@@ -6,7 +6,7 @@ export const _add_settings_list_note = (
 	containerEl: HTMLElement,
 ) => {
 	new_setting(containerEl, {
-		name: "Default Neighbour Field",
+		name: "Default neighbour field",
 		desc: "Field to use to join neighbouring list items.",
 		select: {
 			value: plugin.settings.explicit_edge_sources.list_note

@@ -1,3 +1,4 @@
+import { TFile, TFolder } from "obsidian";
 import { META_ALIAS } from "src/const/metadata_fields";
 import type {
 	BreadcrumbsError,
@@ -46,29 +47,26 @@ const get_folder_note_info = (
 	});
 };
 
-const iterate_folder_files = async (
+const iterate_folder_files = (
 	plugin: BreadcrumbsPlugin,
-	folder: string,
+	folder_path: string,
 	cb: (path: string) => void,
 	/** Keep going for subfolders? Or just stop after the first folder */
 	recurse: boolean,
 ) => {
-	const folder_files = await plugin.app.vault.adapter.list(folder);
+	const folder = plugin.app.vault.getAbstractFileByPath(folder_path);
+	if (!(folder instanceof TFolder)) return;
 
-	// For each of the immediate children
-	folder_files.files.forEach((path) => cb(path));
-
-	if (recurse) {
-		// For each of the folders, recurse
-		await Promise.all(
-			folder_files.folders.map((folder) =>
-				// When the subfolder is recursed, what does it mean when the callback runs?
-				// Where will it point up to? The initial folder's files point up to the folder_note
-				// But the subfolders don't specify a folder_note
-				// NOTE: For now, the subfiles will point up to the initial folder_note
-				iterate_folder_files(plugin, folder, cb, true),
-			),
-		);
+	for (const child of folder.children) {
+		if (child instanceof TFile) {
+			cb(child.path);
+		} else if (recurse && child instanceof TFolder) {
+			// When the subfolder is recursed, what does it mean when the callback runs?
+			// Where will it point up to? The initial folder's files point up to the folder_note
+			// But the subfolders don't specify a folder_note
+			// NOTE: For now, the subfiles will point up to the initial folder_note
+			iterate_folder_files(plugin, child.path, cb, true);
+		}
 	}
 };
 
@@ -129,31 +127,29 @@ export const _add_explicit_edges_folder_note: ExplicitEdgeBuilder = async (
 		});
 	});
 
-	await Promise.all(
-		folder_notes.map(({ data, file: folder_note }) =>
-			iterate_folder_files(
-				plugin,
-				folder_note.folder,
-				(target_path) => {
-					if (
-						!target_path.endsWith(".md") ||
-						target_path === folder_note.path
-					) {
-						return;
-					}
+	folder_notes.forEach(({ data, file: folder_note }) =>
+		iterate_folder_files(
+			plugin,
+			folder_note.folder,
+			(target_path) => {
+				if (
+					!target_path.endsWith(".md") ||
+					target_path === folder_note.path
+				) {
+					return;
+				}
 
-					// We know path is resolved
-					results.edges.push(
-						new GCEdgeData(
-							folder_note.path,
-							target_path,
-							data.field,
-							"folder_note",
-						),
-					);
-				},
-				data.recurse,
-			),
+				// We know path is resolved
+				results.edges.push(
+					new GCEdgeData(
+						folder_note.path,
+						target_path,
+						data.field,
+						"folder_note",
+					),
+				);
+			},
+			data.recurse,
 		),
 	);
 

@@ -39,7 +39,7 @@ export const _add_settings_trail_view = (
 	});
 
 	new_setting(containerEl, {
-		name: "Path Selection",
+		name: "Path selection",
 		desc: "How to select the path(s) to display in the trail view",
 		select: {
 			value: plugin.settings.views.page.trail.selection,
@@ -92,7 +92,7 @@ export const _add_settings_trail_view = (
 	});
 
 	new_setting(containerEl, {
-		name: "Merge Fields",
+		name: "Merge fields",
 		desc: "Merge fields in the traversal, instead of keeping their paths separate",
 		toggle: {
 			value: plugin.settings.views.page.trail.merge_fields,

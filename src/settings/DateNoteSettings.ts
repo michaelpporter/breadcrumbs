@@ -1,4 +1,4 @@
-import { Notice } from "obsidian";
+import { Notice, Setting } from "obsidian";
 import type { PeriodNoteConfig } from "src/interfaces/settings";
 import type BreadcrumbsPlugin from "src/main";
 import { new_setting } from "src/utils/settings";
@@ -28,7 +28,7 @@ function add_period_settings(
 	const cfg = (): PeriodNoteConfig =>
 		plugin.settings.explicit_edge_sources.date_note[kind];
 
-	containerEl.createEl("h6", { text: label });
+	new Setting(containerEl).setHeading().setName(label);
 
 	new_setting(containerEl, {
 		name: "Enabled",
@@ -52,7 +52,7 @@ function add_period_settings(
 	format_frag_span.createEl("code", { text: PERIOD_FORMAT_HINT[kind] });
 
 	new_setting(containerEl, {
-		name: "Date Format",
+		name: "Date format",
 		desc: format_frag,
 		input: {
 			value: cfg().date_format,
@@ -84,7 +84,7 @@ function add_period_settings(
 	const edge_field_options = plugin.settings.edge_fields.map((f) => f.label);
 
 	new_setting(containerEl, {
-		name: "Next Field",
+		name: "Next field",
 		desc: `Edge field for sequential next/prev edges between ${label.toLowerCase()} notes`,
 		select: {
 			value: cfg().next_field,
@@ -97,7 +97,7 @@ function add_period_settings(
 	});
 
 	new_setting(containerEl, {
-		name: "Up Field",
+		name: "Up field",
 		desc: `Edge field for child-note → ${label.toLowerCase()}-note containment edges`,
 		select: {
 			value: cfg().up_field,
@@ -130,7 +130,7 @@ export const _add_settings_date_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Default Field",
+		name: "Default field",
 		desc: "Field used to join date notes together. Breadcrumbs takes the current note's date, adds one day, and joins the two notes with this field.",
 		select: {
 			value: plugin.settings.explicit_edge_sources.date_note.default_field,
@@ -154,7 +154,7 @@ export const _add_settings_date_note = (
 	date_format_span.appendText(" to use");
 
 	new_setting(containerEl, {
-		name: "Date Format",
+		name: "Date format",
 		desc: date_format_fragment,
 		input: {
 			value: plugin.settings.explicit_edge_sources.date_note.date_format,
@@ -172,7 +172,7 @@ export const _add_settings_date_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Stretch to Existing",
+		name: "Stretch to existing",
 		desc: "If there is a gap from one day to another, should the next note be the unresolved one in one day or should it 'stretch' to the next resolved (existing) note?",
 		toggle: {
 			value: plugin.settings.explicit_edge_sources.date_note.stretch_to_existing,
@@ -186,7 +186,7 @@ export const _add_settings_date_note = (
 		},
 	});
 
-	containerEl.createEl("h5", { text: "Period Notes" });
+	new Setting(containerEl).setHeading().setName("Period notes");
 	for (const kind of ["week", "month", "quarter", "year"] as PeriodKind[]) {
 		add_period_settings(plugin, containerEl, kind);
 	}

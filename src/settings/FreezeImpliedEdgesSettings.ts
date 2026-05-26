@@ -28,7 +28,7 @@ export const _add_settings_freeze_implied_edges = (
 	mount(FieldGroupLabelsSettingItem, {
 		target: contentEl,
 		props: {
-			name: "Included Field Groups",
+			name: "Included field groups",
 			description:
 				"Field groups to include when freezing edges.",
 			edge_field_groups: plugin.settings.edge_field_groups,
@@ -42,7 +42,7 @@ export const _add_settings_freeze_implied_edges = (
 	});
 
 	new_setting(contentEl, {
-		name: "Use Alias",
+		name: "Use alias",
 		desc: "Freeze implied edges using the first alias of the target node.",
 		toggle: {
 			value: settings.commands.freeze_implied_edges.default_options.use_alias,

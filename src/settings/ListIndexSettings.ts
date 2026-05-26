@@ -41,7 +41,7 @@ export const _add_settings_list_index = (
 	});
 
 	new_setting(contentEl, {
-		name: "Link Kind",
+		name: "Link kind",
 		desc: "Format to use for links",
 		select: {
 			options: LINK_KINDS,

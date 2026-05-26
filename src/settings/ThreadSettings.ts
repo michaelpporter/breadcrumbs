@@ -22,7 +22,7 @@ export const _add_settings_thread = (
 	});
 
 	new_setting(contentEl, {
-		name: "Target Path Template",
+		name: "Target path template",
 		desc: "The template to use for the target path. You don't need to add the .md extension.",
 		input: {
 			value: settings.commands.thread.default_options

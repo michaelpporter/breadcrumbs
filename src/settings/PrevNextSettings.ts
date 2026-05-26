@@ -26,7 +26,7 @@ export const _add_settings_prev_next_view = (
 	mount(FieldGroupLabelsSettingItem, {
 		target: containerEl,
 		props: {
-			name: "Field Groups for Left",
+			name: "Field groups for left",
 			description:
 				"Select the field groups to show in the left side of this view",
 			edge_field_groups: plugin.settings.edge_field_groups,
@@ -45,7 +45,7 @@ export const _add_settings_prev_next_view = (
 	mount(FieldGroupLabelsSettingItem, {
 		target: containerEl,
 		props: {
-			name: "Field Groups for Right",
+			name: "Field groups for right",
 			description:
 				"Select the field groups to show in the right side of this view",
 			edge_field_groups: plugin.settings.edge_field_groups,
@@ -67,7 +67,7 @@ export const _add_settings_prev_next_view = (
 			(plugin.settings.views.page.prev_next.show_node_options = value),
 	});
 
-	containerEl.createEl("h6", { text: "Period Rows" });
+	new Setting(containerEl).setHeading().setName("Period rows");
 
 	for (const kind of ["week", "month", "quarter", "year"] as const) {
 		new_setting(containerEl, {

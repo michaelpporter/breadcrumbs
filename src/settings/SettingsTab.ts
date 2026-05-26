@@ -1,5 +1,5 @@
 import type { App } from "obsidian";
-import { Notice, PluginSettingTab } from "obsidian";
+import { Notice, PluginSettingTab, Setting } from "obsidian";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { perf_start, perf_end, perf_sync } from "src/utils/perf";
@@ -89,9 +89,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			containerEl.addClass("BC-settings-tab");
 
 			const fallback = containerEl.createDiv({ cls: "p-4" });
-			fallback.createEl("h3", {
-				text: "Breadcrumbs settings failed to load",
-			});
+			new Setting(fallback).setHeading().setName("Breadcrumbs settings failed to load");
 			fallback.createEl("p", {
 				text: String(
 					(error as Error)?.stack ??
@@ -123,7 +121,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 
 		// Implied Relations
 		containerEl.createEl("hr");
-		containerEl.createEl("h3", { text: "Implied Relations" });
+		new Setting(containerEl).setHeading().setName("Implied relations");
 
 		perf_sync("mount:TransitiveImpliedRelations", () => {
 			this.components.push(
@@ -138,7 +136,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 
 		// Edge Sources
 		containerEl.createEl("hr");
-		containerEl.createEl("h3", { text: "Edge Sources" });
+		new Setting(containerEl).setHeading().setName("Edge sources");
 
 		perf_sync("section:tag_note", () =>
 			_add_settings_tag_note(
@@ -192,7 +190,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 
 		// Views
 		containerEl.createEl("hr");
-		containerEl.createEl("h3", { text: "Views" });
+		new Setting(containerEl).setHeading().setName("Views");
 
 		perf_sync("section:matrix", () =>
 			_add_settings_matrix(
@@ -207,17 +205,17 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			s: { text: "> Page" },
 		}).children;
 
-		page_details.createEl("h5", { text: "General" });
+		new Setting(page_details).setHeading().setName("General");
 		perf_sync("section:page_views", () =>
 			_add_settings_page_views(plugin, page_details),
 		);
 
-		page_details.createEl("h5", { text: "Trail" });
+		new Setting(page_details).setHeading().setName("Trail");
 		perf_sync("section:trail_view", () =>
 			_add_settings_trail_view(plugin, page_details),
 		);
 
-		page_details.createEl("h5", { text: "Previous/Next" });
+		new Setting(page_details).setHeading().setName("Previous/Next");
 		perf_sync("section:prev_next_view", () =>
 			_add_settings_prev_next_view(plugin, page_details),
 		);
@@ -240,7 +238,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 
 		// Commands
 		containerEl.createEl("hr");
-		containerEl.createEl("h3", { text: "Commands" });
+		new Setting(containerEl).setHeading().setName("Commands");
 
 		perf_sync("section:rebuild_graph", () =>
 			_add_settings_rebuild_graph(
@@ -278,7 +276,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 
 		// Suggestors
 		containerEl.createEl("hr");
-		containerEl.createEl("h3", { text: "Suggestors" });
+		new Setting(containerEl).setHeading().setName("Suggestors");
 
 		perf_sync("section:edge_field_suggestor", () =>
 			_add_settings_edge_field_suggestor(

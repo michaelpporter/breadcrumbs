@@ -42,7 +42,7 @@ export const _add_settings_dendron_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Default Field",
+		name: "Default field",
 		desc: "Field to use if the BC-dendron-note-field is not specified",
 		select: {
 			value: plugin.settings.explicit_edge_sources.dendron_note
@@ -60,7 +60,7 @@ export const _add_settings_dendron_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Default Sibling Field",
+		name: "Default sibling field",
 		desc: "Field to use for sibling edges between notes at the same level in the hierarchy. Leave empty to disable.",
 		select: {
 			value: plugin.settings.explicit_edge_sources.dendron_note
@@ -78,7 +78,7 @@ export const _add_settings_dendron_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Display Trimmed",
+		name: "Display trimmed",
 		desc: "Display Dendron note names as the right-most split of the delimiter. e.g. `a.b.c` -> `c`",
 		toggle: {
 			value: plugin.settings.explicit_edge_sources.dendron_note

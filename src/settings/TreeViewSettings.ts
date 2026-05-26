@@ -28,7 +28,7 @@ export const _add_settings_tree_view = (
 	});
 
 	new_setting(containerEl, {
-		name: "Find Root",
+		name: "Find root",
 		desc: "Walk up the hierarchy to find the root note, then display the tree from there. When off, the tree starts from the current file.",
 		toggle: {
 			value: plugin.settings.views.side.tree.find_root,
@@ -44,7 +44,7 @@ export const _add_settings_tree_view = (
 	mount(FieldGroupLabelsSettingItem, {
 		target: containerEl,
 		props: {
-			name: "Find Root Field Groups",
+			name: "Find root field groups",
 			description:
 				"Which edge-type groups to follow when walking up to the root. Typically 'ups'.",
 			edge_field_groups: plugin.settings.edge_field_groups,
@@ -112,7 +112,7 @@ export const _add_settings_tree_view = (
 	mount(FieldGroupLabelsSettingItem, {
 		target: containerEl,
 		props: {
-			name: "Field Groups",
+			name: "Field groups",
 			description:
 				"Which edge-type groups this view follows. Include downs so the tree can traverse down (parent → child), including Dendron hubs to their children. With only ups, only up (child → parent) edges are used.",
 			edge_field_groups: plugin.settings.edge_field_groups,
@@ -128,7 +128,7 @@ export const _add_settings_tree_view = (
 	});
 
 	new_setting(containerEl, {
-		name: "Merge Fields",
+		name: "Merge fields",
 		desc: "Merge fields in the traversal, instead of keeping their paths separate",
 		toggle: {
 			value: plugin.settings.views.side.tree.merge_fields,
@@ -142,7 +142,7 @@ export const _add_settings_tree_view = (
 	});
 
 	new_setting(containerEl, {
-		name: "Lock View",
+		name: "Lock view",
 		desc: "Lock the tree view to the current file",
 		toggle: {
 			value: plugin.settings.views.side.tree.lock_view,
@@ -156,7 +156,7 @@ export const _add_settings_tree_view = (
 	});
 
 	new_setting(containerEl, {
-		name: "Lock Path",
+		name: "Lock path",
 		desc: "Path to lock the tree view to (overrides current file)",
 		input: {
 			value: plugin.settings.views.side.tree.lock_path,

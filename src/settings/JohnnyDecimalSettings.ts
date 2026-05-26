@@ -44,7 +44,7 @@ export const _add_settings_johnny_decimal_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Default Field",
+		name: "Default field",
 		desc: "Field to use to point to next note in the Johnny.Decimal system",
 		select: {
 			value: plugin.settings.explicit_edge_sources.johnny_decimal_note
@@ -62,7 +62,7 @@ export const _add_settings_johnny_decimal_note = (
 	});
 
 	new_setting(containerEl, {
-		name: "Default Sibling Field",
+		name: "Default sibling field",
 		desc: "Field to use for sibling edges between notes at the same level in the hierarchy. Leave empty to disable.",
 		select: {
 			value: plugin.settings.explicit_edge_sources.johnny_decimal_note

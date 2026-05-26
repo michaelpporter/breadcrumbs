@@ -28,7 +28,7 @@ export const _add_settings_edge_field_suggestor = (
 	});
 
 	new_setting(contentEl, {
-		name: "Trigger String",
+		name: "Trigger string",
 		desc: "The string that triggers the suggestor (when entered at the start of a line)",
 		input: {
 			value: settings.suggestors.edge_field.trigger,
