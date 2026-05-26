@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.12.0](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.10...4.12.0) (2026-05-26)
+
+### Chores
+
+* **Add `eslint-plugin-obsidianmd`** — integrates Obsidian's official ESLint plugin (v0.3.0) into the lint pipeline. Enforces plugin guidelines on command IDs, settings headings, UI sentence case, vault APIs, and more. ESLint now errors at max 0 warnings.
+* **Strip plugin-ID prefix from all command IDs** — command IDs previously included the `breadcrumbs:` prefix (e.g. `breadcrumbs:rebuild-graph`), causing Obsidian to register them as `breadcrumbs:breadcrumbs:rebuild-graph`. All IDs are now unprefixed per Obsidian guidelines. **⚠ Breaking for users with custom keybindings** — re-bind any affected commands after updating.
+* **Remove `confirm()` from freeze-to-vault command** — replaced the browser `confirm()` dialog with the existing `GenericModal` prompt (which already requires typing `FREEZE TO VAULT` to confirm). `confirm()` is not permitted in Obsidian plugins.
+* **Sentence case audit** — fix casing in several UI strings: `'Show/Copy graph stats'` → `'Show/copy graph stats'`, `'Create List Index'` → `'Create list index'`, `'Build & Copy to Clipboard'` → `'Build & copy to clipboard'`, `'Enable Previous/Next view'` / `'Previous/Next'` → lowercase, `'No active markdown view'` → `'No active Markdown view'`.
+* **Zod `.passthrough()` → `.loose()`** — `.passthrough()` is deprecated in Zod v4; updated codeblock schema to use `.loose()`.
+* **AGENTS.md** — replace generic sample-plugin template with breadcrumbs-specific guidance covering bun, Svelte 5 runes, WASM boundary, edge builders, settings migration, and agent do/don't rules.
+
 ### [4.11.10](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.9...4.11.10) (2026-05-25)
 
 ### Bug Fixes

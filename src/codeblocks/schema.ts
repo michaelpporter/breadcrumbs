@@ -262,7 +262,7 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 					field: "basename",
 				}),
 		})
-		.passthrough()
+		.loose()
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
 		.default({} as any)
 

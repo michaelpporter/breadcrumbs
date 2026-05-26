@@ -82,6 +82,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 		} catch (error) {
 			log.error("BreadcrumbsSettingTab.display threw >", error);
 			new Notice(
+				// eslint-disable-next-line obsidianmd/ui/sentence-case -- URL embedded in string; capitalising breaks the link
 				"Breadcrumbs: failed to render settings tab. See developer console and report at https://github.com/SkepticMystic/breadcrumbs/issues",
 			);
 
@@ -215,7 +216,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			_add_settings_trail_view(plugin, page_details),
 		);
 
-		new Setting(page_details).setHeading().setName("Previous/Next");
+		new Setting(page_details).setHeading().setName("Previous/next");
 		perf_sync("section:prev_next_view", () =>
 			_add_settings_prev_next_view(plugin, page_details),
 		);

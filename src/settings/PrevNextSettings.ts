@@ -10,8 +10,8 @@ export const _add_settings_prev_next_view = (
 	containerEl: HTMLElement,
 ) => {
 	new Setting(containerEl)
-		.setName("Enable Previous/Next view")
-		.setDesc("Show the Previous/Next view at the top of the page")
+		.setName("Enable previous/next view")
+		.setDesc("Show the previous/next view at the top of the page")
 		.addToggle((toggle) => {
 			toggle
 				.setValue(plugin.settings.views.page.prev_next.enabled)

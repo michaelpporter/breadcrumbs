@@ -17,14 +17,14 @@ import { thread } from "./thread";
 
 export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	plugin.addCommand({
-		id: "breadcrumbs:rebuild-graph",
+		id: "rebuild-graph",
 		name: "Rebuild graph",
 		callback: async () => await plugin.rebuildGraph(),
 	});
 
 	Object.keys(VIEW_IDS).forEach((view_id) => {
 		plugin.addCommand({
-			id: `breadcrumbs:open-${view_id}-view`,
+			id: `open-${view_id}-view`,
 			name: `Open ${view_id} view`,
 			callback: () =>
 				plugin.activateView(VIEW_IDS[view_id as keyof typeof VIEW_IDS]),
@@ -32,7 +32,7 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	});
 
 	plugin.addCommand({
-		id: "breadcrumbs:create-list-index",
+		id: "create-list-index",
 		name: "Create list index",
 		callback: () => {
 			new CreateListIndexModal(plugin.app, plugin).open();
@@ -40,8 +40,8 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	});
 
 	plugin.addCommand({
-		id: "breadcrumbs:graph-stats",
-		name: "Show/Copy graph stats",
+		id: "graph-stats",
+		name: "Show/copy graph stats",
 		callback: async () => {
 			const stats = get_graph_stats(plugin.graph, {
 				groups: plugin.settings.edge_field_groups,
@@ -57,7 +57,7 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	});
 
 	plugin.addCommand({
-		id: "breadcrumbs:freeze-implied-edges-to-note",
+		id: "freeze-implied-edges-to-note",
 		name: "Freeze implied edges to note",
 		callback: async () => {
 			// TODO: Probably add an intermediate modal to specify options
@@ -79,17 +79,9 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	});
 
 	plugin.addCommand({
-		id: "breadcrumbs:freeze-implied-edges-to-vault",
+		id: "freeze-implied-edges-to-vault",
 		name: "Freeze implied edges to all notes in vault",
 		callback: async () => {
-			if (
-				!confirm(
-					"Are you sure you want to freeze implied edges to all notes in vault? This will write to all notes that have outgoing implied edges.",
-				)
-			) {
-				return new Notice("Command cancelled");
-			}
-
 			const PROMPT_TARGET = "FREEZE TO VAULT";
 
 			new GenericModal(plugin.app, (modal) => {
@@ -142,7 +134,7 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	/// Jump to first neighbour
 	plugin.settings.edge_field_groups.forEach((group) => {
 		plugin.addCommand({
-			id: `breadcrumbs:jump-to-first-neighbour-group:${group.label}`,
+			id: `jump-to-first-neighbour-group:${group.label}`,
 			name: `Jump to first neighbour by group:${group.label}`,
 			callback: () => jump_to_neighbour(plugin, { fields: group.fields }),
 		});
@@ -151,7 +143,7 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	// Thread
 	plugin.settings.edge_fields.forEach(({ label }) => {
 		plugin.addCommand({
-			id: `breadcrumbs:thread-field:${label}`,
+			id: `thread-field:${label}`,
 			name: `Thread by field:${label}`,
 			callback: () =>
 				thread(
@@ -163,7 +155,7 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	});
 
 	plugin.addCommand({
-		id: "breadcrumbs:toggle-sticky-page-views",
+		id: "toggle-sticky-page-views",
 		name: "Toggle sticky page views",
 		callback: async () => {
 			plugin.settings.views.page.all.sticky =

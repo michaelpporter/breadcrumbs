@@ -29,6 +29,7 @@ export function to_node_stringify_options(
  * @deprecated
  */
 export type EdgeAttrFilters = Partial<
+	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	Pick<BCEdgeAttributes, "explicit" | "field">
 > &
 	Partial<{

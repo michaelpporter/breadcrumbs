@@ -40,7 +40,7 @@ export class CreateListIndexModal extends Modal {
 		const { contentEl, plugin } = this;
 
 		contentEl.createEl("h2", {
-			text: "Create List Index",
+			text: "Create list index",
 		});
 
 		mount(FieldGroupLabelsSettingItem, {
@@ -112,7 +112,7 @@ export class CreateListIndexModal extends Modal {
 
 		new Setting(contentEl).addButton((btn) =>
 			btn
-				.setButtonText("Build & Copy to Clipboard")
+				.setButtonText("Build & copy to clipboard")
 				.setCta()
 				.onClick(async () => {
 					log.debug("build_list_index options", this.options);

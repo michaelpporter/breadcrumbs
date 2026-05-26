@@ -5,11 +5,18 @@ import tseslint from 'typescript-eslint';
 import only_warn from 'eslint-plugin-only-warn';
 import eslintPluginSvelte from 'eslint-plugin-svelte';
 import plugin_import from 'eslint-plugin-import-x';
+import obsidianmd from 'eslint-plugin-obsidianmd';
 
 export default tseslint.config(
 	{
 		ignores: ['npm/', 'node_modules/', 'main.js', '**/*.svelte', '**/*.d.ts'],
 	},
+	// Strip `import` plugin from obsidianmd recommended — we use import-x which registers the same namespace
+	...obsidianmd.configs.recommended.map((c) => {
+		if (!c.plugins || !('import' in c.plugins)) return c;
+		const { import: _dropped, ...rest } = c.plugins;
+		return { ...c, plugins: rest };
+	}),
 	...eslintPluginSvelte.configs['flat/recommended'],
 	...eslintPluginSvelte.configs['flat/prettier'],
 	{

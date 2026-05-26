@@ -18,7 +18,7 @@ export async function thread(
 	options: BreadcrumbsSettings["commands"]["thread"]["default_options"],
 ) {
 	const active_view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
-	if (!active_view) return new Notice("No active markdown view");
+	if (!active_view) return new Notice("No active Markdown view");
 	const source_file = active_view.file;
 	if (!source_file) return new Notice("No active file");
 

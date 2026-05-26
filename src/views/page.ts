@@ -5,12 +5,12 @@ import type BreadcrumbsPlugin from "src/main";
 import { mount, unmount } from "svelte";
 
 type MountedPageView = ReturnType<typeof mount>;
-type PageViewMountState = {
+interface PageViewMountState {
 	view: MountedPageView;
 	mode: string;
 	sticky: boolean;
 	file_path: string;
-};
+}
 
 const mounted_page_views = new WeakMap<MarkdownView, PageViewMountState>();
 
@@ -47,8 +47,7 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		// layout-change fires on every CM6 cursor/scroll update; remounting on each one
 		// causes DOM thrash inside .cm-scroller which makes CM6 re-measure and skip cursor positions.
 		if (
-			existing &&
-			existing.mode === mode &&
+			existing?.mode === mode &&
 			existing.sticky === sticky &&
 			existing.file_path === file_path
 		) {
