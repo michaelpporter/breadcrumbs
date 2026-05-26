@@ -9,6 +9,7 @@ type PageViewMountState = {
 	view: MountedPageView;
 	mode: string;
 	sticky: boolean;
+	file_path: string;
 };
 
 const mounted_page_views = new WeakMap<MarkdownView, PageViewMountState>();
@@ -39,12 +40,18 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		const mode = markdown_view.getMode();
 		const sticky = plugin.settings.views.page.all.sticky;
 
+		const file_path = markdown_view.file?.path ?? "";
 		const existing = mounted_page_views.get(markdown_view);
 
-		// Skip remount if mode and sticky haven't changed and the element is still in the DOM.
+		// Skip remount if mode, sticky, and file_path haven't changed and the element is still in the DOM.
 		// layout-change fires on every CM6 cursor/scroll update; remounting on each one
 		// causes DOM thrash inside .cm-scroller which makes CM6 re-measure and skip cursor positions.
-		if (existing && existing.mode === mode && existing.sticky === sticky) {
+		if (
+			existing &&
+			existing.mode === mode &&
+			existing.sticky === sticky &&
+			existing.file_path === file_path
+		) {
 			const page_views_el =
 				markdown_view.containerEl.querySelector<HTMLElement>(".BC-page-views");
 			if (page_views_el?.isConnected) return;
@@ -169,8 +176,8 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		// Render the component into the container
 		const mounted = mount(PageViewsComponent, {
 			target: mount_target,
-			props: { plugin, file_path: markdown_view.file?.path ?? "" },
+			props: { plugin, file_path },
 		});
-		mounted_page_views.set(markdown_view, { view: mounted, mode, sticky });
+		mounted_page_views.set(markdown_view, { view: mounted, mode, sticky, file_path });
 	});
 }

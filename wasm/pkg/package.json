@@ -1,0 +1,19 @@
+{
+  "name": "breadcrumbs_graph_wasm",
+  "type": "module",
+  "collaborators": [
+    "Moritz Jung <m.projects.code@gmail.com>",
+    "SkepticMystic"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "breadcrumbs_graph_wasm_bg.wasm",
+    "breadcrumbs_graph_wasm.js",
+    "breadcrumbs_graph_wasm.d.ts"
+  ],
+  "main": "breadcrumbs_graph_wasm.js",
+  "types": "breadcrumbs_graph_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

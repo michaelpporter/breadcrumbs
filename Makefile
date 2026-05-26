@@ -14,7 +14,6 @@ dev:
 gh-actions:
 		bun install
 		bun run wasm:test || exit 1
-		bun run wasm:build || exit 1
 		bun run test || exit 1
 		bun run build || exit 1
 

@@ -35,13 +35,9 @@ export class FieldFuzzySuggester extends FuzzySuggestModal<EdgeField> {
 	}
 
 	onChooseItem(field: EdgeField): void {
-		console.log("FieldFuzzySuggester.onChooseItem", field);
-
 		this.cb(field);
 		this.open();
 	}
 
-	onNoSuggestion(): void {
-		console.log("No suggestion found");
-	}
+	onNoSuggestion(): void {}
 }

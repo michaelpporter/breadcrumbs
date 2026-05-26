@@ -39,6 +39,8 @@ bun run wasm:test           # Rust unit tests via wasm-pack
 
 The build output is `main.js` and `styles.css` in the repo root. These are loaded directly by Obsidian from `.obsidian/plugins/breadcrumbs/`.
 
+> **Note:** `main.js`, `styles.css`, `*.map`, `node_modules/`, `coverage/`, `data.json`, and `wasm/pkg/` are git-ignored. Don't read or reference them — check source files under `src/` and `wasm/src/` instead.
+
 ## Architecture
 
 ### Stack

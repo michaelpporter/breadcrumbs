@@ -43,9 +43,13 @@ function add_period_settings(
 	});
 
 	const format_frag = new DocumentFragment();
-	format_frag.createEl("span", {}, (el) => {
-		el.innerHTML = `<a href="https://moment.github.io/luxon/#/formatting?id=table-of-tokens">Luxon format</a> matching the note filename. Default: <code>${PERIOD_FORMAT_HINT[kind]}</code>`;
+	const format_frag_span = format_frag.createEl("span");
+	format_frag_span.createEl("a", {
+		text: "Luxon format",
+		href: "https://moment.github.io/luxon/#/formatting?id=table-of-tokens",
 	});
+	format_frag_span.appendText(` matching the note filename. Default: `);
+	format_frag_span.createEl("code", { text: PERIOD_FORMAT_HINT[kind] });
 
 	new_setting(containerEl, {
 		name: "Date Format",
@@ -142,12 +146,12 @@ export const _add_settings_date_note = (
 	});
 
 	const date_format_fragment = new DocumentFragment();
-	date_format_fragment.createEl(
-		"span",
-		{},
-		(el) =>
-			(el.innerHTML = `<a href="https://moment.github.io/luxon/#/formatting?id=table-of-tokens">Luxon date format</a> to use`),
-	);
+	const date_format_span = date_format_fragment.createEl("span");
+	date_format_span.createEl("a", {
+		text: "Luxon date format",
+		href: "https://moment.github.io/luxon/#/formatting?id=table-of-tokens",
+	});
+	date_format_span.appendText(" to use");
 
 	new_setting(containerEl, {
 		name: "Date Format",
