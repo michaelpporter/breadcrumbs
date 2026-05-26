@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.12.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.12.0...4.12.1) (2026-05-26)
+
+### Bug Fixes
+
+* **Free WASM objects to prevent long-session memory leaks** — all components that create `NodeStringifyOptions`, `FlatTraversalResult`, `TraversalResult`, `PathList`, `Path[]`, and `MermaidGraphData` now explicitly free them via `$effect` cleanup and `onDestroy`. Addresses a reported 16 GB memory growth over long sessions ([#698](https://github.com/SkepticMystic/breadcrumbs/issues/698)).
+* **Johnny.Decimal notes no longer link to ghost parent nodes** — the Dendron builder was splitting any dot-containing basename (e.g. `12.01 GP Records`) and creating phantom nodes like `12.md`. Files whose first dot-segment is all digits are now skipped — they belong to the Johnny.Decimal builder.
+
+### CI
+
+* **Remove Rust/WASM toolchain from release workflow** — `wasm/pkg/` is committed to the repo; release builds only need Bun. Drops Rust install, wasm-pack install, `wasm:test`, and `wasm:build` from the release job, significantly reducing release CI time.
+
 ### [4.12.0](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.10...4.12.0) (2026-05-26)
 
 ### Chores
