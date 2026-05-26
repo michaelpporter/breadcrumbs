@@ -78,6 +78,8 @@ The graph is a singleton on `plugin.graph`. It is rebuilt from scratch on `rebui
 | `folder_note` | Folder → note containment |
 | `regex_note` | Regex matches on basenames |
 
+Builder implementations live in `src/graph/builders/explicit/` (one file per builder + `index.ts` exporting the `add_explicit_edges` record). The coordinator is `src/graph/builders/index.ts`.
+
 After explicit edges are collected, `TransitiveGraphRule`s (stored in settings as `implied_relations.transitive`) are applied inside the WASM engine to generate implied edges (e.g. the `up`↔`down` pair).
 
 Each explicit builder can read a per-note override from frontmatter via the `BC-*-field` metadata keys (see `src/const/metadata_fields.ts`). The fallback is `plugin.settings.explicit_edge_sources.<source>.default_field`.
