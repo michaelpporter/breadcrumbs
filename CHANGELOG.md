@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.11.10](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.9...4.11.10) (2026-05-25)
+
+### Bug Fixes
+
+* **Trail view not updating on note switch** — the `layout-change` early-return optimisation (introduced in 4.11.7 for [#698](https://github.com/SkepticMystic/breadcrumbs/issues/698)) skipped remounting when editor mode and sticky setting were unchanged, but did not check which file was open. Switching notes in the same tab left the Trail/Prev-Next page view showing the previous note's breadcrumbs. `file_path` is now included in the skip condition; CM6 cursor/scroll events still short-circuit as before ([#700](https://github.com/SkepticMystic/breadcrumbs/issues/700)).
+
+### Build
+
+* **Commit wasm/pkg artifacts; drop `wasm:build` from CI** — `wasm/pkg` was re-gitignored in 4.11.9-beta.1, breaking the Obsidian community build verifier (clean env, no Rust toolchain). Pre-built WASM binaries are committed again; CI and Makefile no longer run `wasm:build` (`wasm:test` still runs to verify Rust logic). To update the WASM binary: run `bun run wasm:build` locally and commit the result.
+
+### Chores
+
+* **Plugin guideline compliance** — replace `innerHTML` with `createEl()`/`appendText()` in date-note settings descriptions; remove leftover debug `console.log` calls from `FieldFuzzySuggestModal`.
+* **CLAUDE.md** — note git-ignored files so Claude Code avoids reading generated artifacts.
+
 ### [4.11.9](https://github.com/SkepticMystic/breadcrumbs/compare/4.11.8...4.11.9) (2026-05-24)
 
 ### Build
