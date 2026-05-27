@@ -15,18 +15,18 @@ function plugin(default_field = "") {
 describe("regex_note builder", () => {
 	// ---- disabled / empty ----
 
-	test("no files → empty results", (t) => {
-		const r = _add_explicit_edges_regex_note(plugin(), make_all_files([]));
+	test("no files → empty results", async (t) => {
+		const r = await _add_explicit_edges_regex_note(plugin(), make_all_files([]));
 		t.expect(r.edges).toHaveLength(0);
 		t.expect(r.errors).toHaveLength(0);
 	});
 
-	test("files without BC-regex-note-regex → no edges", (t) => {
+	test("files without BC-regex-note-regex → no edges", async (t) => {
 		const files = [
 			mock_file("a.md"),
 			mock_file("b.md", { frontmatter: { title: "hello" } }),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -35,7 +35,7 @@ describe("regex_note builder", () => {
 
 	// ---- basic matching ----
 
-	test("regex matches other notes → edges created", (t) => {
+	test("regex matches other notes → edges created", async (t) => {
 		const files = [
 			// Hub note: matches any note with "topic" in the path
 			mock_file("hub.md", {
@@ -48,7 +48,7 @@ describe("regex_note builder", () => {
 			mock_file("topic-b.md"),
 			mock_file("unrelated.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -59,7 +59,7 @@ describe("regex_note builder", () => {
 		t.expect(targets).toContain("topic-b.md");
 	});
 
-	test("regex matches self too", (t) => {
+	test("regex matches self too", async (t) => {
 		const files = [
 			mock_file("my-hub.md", {
 				frontmatter: {
@@ -69,7 +69,7 @@ describe("regex_note builder", () => {
 			}),
 			mock_file("other.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -79,7 +79,7 @@ describe("regex_note builder", () => {
 
 	// ---- field resolution ----
 
-	test("uses BC-regex-note-field from frontmatter", (t) => {
+	test("uses BC-regex-note-field from frontmatter", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -89,35 +89,35 @@ describe("regex_note builder", () => {
 			}),
 			mock_file("child.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
 		t.expect(r.edges[0]!.edge_type).toBe("down");
 	});
 
-	test("falls back to default_field when no frontmatter field", (t) => {
+	test("falls back to default_field when no frontmatter field", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-regex-note-regex": "child" },
 			}),
 			mock_file("child.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin("up"),
 			make_all_files(files),
 		);
 		t.expect(r.edges[0]!.edge_type).toBe("up");
 	});
 
-	test("no field and no default → no edge (fail undefined)", (t) => {
+	test("no field and no default → no edge (fail undefined)", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-regex-note-regex": "child" },
 			}),
 			mock_file("child.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(""),
 			make_all_files(files),
 		);
@@ -127,7 +127,7 @@ describe("regex_note builder", () => {
 
 	// ---- case-insensitive flag ----
 
-	test("BC-regex-note-flags: i enables case-insensitive matching", (t) => {
+	test("BC-regex-note-flags: i enables case-insensitive matching", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -139,7 +139,7 @@ describe("regex_note builder", () => {
 			mock_file("topic-a.md"),
 			mock_file("TOPIC-b.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -148,7 +148,7 @@ describe("regex_note builder", () => {
 		t.expect(targets).toContain("TOPIC-b.md");
 	});
 
-	test("without flags: case-sensitive (no match)", (t) => {
+	test("without flags: case-sensitive (no match)", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -158,7 +158,7 @@ describe("regex_note builder", () => {
 			}),
 			mock_file("topic-a.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -167,7 +167,7 @@ describe("regex_note builder", () => {
 
 	// ---- errors ----
 
-	test("invalid regex → error, no edge", (t) => {
+	test("invalid regex → error, no edge", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -177,7 +177,7 @@ describe("regex_note builder", () => {
 			}),
 			mock_file("target.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -186,7 +186,7 @@ describe("regex_note builder", () => {
 		t.expect(r.edges).toHaveLength(0);
 	});
 
-	test("non-string regex → error", (t) => {
+	test("non-string regex → error", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -195,7 +195,7 @@ describe("regex_note builder", () => {
 				},
 			}),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -203,7 +203,7 @@ describe("regex_note builder", () => {
 		t.expect(r.errors[0]!.code).toBe("invalid_field_value");
 	});
 
-	test("field not in edge_fields → error", (t) => {
+	test("field not in edge_fields → error", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -213,7 +213,7 @@ describe("regex_note builder", () => {
 			}),
 			mock_file("child.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -222,7 +222,7 @@ describe("regex_note builder", () => {
 		t.expect(r.edges).toHaveLength(0);
 	});
 
-	test("non-string flags → error", (t) => {
+	test("non-string flags → error", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -232,7 +232,7 @@ describe("regex_note builder", () => {
 				},
 			}),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -242,7 +242,7 @@ describe("regex_note builder", () => {
 
 	// ---- multiple hub notes ----
 
-	test("multiple hub notes each create their own edges", (t) => {
+	test("multiple hub notes each create their own edges", async (t) => {
 		const files = [
 			mock_file("hub-a.md", {
 				frontmatter: {
@@ -259,7 +259,7 @@ describe("regex_note builder", () => {
 			mock_file("alpha-1.md"),
 			mock_file("beta-1.md"),
 		];
-		const r = _add_explicit_edges_regex_note(
+		const r = await _add_explicit_edges_regex_note(
 			plugin(),
 			make_all_files(files),
 		);

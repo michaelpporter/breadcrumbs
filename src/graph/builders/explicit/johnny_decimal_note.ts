@@ -70,10 +70,24 @@ const handle_johnny_decimal_note = (
 		plugin.settings.explicit_edge_sources.johnny_decimal_note;
 
 	// Go one note up
-	const target_decimals = source_note.decimals
-		.split(delimiter)
-		.slice(0, -1)
-		.join(delimiter);
+	let target_decimals: string;
+	if (source_note.decimals.includes(delimiter)) {
+		// Item/sub-item → parent via delimiter split (e.g. "11.01" → "11")
+		target_decimals = source_note.decimals
+			.split(delimiter)
+			.slice(0, -1)
+			.join(delimiter);
+	} else {
+		// Category → parent area via numeric floor (e.g. "11" → "10", "21" → "20")
+		const num = parseInt(source_note.decimals, 10);
+		if (isNaN(num)) return;
+		const parent_num = Math.floor(num / 10) * 10;
+		if (parent_num === num) return; // already an area (10, 20, …) — no parent
+		target_decimals = String(parent_num).padStart(
+			source_note.decimals.length,
+			"0",
+		);
+	}
 	if (target_decimals === "") return;
 
 	const target_note = notes.find((n) => n.decimals === target_decimals);

@@ -9,7 +9,7 @@ import type { Result } from "src/interfaces/result";
  * @example
  * return succ({ field: "up", recurse: false });
  */
-export const succ = <S>(data: S): Result<S, never> => ({
+export const succ = <S>(data: S): { ok: true; data: S } => ({
 	ok: true,
 	data,
 });
@@ -23,7 +23,7 @@ export const succ = <S>(data: S): Result<S, never> => ({
  * @example
  * if (!metadata) return fail(undefined); // note has no frontmatter — skip silently
  */
-export const fail = <F>(error: F): Result<never, F> => ({
+export const fail = <F>(error: F): { ok: false; error: F } => ({
 	ok: false,
 	error,
 });

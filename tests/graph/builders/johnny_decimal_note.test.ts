@@ -46,7 +46,7 @@ function plugin(
 describe("johnny_decimal_note builder", () => {
 	// ---- disabled ----
 
-	test("enabled=false → empty results", (t) => {
+	test("enabled=false → empty results", async (t) => {
 		const p = make_plugin({
 			explicit_edge_sources: {
 				johnny_decimal_note: {
@@ -61,7 +61,7 @@ describe("johnny_decimal_note builder", () => {
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			p,
 			make_all_files(files),
 		);
@@ -70,9 +70,9 @@ describe("johnny_decimal_note builder", () => {
 
 	// ---- non-JD basenames ----
 
-	test("plain basename without numeric prefix → no edge", (t) => {
+	test("plain basename without numeric prefix → no edge", async (t) => {
 		const files = [mock_file("plain-note.md"), mock_file("another.md")];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -81,14 +81,14 @@ describe("johnny_decimal_note builder", () => {
 
 	// ---- basic hierarchy ----
 
-	test("01.02 Category → up edge to 01 Area", (t) => {
+	test("01.02 Category → up edge to 01 Area", async (t) => {
 		// Child: "01.02 Category.md" → decimals "01.02"
 		// Parent: "01 Area.md" → decimals "01"
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"] }),
 			make_all_files(files),
 		);
@@ -98,12 +98,12 @@ describe("johnny_decimal_note builder", () => {
 		t.expect(up_edges[0]!.target).toBe("01 Area.md");
 	});
 
-	test("down return edge added when parent exists", (t) => {
+	test("down return edge added when parent exists", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"] }),
 			make_all_files(files),
 		);
@@ -116,25 +116,83 @@ describe("johnny_decimal_note builder", () => {
 		).toBe(true);
 	});
 
-	test("no edge when parent note not in notes list", (t) => {
+	test("no edge when parent note not in notes list", async (t) => {
 		// "01 Area.md" not in files → no parent found → no edge
 		const files = [mock_file("01.02 Category.md")];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin(),
 			make_all_files(files),
 		);
 		t.expect(r.edges).toHaveLength(0);
 	});
 
+	// ---- real JD area→category (no delimiter) ----
+
+	test("11 Finance → up edge to 10 Life Admin (area parent)", async (t) => {
+		const files = [
+			mock_file("10 Life Admin.md"),
+			mock_file("11 Finance.md"),
+		];
+		const r = await _add_explicit_edges_johnny_decimal_note(
+			plugin({ known_paths: ["10 Life Admin.md"] }),
+			make_all_files(files),
+		);
+		const up_edges = r.edges.filter((e) => e.edge_type === "up");
+		t.expect(up_edges).toHaveLength(1);
+		t.expect(up_edges[0]!.source).toBe("11 Finance.md");
+		t.expect(up_edges[0]!.target).toBe("10 Life Admin.md");
+	});
+
+	test("10 Life Admin has no parent (area is top-level)", async (t) => {
+		const files = [
+			mock_file("10 Life Admin.md"),
+			mock_file("20 Work.md"),
+		];
+		const r = await _add_explicit_edges_johnny_decimal_note(
+			plugin(),
+			make_all_files(files),
+		);
+		t.expect(r.edges).toHaveLength(0);
+	});
+
+	test("11.01 item → 11 category → 10 area full three-level chain", async (t) => {
+		const files = [
+			mock_file("10 Life Admin.md"),
+			mock_file("11 Finance.md"),
+			mock_file("11.01 Tax Returns.md"),
+		];
+		const r = await _add_explicit_edges_johnny_decimal_note(
+			plugin({
+				known_paths: ["10 Life Admin.md", "11 Finance.md"],
+			}),
+			make_all_files(files),
+		);
+		const up_edges = r.edges.filter((e) => e.edge_type === "up");
+		// 11 → 10 and 11.01 → 11
+		t.expect(
+			up_edges.some(
+				(e) =>
+					e.source === "11 Finance.md" && e.target === "10 Life Admin.md",
+			),
+		).toBe(true);
+		t.expect(
+			up_edges.some(
+				(e) =>
+					e.source === "11.01 Tax Returns.md" &&
+					e.target === "11 Finance.md",
+			),
+		).toBe(true);
+	});
+
 	// ---- three-level ----
 
-	test("01.02.03 → edge to 01.02", (t) => {
+	test("01.02.03 → edge to 01.02", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md"),
 			mock_file("01.02.03 Item.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md", "01.02 Category.md"] }),
 			make_all_files(files),
 		);
@@ -149,13 +207,13 @@ describe("johnny_decimal_note builder", () => {
 
 	// ---- sibling edges ----
 
-	test("sibling edges between notes sharing same parent", (t) => {
+	test("sibling edges between notes sharing same parent", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.01 Cat-A.md"),
 			mock_file("01.02 Cat-B.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({
 				known_paths: ["01 Area.md"],
 				default_sibling_field: "same",
@@ -166,13 +224,13 @@ describe("johnny_decimal_note builder", () => {
 		t.expect(sibling_edges.length).toBeGreaterThan(0);
 	});
 
-	test("no sibling edges when default_sibling_field is empty", (t) => {
+	test("no sibling edges when default_sibling_field is empty", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.01 Cat-A.md"),
 			mock_file("01.02 Cat-B.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"], default_sibling_field: "" }),
 			make_all_files(files),
 		);
@@ -182,12 +240,12 @@ describe("johnny_decimal_note builder", () => {
 
 	// ---- edge_source ----
 
-	test("edge_source is johnny_decimal_note", (t) => {
+	test("edge_source is johnny_decimal_note", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"] }),
 			make_all_files(files),
 		);
@@ -196,14 +254,14 @@ describe("johnny_decimal_note builder", () => {
 
 	// ---- per-note field override ----
 
-	test("BC-johnny-decimal-note-field overrides default_field", (t) => {
+	test("BC-johnny-decimal-note-field overrides default_field", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md", {
 				frontmatter: { "BC-johnny-decimal-note-field": "down" },
 			}),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"] }),
 			make_all_files(files),
 		);
@@ -216,14 +274,14 @@ describe("johnny_decimal_note builder", () => {
 
 	// ---- errors ----
 
-	test("non-string BC-johnny-decimal-note-field → error", (t) => {
+	test("non-string BC-johnny-decimal-note-field → error", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md", {
 				frontmatter: { "BC-johnny-decimal-note-field": 99 },
 			}),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"] }),
 			make_all_files(files),
 		);
@@ -231,14 +289,14 @@ describe("johnny_decimal_note builder", () => {
 		t.expect(r.errors[0]!.code).toBe("invalid_field_value");
 	});
 
-	test("BC-johnny-decimal-note-field not in edge_fields → error", (t) => {
+	test("BC-johnny-decimal-note-field not in edge_fields → error", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md", {
 				frontmatter: { "BC-johnny-decimal-note-field": "nonexistent" },
 			}),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"] }),
 			make_all_files(files),
 		);
@@ -246,12 +304,12 @@ describe("johnny_decimal_note builder", () => {
 		t.expect(r.errors[0]!.code).toBe("invalid_edge_field");
 	});
 
-	test("no default_field → no edge (skip)", (t) => {
+	test("no default_field → no edge (skip)", async (t) => {
 		const files = [
 			mock_file("01 Area.md"),
 			mock_file("01.02 Category.md"),
 		];
-		const r = _add_explicit_edges_johnny_decimal_note(
+		const r = await _add_explicit_edges_johnny_decimal_note(
 			plugin({ known_paths: ["01 Area.md"], default_field: "" }),
 			make_all_files(files),
 		);

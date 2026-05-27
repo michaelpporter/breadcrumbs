@@ -49,7 +49,7 @@ function plugin(
 describe("dendron_note builder", () => {
 	// ---- disabled ----
 
-	test("enabled=false → empty results", (t) => {
+	test("enabled=false → empty results", async (t) => {
 		const p = make_plugin({
 			explicit_edge_sources: {
 				dendron_note: {
@@ -62,15 +62,15 @@ describe("dendron_note builder", () => {
 			} as never,
 		});
 		const files = [mock_file("a.b.md")];
-		const r = _add_explicit_edges_dendron_note(p, make_all_files(files));
+		const r = await _add_explicit_edges_dendron_note(p, make_all_files(files));
 		t.expect(r.edges).toHaveLength(0);
 	});
 
 	// ---- single-level (no delimiter) ----
 
-	test("single-segment basename → no edge", (t) => {
+	test("single-segment basename → no edge", async (t) => {
 		const files = [mock_file("root.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -79,10 +79,10 @@ describe("dendron_note builder", () => {
 
 	// ---- basic hierarchy ----
 
-	test("two-level: a.b → up edge to a, a is unresolved node", (t) => {
+	test("two-level: a.b → up edge to a, a is unresolved node", async (t) => {
 		// a.md doesn't exist in vault → getFileByPath returns null
 		const files = [mock_file("a.b.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(), // no known_paths → a.md is unresolved
 			make_all_files(files),
 		);
@@ -95,9 +95,9 @@ describe("dendron_note builder", () => {
 		t.expect(unresolved).toBeDefined();
 	});
 
-	test("two-level: down return edge added when parent exists", (t) => {
+	test("two-level: down return edge added when parent exists", async (t) => {
 		const files = [mock_file("a.b.md"), mock_file("a.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ known_paths: ["a.md"] }),
 			make_all_files(files),
 		);
@@ -105,9 +105,9 @@ describe("dendron_note builder", () => {
 		t.expect(down_edges.some((e) => e.source === "a.md" && e.target === "a.b.md")).toBe(true);
 	});
 
-	test("two-level: edge_source is dendron_note", (t) => {
+	test("two-level: edge_source is dendron_note", async (t) => {
 		const files = [mock_file("a.b.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -116,9 +116,9 @@ describe("dendron_note builder", () => {
 
 	// ---- three-level chain ----
 
-	test("three-level: a.b.c → edges to a.b and a.b → a (recursive)", (t) => {
+	test("three-level: a.b.c → edges to a.b and a.b → a (recursive)", async (t) => {
 		const files = [mock_file("a.b.c.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -131,21 +131,21 @@ describe("dendron_note builder", () => {
 
 	// ---- JD skip guard ----
 
-	test("first segment all-digits (JD style) → skipped", (t) => {
+	test("first segment all-digits (JD style) → skipped", async (t) => {
 		// "12.01 Title.md" has basename "12.01 Title"; split by "." gives ["12", "01 Title"]
 		// First segment "12" is all digits → skip
 		const files = [mock_file("12.01 Title.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
 		t.expect(r.edges.filter((e) => e.edge_type === "up")).toHaveLength(0);
 	});
 
-	test("first segment has letters (not JD) → not skipped", (t) => {
+	test("first segment has letters (not JD) → not skipped", async (t) => {
 		// "git.config.md" — first segment "git" is not all digits
 		const files = [mock_file("git.config.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -154,9 +154,9 @@ describe("dendron_note builder", () => {
 
 	// ---- custom delimiter ----
 
-	test("dash delimiter: a-b.md → edge to a.md", (t) => {
+	test("dash delimiter: a-b.md → edge to a.md", async (t) => {
 		const files = [mock_file("a-b.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ delimiter: "-" }),
 			make_all_files(files),
 		);
@@ -167,9 +167,9 @@ describe("dendron_note builder", () => {
 
 	// ---- sibling edges ----
 
-	test("sibling edges when default_sibling_field is set", (t) => {
+	test("sibling edges when default_sibling_field is set", async (t) => {
 		const files = [mock_file("a.b.md"), mock_file("a.c.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ default_sibling_field: "same" }),
 			make_all_files(files),
 		);
@@ -178,9 +178,9 @@ describe("dendron_note builder", () => {
 		t.expect(sibling_edges.length).toBeGreaterThan(0);
 	});
 
-	test("no sibling edges when default_sibling_field is empty", (t) => {
+	test("no sibling edges when default_sibling_field is empty", async (t) => {
 		const files = [mock_file("a.b.md"), mock_file("a.c.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ default_sibling_field: "" }),
 			make_all_files(files),
 		);
@@ -190,13 +190,13 @@ describe("dendron_note builder", () => {
 
 	// ---- per-note field override ----
 
-	test("BC-dendron-note-field overrides default_field", (t) => {
+	test("BC-dendron-note-field overrides default_field", async (t) => {
 		const files = [
 			mock_file("a.b.md", {
 				frontmatter: { "BC-dendron-note-field": "down" },
 			}),
 		];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ default_field: "up" }),
 			make_all_files(files),
 		);
@@ -208,11 +208,11 @@ describe("dendron_note builder", () => {
 
 	// ---- errors ----
 
-	test("non-string BC-dendron-note-field → error", (t) => {
+	test("non-string BC-dendron-note-field → error", async (t) => {
 		const files = [
 			mock_file("a.b.md", { frontmatter: { "BC-dendron-note-field": 42 } }),
 		];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -220,13 +220,13 @@ describe("dendron_note builder", () => {
 		t.expect(r.errors[0]!.code).toBe("invalid_field_value");
 	});
 
-	test("BC-dendron-note-field not in edge_fields → error", (t) => {
+	test("BC-dendron-note-field not in edge_fields → error", async (t) => {
 		const files = [
 			mock_file("a.b.md", {
 				frontmatter: { "BC-dendron-note-field": "nonexistent" },
 			}),
 		];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin(),
 			make_all_files(files),
 		);
@@ -234,9 +234,9 @@ describe("dendron_note builder", () => {
 		t.expect(r.errors[0]!.code).toBe("invalid_edge_field");
 	});
 
-	test("no default_field and no frontmatter field → no edge (skip)", (t) => {
+	test("no default_field and no frontmatter field → no edge (skip)", async (t) => {
 		const files = [mock_file("a.b.md")];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ default_field: "" }),
 			make_all_files(files),
 		);
@@ -246,14 +246,14 @@ describe("dendron_note builder", () => {
 
 	// ---- hub parent down edges ----
 
-	test("hub note (a.md) gets down edge to children added by scan", (t) => {
+	test("hub note (a.md) gets down edge to children added by scan", async (t) => {
 		// a.md is the hub (single-segment); a.b.md is the child
 		// add_dendron_hub_parent_down_edges should add a.md → a.b.md (down)
 		const files = [
 			mock_file("a.md"),
 			mock_file("a.b.md"),
 		];
-		const r = _add_explicit_edges_dendron_note(
+		const r = await _add_explicit_edges_dendron_note(
 			plugin({ known_paths: ["a.md"] }),
 			make_all_files(files),
 		);

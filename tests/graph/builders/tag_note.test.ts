@@ -18,24 +18,24 @@ function plugin(default_field = "down", default_sibling_field = "") {
 describe("tag_note builder", () => {
 	// ---- empty / no hub ----
 
-	test("no files → empty results", (t) => {
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files([]));
+	test("no files → empty results", async (t) => {
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files([]));
 		t.expect(r.edges).toHaveLength(0);
 		t.expect(r.errors).toHaveLength(0);
 	});
 
-	test("files without BC-tag-note-tag → no edges", (t) => {
+	test("files without BC-tag-note-tag → no edges", async (t) => {
 		const files = [
 			mock_file("a.md"),
 			mock_file("b.md", { frontmatter: { title: "hello" } }),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.edges).toHaveLength(0);
 	});
 
 	// ---- basic matching ----
 
-	test("hub note matches tagged notes → edge from hub to target", (t) => {
+	test("hub note matches tagged notes → edge from hub to target", async (t) => {
 		const files = [
 			// The hub note
 			mock_file("hub.md", {
@@ -47,14 +47,14 @@ describe("tag_note builder", () => {
 			}),
 			mock_file("untagged.md"),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.edges).toHaveLength(1);
 		t.expect(r.edges[0]!.source).toBe("hub.md");
 		t.expect(r.edges[0]!.target).toBe("tagged.md");
 		t.expect(r.edges[0]!.edge_type).toBe("down");
 	});
 
-	test("hub adds # prefix automatically when tag lacks it", (t) => {
+	test("hub adds # prefix automatically when tag lacks it", async (t) => {
 		const files = [
 			// tag without #
 			mock_file("hub.md", {
@@ -64,11 +64,11 @@ describe("tag_note builder", () => {
 				frontmatter: { tags: ["foo"] },
 			}),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.edges).toHaveLength(1);
 	});
 
-	test("hub matches multiple tagged notes", (t) => {
+	test("hub matches multiple tagged notes", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": "#project" },
@@ -77,7 +77,7 @@ describe("tag_note builder", () => {
 			mock_file("b.md", { frontmatter: { tags: ["project"] } }),
 			mock_file("c.md", { frontmatter: { tags: ["other"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		const targets = r.edges.map((e) => e.target);
 		t.expect(r.edges).toHaveLength(2);
 		t.expect(targets).toContain("a.md");
@@ -86,7 +86,7 @@ describe("tag_note builder", () => {
 
 	// ---- sub-tag (prefix) matching ----
 
-	test("sub-tag matching (non-exact): #foo matches #foo/bar", (t) => {
+	test("sub-tag matching (non-exact): #foo matches #foo/bar", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": "#topic" },
@@ -96,13 +96,13 @@ describe("tag_note builder", () => {
 			// sub-tag
 			mock_file("sub.md", { frontmatter: { tags: ["topic/sub"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		const targets = r.edges.map((e) => e.target);
 		t.expect(targets).toContain("exact.md");
 		t.expect(targets).toContain("sub.md");
 	});
 
-	test("exact mode: #foo does NOT match #foo/bar", (t) => {
+	test("exact mode: #foo does NOT match #foo/bar", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -113,7 +113,7 @@ describe("tag_note builder", () => {
 			mock_file("exact.md", { frontmatter: { tags: ["topic"] } }),
 			mock_file("sub.md", { frontmatter: { tags: ["topic/sub"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		const targets = r.edges.map((e) => e.target);
 		t.expect(targets).toContain("exact.md");
 		t.expect(targets).not.toContain("sub.md");
@@ -121,7 +121,7 @@ describe("tag_note builder", () => {
 
 	// ---- field resolution ----
 
-	test("uses BC-tag-note-field from frontmatter", (t) => {
+	test("uses BC-tag-note-field from frontmatter", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -131,32 +131,32 @@ describe("tag_note builder", () => {
 			}),
 			mock_file("tagged.md", { frontmatter: { tags: ["foo"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.edges[0]!.edge_type).toBe("up");
 	});
 
-	test("falls back to default_field", (t) => {
+	test("falls back to default_field", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": "#foo" },
 			}),
 			mock_file("tagged.md", { frontmatter: { tags: ["foo"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(
+		const r = await _add_explicit_edges_tag_note(
 			plugin("same"),
 			make_all_files(files),
 		);
 		t.expect(r.edges[0]!.edge_type).toBe("same");
 	});
 
-	test("no field and no default → no edge", (t) => {
+	test("no field and no default → no edge", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": "#foo" },
 			}),
 			mock_file("tagged.md", { frontmatter: { tags: ["foo"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(
+		const r = await _add_explicit_edges_tag_note(
 			plugin(""),
 			make_all_files(files),
 		);
@@ -166,7 +166,7 @@ describe("tag_note builder", () => {
 
 	// ---- sibling edges ----
 
-	test("sibling edges between tag-matched notes", (t) => {
+	test("sibling edges between tag-matched notes", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": "#foo" },
@@ -174,7 +174,7 @@ describe("tag_note builder", () => {
 			mock_file("a.md", { frontmatter: { tags: ["foo"] } }),
 			mock_file("b.md", { frontmatter: { tags: ["foo"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(
+		const r = await _add_explicit_edges_tag_note(
 			plugin("down", "same"),
 			make_all_files(files),
 		);
@@ -185,18 +185,18 @@ describe("tag_note builder", () => {
 
 	// ---- errors ----
 
-	test("non-string tag → error", (t) => {
+	test("non-string tag → error", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": 42 },
 			}),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.errors).toHaveLength(1);
 		t.expect(r.errors[0]!.code).toBe("invalid_field_value");
 	});
 
-	test("field not in edge_fields → error", (t) => {
+	test("field not in edge_fields → error", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: {
@@ -205,19 +205,19 @@ describe("tag_note builder", () => {
 				},
 			}),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.errors).toHaveLength(1);
 		t.expect(r.errors[0]!.code).toBe("invalid_edge_field");
 	});
 
-	test("edge_source is tag_note", (t) => {
+	test("edge_source is tag_note", async (t) => {
 		const files = [
 			mock_file("hub.md", {
 				frontmatter: { "BC-tag-note-tag": "#foo" },
 			}),
 			mock_file("tagged.md", { frontmatter: { tags: ["foo"] } }),
 		];
-		const r = _add_explicit_edges_tag_note(plugin(), make_all_files(files));
+		const r = await _add_explicit_edges_tag_note(plugin(), make_all_files(files));
 		t.expect(r.edges[0]!.edge_source).toBe("tag_note");
 	});
 });
