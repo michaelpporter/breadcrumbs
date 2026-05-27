@@ -98,6 +98,15 @@ const get_tag_note_info = (
 	return succ({ tag, field, exact, sibling_field });
 };
 
+/**
+ * **tag_note** — tag-hub edge builder.
+ *
+ * A note annotated with `BC-tag-note-tag: #some-tag` becomes a "tag hub".
+ * Every other vault note that carries `#some-tag` in its frontmatter gets an
+ * edge pointing to the hub using the field from `BC-tag-note-field` (or the
+ * builder's `default_field` setting). Useful for collecting all notes about a
+ * topic under a single hub note.
+ */
 export const _add_explicit_edges_tag_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

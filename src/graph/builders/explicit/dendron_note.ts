@@ -244,6 +244,18 @@ function add_dendron_sibling_edges(
 	}
 }
 
+/**
+ * **dendron_note** — dot/dash-delimited basename hierarchy builder.
+ *
+ * Treats dot-separated (or dash-separated) note basenames as a hierarchy:
+ * `a.b.c` is a child of `a.b`, which is a child of `a`. An `up` edge is added
+ * from child → parent; if an implied transitive rule defines a close_field
+ * (typically `down`), a reverse `down` edge is also added from parent → child.
+ *
+ * Per-note override via `BC-dendron-note-field`; falls back to
+ * `settings.explicit_edge_sources.dendron_note.default_field`.
+ * The delimiter is configurable in settings.
+ */
 export const _add_explicit_edges_dendron_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

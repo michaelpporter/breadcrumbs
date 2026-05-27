@@ -150,6 +150,19 @@ function add_period_edges(
 	}
 }
 
+/**
+ * **date_note** — sequential date-based hierarchy builder.
+ *
+ * Builds containment edges between date-named notes using Luxon to parse
+ * basenames against configured format strings. Supported periods:
+ * `day → week → month → quarter → year`.
+ *
+ * For each configured period kind (week/month/quarter/year) the builder finds
+ * notes whose basename matches the period's date format, then creates edges
+ * from contained period notes to their containing period notes (e.g. a daily
+ * note gets an edge to its weekly note). Periods must be configured in settings
+ * (`explicit_edge_sources.date_note`); unconfigured periods are skipped.
+ */
 export const _add_explicit_edges_date_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

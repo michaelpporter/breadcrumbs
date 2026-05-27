@@ -75,6 +75,17 @@ function get_regex_note_info(
 	});
 }
 
+/**
+ * **regex_note** — basename regex match edge builder.
+ *
+ * A note annotated with `BC-regex-note-regex: <pattern>` becomes a parent hub.
+ * Every vault note whose basename matches the regex gets a `<field>` edge
+ * pointing to the regex note. The field comes from `BC-regex-note-field` or
+ * `default_field`. Optional `BC-regex-note-flags` sets regex flags (e.g. `i`).
+ *
+ * The regex is compiled once per note at build time; invalid patterns produce
+ * an `invalid_field_value` error without aborting the rest of the build.
+ */
 export const _add_explicit_edges_regex_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

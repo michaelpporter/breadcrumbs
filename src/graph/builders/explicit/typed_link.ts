@@ -8,6 +8,23 @@ import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 const MARKDOWN_LINK_REGEX = /\[(.+?)\]\((.+?)\)/;
 
+/**
+ * **typed_link** — the primary edge builder.
+ *
+ * Reads every frontmatter property whose key matches a registered edge-field
+ * label. If the value is a wikilink or markdown link, an edge is created from
+ * the current note to the target note with that field as the edge type.
+ *
+ * Two passes:
+ * - **Obsidian** (`frontmatterLinks`): uses Obsidian's built-in link resolution;
+ *   covers standard `[[wikilink]]` values in frontmatter.
+ * - **Dataview** (`all_files.dataview`): supplements inline fields that
+ *   `frontmatterLinks` misses (only runs when Dataview is present and the key
+ *   isn't already covered by the Obsidian pass to avoid duplicate edges).
+ *
+ * Unresolved link targets are added as unresolved nodes so they still appear
+ * in the graph even without a corresponding vault file.
+ */
 export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

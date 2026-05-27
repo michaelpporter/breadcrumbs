@@ -124,6 +124,17 @@ interface JohnnyDecimalNote {
 	metadata?: Record<string, unknown>;
 }
 
+/**
+ * **johnny_decimal_note** — numeric prefix hierarchy builder.
+ *
+ * Treats numeric-prefixed basenames as a Johnny.Decimal hierarchy:
+ * `01.02 Title` is a child of the `01` area note. An `up` edge is added from
+ * child → parent; if an implied transitive rule defines a close_field
+ * (typically `down`), a reverse `down` edge is also added.
+ *
+ * Per-note override via `BC-johnny-decimal-note-field`; falls back to
+ * `settings.explicit_edge_sources.johnny_decimal_note.default_field`.
+ */
 export const _add_explicit_edges_johnny_decimal_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

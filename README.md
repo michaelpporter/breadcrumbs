@@ -15,6 +15,32 @@ Media related to Breacrumbs. Thanks to everyone for sharing!
 -   [Obsidian Hub - Breadcrumbs for Comparative Law](https://publish.obsidian.md/hub/03+-+Showcases+%26+Templates/Plugin+Showcases/Breadcrumbs+for+Comparative+Law)
 -   [Obsidian Hub - How to get the most out of Breadcrumbs](https://publish.obsidian.md/hub/04+-+Guides%2C+Workflows%2C+%26+Courses/Guides/How+to+get+the+most+out+of+the+Breadcrumbs+plugin)
 
+## Security & Privacy
+
+Breadcrumbs is fully open source. This section discloses every network request, binary module, and non-obvious code pattern in the compiled plugin.
+
+### Network Requests
+
+**Mermaid diagrams** — when you open a `breadcrumbs` codeblock rendered as Mermaid and click the **"View Image on mermaid.ink"** button, your browser opens `https://mermaid.ink/img/<encoded-diagram>` in a new tab. This is the only outbound network request. It is user-initiated (button click), not automatic. The diagram text is base64-encoded with `btoa()` and appended to the URL; no data is sent to any Breadcrumbs server.
+
+No other network requests are made by this plugin.
+
+### WebAssembly Module
+
+The compiled bundle includes an inline WebAssembly binary. This is the **Breadcrumbs graph engine**, written in Rust and compiled with [`wasm-pack`](https://rustwasm.github.io/wasm-pack/). The full Rust source is in [`wasm/src/`](./wasm/src/) and can be audited directly. The WASM binary is never fetched from a remote URL; it is embedded at build time.
+
+### wasm-bindgen Generated Code Patterns
+
+`wasm-pack` generates JavaScript glue code in `wasm/pkg/breadcrumbs_graph_wasm.js`. Static scanners may flag three patterns in this generated file:
+
+| Pattern | Origin | Purpose |
+|---|---|---|
+| `fetch()` | wasm-bindgen shim | Fallback for loading WASM by URL. **Never called** — the plugin passes the inline binary directly to `init({ module_or_path: wasmbin })`. |
+| `new Function(...)` | wasm-bindgen shim | Exposes `js_sys::Function` to Rust. Standard wasm-bindgen pattern; no arbitrary code is constructed from user input. |
+| `wasm.memory` access | wasm-bindgen shim | JS reads/writes WASM linear memory to pass strings and arrays between Rust and JavaScript. Required by the WASM spec for cross-boundary data transfer. |
+
+All of the above are generated automatically by wasm-bindgen and are not written by the plugin authors.
+
 ## Credits
 
 -   [mProjectsCode](https://github.com/mProjectsCode): For their PRs, insightful suggestions, and efficiency improvements.
@@ -31,6 +57,8 @@ If you like Breadcrumbs and want to show your support, there are a few ways you 
 -   I have a coffee problem, which you can indulge here: https://ko-fi.com/skepticmystic
 
 ## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, build commands, and how to submit a pull request.
 
 ### Release process
 

@@ -183,6 +183,15 @@ const handle_neighbour_list_item = ({
 	);
 };
 
+/**
+ * **list_note** — list-as-children edge builder.
+ *
+ * A note annotated with `BC-list-note-field: <field>` is treated as a parent
+ * node. Each top-level list item in that note that resolves to a vault note
+ * (wikilink or plain basename) gets a `<field>` edge from the list note to the
+ * item note (i.e. the list note is the parent, list items are children).
+ * Supports Dataview link objects in addition to plain wikilinks.
+ */
 export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

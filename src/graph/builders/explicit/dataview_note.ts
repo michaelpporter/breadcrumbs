@@ -54,6 +54,16 @@ function get_dataview_note_info(
 	});
 }
 
+/**
+ * **dataview_note** — Dataview query result edge builder.
+ *
+ * A note annotated with `BC-dataview-note-query: <DQL query>` becomes a parent.
+ * The query is executed via the Dataview API; each result page gets an edge
+ * pointing to this note using `BC-dataview-note-field` (or `default_field`).
+ *
+ * Requires the Dataview plugin to be installed and enabled. Returns a
+ * `missing_other_plugin` error if Dataview is absent.
+ */
 export const _add_explicit_edges_dataview_note: ExplicitEdgeBuilder = (
 	plugin,
 	all_files,

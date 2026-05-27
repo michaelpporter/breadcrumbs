@@ -70,6 +70,17 @@ const iterate_folder_files = (
 	}
 };
 
+/**
+ * **folder_note** — folder containment edge builder.
+ *
+ * A note annotated with `BC-folder-note-field: <field>` represents its
+ * containing folder. Every other note inside that folder gets a `<field>` edge
+ * pointing to the folder note (folder note = parent). When `recurse: true` is
+ * set, all notes in sub-folders are also included.
+ *
+ * The builder walks the vault's folder tree via Obsidian's `TFolder` API;
+ * edges are only created for markdown files that are not the folder note itself.
+ */
 export const _add_explicit_edges_folder_note: ExplicitEdgeBuilder = async (
 	plugin,
 	all_files,

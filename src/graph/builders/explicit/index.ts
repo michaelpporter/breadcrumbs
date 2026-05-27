@@ -10,6 +10,14 @@ import { _add_explicit_edges_regex_note } from "./regex_note";
 import { _add_explicit_edges_tag_note } from "./tag_note";
 import { _add_explicit_edges_typed_link } from "./typed_link";
 
+/**
+ * Registry of all explicit edge builders, keyed by source name.
+ *
+ * `rebuild_graph` iterates `EXPLICIT_EDGE_SOURCES` and calls each builder in
+ * parallel via `Promise.all`. To add a new builder, export its function from
+ * its own file, add the key to `EXPLICIT_EDGE_SOURCES` in `src/const/graph.ts`,
+ * and register it here.
+ */
 export const add_explicit_edges: Record<
 	ExplicitEdgeSource,
 	ExplicitEdgeBuilder

@@ -16,6 +16,15 @@ import { add_explicit_edges } from "./explicit";
 import type { AllFiles } from "./explicit/files";
 import { get_all_files } from "./explicit/files";
 
+/**
+ * Build the initial node list from every vault file.
+ *
+ * Every markdown/canvas/base file becomes a `GCNodeData` node before any edge
+ * builder runs. Builders may add *extra* nodes (e.g. unresolved link targets)
+ * in their own results; duplicates are safe — the WASM engine deduplicates by
+ * node id. Reads `BC-ignore-in-edges` / `BC-ignore-out-edges` frontmatter flags
+ * and all `aliases` values from the Obsidian metadata cache.
+ */
 function get_initial_nodes(all_files: AllFiles) {
 	const nodes: GCNodeData[] = [];
 
@@ -50,6 +59,21 @@ function get_initial_nodes(all_files: AllFiles) {
 	return nodes;
 }
 
+/**
+ * Full graph rebuild pipeline. Called on plugin load, vault-ready, and
+ * whenever the user triggers a manual rebuild. Steps:
+ *
+ * 1. Collect all vault files + metadata cache entries once (`get_all_files`).
+ * 2. Optionally populate Dataview pages for inline-field support.
+ * 3. Build initial nodes from every file (`get_initial_nodes`).
+ * 4. Run all 9 explicit edge builders **in parallel** (`add_explicit_edges`).
+ * 5. Merge builder results (nodes + edges; log errors separately).
+ * 6. Convert settings' transitive implied-relation rules to WASM objects.
+ * 7. Call `plugin.graph.build_graph()` — the WASM engine takes ownership and
+ *    applies transitive rules, producing the final graph.
+ *
+ * Returns `explicit_edge_results` so callers can inspect per-builder errors.
+ */
 export const rebuild_graph = async (plugin: BreadcrumbsPlugin) => {
 	const timer = new Timer();
 	const timer2 = new Timer();
