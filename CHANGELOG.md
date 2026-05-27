@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.12.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.12.1...4.12.2) (2026-05-27)
+
+### Bug Fixes
+
+* **Johnny.Decimal area→category edges now resolve** — categories like `11 Finance` were not linked to their area `10 Life Admin` because the builder only used delimiter-splitting to find parents. Splitting `"11"` by `"."` yields no parent. Area parents are now derived numerically (`floor(n/10)*10`), so `11 → 10`, `21 → 20`, etc. Area notes (exact multiples of 10) remain top-level with no parent.
+
+### Build
+
+* **Expose `GCEdgeData` field accessors in WASM bindings** — `source`, `target`, `edge_type`, and `edge_source` are now exposed as `#[wasm_bindgen(getter)]` properties, enabling type-safe access in TypeScript tests without casting.
+* **Fix TypeScript build errors in test suite** — `succ`/`fail` now return concrete types so `.data`/`.error` are accessible without discriminant narrowing; builder tests updated to `async`/`await` to satisfy the `MaybePromise<EdgeBuilderResults>` return type.
+
 ### [4.12.1](https://github.com/SkepticMystic/breadcrumbs/compare/4.12.0...4.12.1) (2026-05-26)
 
 ### Bug Fixes
