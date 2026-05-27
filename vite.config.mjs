@@ -12,7 +12,10 @@ export default defineConfig({
 		alias: {
 			src: resolve(__dirname, "src"),
 			wasm: resolve(__dirname, "wasm"),
+			obsidian: resolve(__dirname, "tests/__mocks__/obsidian.ts"),
 		},
 	},
-	test: {},
+	test: {
+		setupFiles: ["tests/setup.ts"],
+	},
 });

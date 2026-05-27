@@ -84,6 +84,26 @@ impl GCEdgeData {
         }
     }
 
+    #[wasm_bindgen(getter)]
+    pub fn source(&self) -> String {
+        self.source.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn target(&self) -> String {
+        self.target.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn edge_type(&self) -> String {
+        self.edge_type.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn edge_source(&self) -> String {
+        self.edge_source.clone()
+    }
+
     #[wasm_bindgen(js_name = toString)]
     pub fn to_fancy_string(&self) -> String {
         format!("{self:#?}")
