@@ -121,6 +121,10 @@ export class GCEdgeData {
   free(): void;
   toString(): string;
   constructor(source: string, target: string, edge_type: string, edge_source: string);
+  readonly edge_source: string;
+  readonly source: string;
+  readonly target: string;
+  readonly edge_type: string;
 }
 export class GCNodeData {
   free(): void;
@@ -471,7 +475,11 @@ export interface InitOutput {
   readonly nodestringifyoptions_stringify_node: (a: number, b: number) => [number, number];
   readonly __wbg_gcedgedata_free: (a: number, b: number) => void;
   readonly __wbg_gcnodedata_free: (a: number, b: number) => void;
+  readonly gcedgedata_edge_source: (a: number) => [number, number];
+  readonly gcedgedata_edge_type: (a: number) => [number, number];
   readonly gcedgedata_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
+  readonly gcedgedata_source: (a: number) => [number, number];
+  readonly gcedgedata_target: (a: number) => [number, number];
   readonly gcedgedata_toString: (a: number) => [number, number];
   readonly gcnodedata_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly gcnodedata_toString: (a: number) => [number, number];

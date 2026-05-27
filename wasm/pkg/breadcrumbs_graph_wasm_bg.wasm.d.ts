@@ -78,7 +78,11 @@ export const nodestringifyoptions_new: (a: number, b: number, c: number, d: numb
 export const nodestringifyoptions_stringify_node: (a: number, b: number) => [number, number];
 export const __wbg_gcedgedata_free: (a: number, b: number) => void;
 export const __wbg_gcnodedata_free: (a: number, b: number) => void;
+export const gcedgedata_edge_source: (a: number) => [number, number];
+export const gcedgedata_edge_type: (a: number) => [number, number];
 export const gcedgedata_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
+export const gcedgedata_source: (a: number) => [number, number];
+export const gcedgedata_target: (a: number) => [number, number];
 export const gcedgedata_toString: (a: number) => [number, number];
 export const gcnodedata_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
 export const gcnodedata_toString: (a: number) => [number, number];

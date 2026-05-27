@@ -1299,6 +1299,21 @@ export class GCEdgeData {
     /**
      * @returns {string}
      */
+    get edge_source() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.gcedgedata_edge_source(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
     toString() {
         let deferred1_0;
         let deferred1_1;
@@ -1330,6 +1345,51 @@ export class GCEdgeData {
         this.__wbg_ptr = ret >>> 0;
         GCEdgeDataFinalization.register(this, this.__wbg_ptr, this);
         return this;
+    }
+    /**
+     * @returns {string}
+     */
+    get source() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.gcedgedata_source(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get target() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.gcedgedata_target(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get edge_type() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.gcedgedata_edge_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
     }
 }
 
