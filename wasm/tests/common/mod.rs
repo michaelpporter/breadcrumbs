@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use breadcrumbs_graph_wasm::{
     data::construction::{GCEdgeData, GCNodeData},
     graph::NoteGraph,
