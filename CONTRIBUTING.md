@@ -67,7 +67,7 @@ The generated bindings in `wasm/pkg/` are committed to the repo; `wasm/target/` 
 
 ## Submitting Changes
 
-1. Fork the repo and create a branch from `master`.
+1. Fork the repo and create a branch from `main`.
 2. Make your changes, add or update tests as appropriate.
 3. Run `bun run build` and `bun run test` — both must pass.
 4. Open a pull request with a clear description of what and why.

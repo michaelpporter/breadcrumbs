@@ -1,5 +1,17 @@
 Breadcrumbs is an Obsidian plugin that lets you add _typed links_ to your notes, then view/traverse them in various ways. Internally, Breadcrumbs uses a graph to represent this structure (much like the regular Obsidian graph, except now, links have _types_ to them). You tell Breadcrumbs about the structure of your notes, then it lets you visualise and navigate the graph.
 
+## New Maintainer
+
+As of 2025, Breadcrumbs is maintained by [michaelpporter](https://github.com/michaelpporter). The plugin was originally created by [SkepticMystic](https://github.com/SkepticMystic), whose foundational work made this all possible. Development continues at [github.com/michaelpporter/breadcrumbs](https://github.com/michaelpporter/breadcrumbs).
+
+> **Note:** The default branch has been renamed from `master` to `main`. Update any existing forks or local clones:
+> ```bash
+> git branch -m master main
+> git fetch origin
+> git branch -u origin/main main
+> git remote set-head origin -a
+> ```
+
 ## Documentation
 
 Breadcrumbs has its own docs site!✨ All detailed documentation lives there: https://breadcrumbs-docs.michaelpporter.com
@@ -43,18 +55,20 @@ All of the above are generated automatically by wasm-bindgen and are not written
 
 ## Credits
 
+-   [SkepticMystic](https://github.com/SkepticMystic): Original creator of Breadcrumbs. The plugin concept, architecture, and community were built by them.
 -   [mProjectsCode](https://github.com/mProjectsCode): For their PRs, insightful suggestions, and efficiency improvements.
 -   [HEmile](https://github.com/HEmile): For their PRs, and helpful discussions on graph-theory.
--   [michaelpporter](https://github.com/michaelpporter): For their PRs and issue support
+-   [michaelpporter](https://github.com/michaelpporter): Current maintainer.
 
 <!-- NOTE: This heading is linked to in the manifest.fundingUrl. Be sure to change that if updating the heading label -->
 
 ## Donations
 
-If you like Breadcrumbs and want to show your support, there are a few ways you can do so:
+If you find Breadcrumbs useful, consider sponsoring continued development:
 
--   Make a donation to your local animal shelter or charity. To support the animals in my country, you can [donate to the SPCA](https://nspca.co.za/donate/). If you do, please let me know! I'd love to hear about it :)
--   I have a coffee problem, which you can indulge here: https://ko-fi.com/skepticmystic
+-   [GitHub Sponsors — michaelpporter](https://github.com/sponsors/michaelpporter)
+
+Original creator SkepticMystic also accepts donations via [Ko-fi](https://ko-fi.com/skepticmystic) — their foundational work is what made this plugin possible.
 
 ## Contributing
 
