@@ -2,7 +2,7 @@ Breadcrumbs is an Obsidian plugin that lets you add _typed links_ to your notes,
 
 ## New Maintainer
 
-As of 2025, Breadcrumbs is maintained by [michaelpporter](https://github.com/michaelpporter). The plugin was originally created by [SkepticMystic](https://github.com/SkepticMystic), whose foundational work made this all possible. Development continues at [github.com/michaelpporter/breadcrumbs](https://github.com/michaelpporter/breadcrumbs).
+As of May 2026, Breadcrumbs is maintained by [michaelpporter](https://github.com/michaelpporter). The plugin was originally created by [SkepticMystic](https://github.com/SkepticMystic), whose foundational work made this all possible. Development continues at [github.com/michaelpporter/breadcrumbs](https://github.com/michaelpporter/breadcrumbs).
 
 > **Note:** The default branch has been renamed from `master` to `main`. Update any existing forks or local clones:
 > ```bash
