@@ -141,4 +141,4 @@ Tests live in `tests/`. No test framework for Svelte components — TypeScript l
 - Obsidian API docs: https://docs.obsidian.md
 - Plugin guidelines: https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines
 - `eslint-plugin-obsidianmd`: https://www.npmjs.com/package/eslint-plugin-obsidianmd
-- GitHub: https://github.com/SkepticMystic/breadcrumbs
+- GitHub: https://github.com/michaelpporter/breadcrumbs

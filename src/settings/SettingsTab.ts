@@ -83,7 +83,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			log.error("BreadcrumbsSettingTab.display threw >", error);
 			new Notice(
 				// eslint-disable-next-line obsidianmd/ui/sentence-case -- URL embedded in string; capitalising breaks the link
-				"Breadcrumbs: failed to render settings tab. See developer console and report at https://github.com/SkepticMystic/breadcrumbs/issues",
+				"Breadcrumbs: failed to render settings tab. See developer console and report at https://github.com/michaelpporter/breadcrumbs/issues",
 			);
 
 			containerEl.empty();

@@ -11,7 +11,7 @@ Thanks for your interest in contributing! This guide covers setup, development w
 ## Setup
 
 ```bash
-git clone https://github.com/SkepticMystic/breadcrumbs
+git clone https://github.com/michaelpporter/breadcrumbs
 cd breadcrumbs
 bun install
 ```
