@@ -4,7 +4,7 @@
 	"version": "4.11.9-beta.1",
 	"minAppVersion": "1.12.3",
 	"description": "Add structured hierarchies to your notes.",
-	"author": "SkepticMystic",
+	"author": "MichaelPPorter",
 	"authorUrl": "https://github.com/michaelpporter/breadcrumbs",
 	"fundingUrl": "https://github.com/michaelpporter/breadcrumbs#donations",
 	"helpUrl": "https://publish.obsidian.md/breadcrumbs-docs",
