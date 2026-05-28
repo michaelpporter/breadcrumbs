@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.12.3](https://github.com/michaelpporter/breadcrumbs/compare/4.12.2...4.12.3) (2026-05-28)
+
+### Chores
+
+* **Update GitHub repository references** — all in-repo links (manifests, CONTRIBUTING, SettingsTab, AGENTS) now point to the new location at `michaelpporter/breadcrumbs` following the project transfer.
+
 ### [4.12.2](https://github.com/SkepticMystic/breadcrumbs/compare/4.12.1...4.12.2) (2026-05-27)
 
 ### Bug Fixes
