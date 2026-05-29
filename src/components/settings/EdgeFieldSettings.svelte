@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowDown, PlusIcon, SaveIcon } from "lucide-svelte";
+	import { ArrowDown, ArrowUp, PlusIcon, SaveIcon } from "lucide-svelte";
 	import { Menu, Notice } from "obsidian";
 	import { ICON_SIZE } from "src/const";
 	import {
@@ -25,6 +25,7 @@
 		fields: "",
 		groups: "",
 	});
+
 
 	const autosave = () => {
 		settings.is_dirty = true;
@@ -62,6 +63,16 @@
 
 				autosave();
 			},
+			reorder: (from: number, to: number) => {
+				if (from === to) return;
+				const next = [...settings.edge_fields];
+				const [item] = next.splice(from, 1);
+				next.splice(to, 0, item);
+				settings.edge_fields = next;
+
+				autosave();
+			},
+
 			remove: (edge_field: EdgeField) => {
 				settings.edge_fields = settings.edge_fields.filter(
 					(f) => f.label !== edge_field.label,
@@ -272,6 +283,33 @@
 	};
 
 	const context_menus = {
+		add_to_group: (edge_field: EdgeField) => (e: MouseEvent) => {
+			const menu = new Menu();
+
+			const available = settings.edge_field_groups.filter(
+				(g) => !g.fields.includes(edge_field.label),
+			);
+
+			if (!available.length) {
+				menu.addItem((item) =>
+					item.setTitle("No groups available").setDisabled(true),
+				);
+			} else {
+				available.forEach((group) =>
+					menu.addItem((item) =>
+						item
+							.setTitle(group.label)
+							.setIcon("plus")
+							.onClick(() =>
+								actions.groups.add_field(group, edge_field.label),
+							),
+					),
+				);
+			}
+
+			menu.showAtMouseEvent(e);
+		},
+
 		field_group:
 			(edge_field: EdgeField, group_label: string) => (e: MouseEvent) => {
 				const menu = new Menu();
@@ -356,13 +394,21 @@
 		{/if}
 	</div>
 
-	<div class="flex flex-col gap-7">
-		{#each settings.edge_fields.filter( (f) => f.label.includes(filters.fields.toLowerCase()), ) as field}
+	<div class="flex flex-col">
+		{#each settings.edge_fields.filter( (f) => f.label.includes(filters.fields.toLowerCase()), ) as field, i}
 			{@const group_labels = settings.edge_field_groups
 				.filter((group) => group.fields.includes(field.label))
 				.map((g) => g.label)}
+			{@const field_i = settings.edge_fields.indexOf(field)}
 
-			<div class="flex flex-col gap-2">
+			{#if i > 0}
+				<hr class="my-1 opacity-20" />
+			{/if}
+
+			<!-- TODO: I don't think this key even does what I'm looking for
+			The intention is to update the groups_label references when the groups themselves change
+			To replicate an issue this cause, context-menu > remove field from group, then do that again. It doesn't remove the second time -->
+			{#key settings.edge_field_groups}
 				<div class="flex flex-wrap items-center gap-1">
 					<input
 						id={actions.fields.make_id(field.label)}
@@ -375,90 +421,62 @@
 					/>
 					<button
 						class="w-8"
-						title="Remove Field"
+						title="Remove field"
 						onclick={() => actions.fields.remove(field)}
 					>
 						X
+					</button>
+					<button
+						disabled={field_i === 0}
+						title="Move up"
+						onclick={() => actions.fields.reorder(field_i, field_i - 1)}
+					>
+						<ArrowUp size={ICON_SIZE} />
+					</button>
+					<button
+						disabled={field_i === settings.edge_fields.length - 1}
+						title="Move down"
+						onclick={() => actions.fields.reorder(field_i, field_i + 1)}
+					>
+						<ArrowDown size={ICON_SIZE} />
 					</button>
 					<select
 						class="dropdown"
 						title="Mermaid arrow shape for this field"
 						value={field.mermaid_arrow ?? ""}
 						onchange={(e) =>
-							actions.fields.set_arrow(
-								field,
-								e.currentTarget.value,
-							)}
+							actions.fields.set_arrow(field, e.currentTarget.value)}
 					>
 						<option value="">Default arrow</option>
 						{#each MERMAID_ARROW_TYPES as arrow}
 							<option value={arrow}>{arrow}</option>
 						{/each}
 					</select>
+
+					{#each group_labels as group_label}
+						<Tag
+							tag={group_label}
+							title="Jump to group. Right click to remove."
+							onclick={() => actions.groups.scroll_to(group_label)}
+							oncontextmenu={context_menus.field_group(
+								field,
+								group_label,
+							)}
+						/>
+					{/each}
+
+					<button
+						class="w-6"
+						title="Add to group"
+						onclick={context_menus.add_to_group(field)}
+					>
+						<PlusIcon size={ICON_SIZE} />
+					</button>
 				</div>
-
-				<!-- TODO: I don't think this key even does what I'm looking for
-				The intention is to update the groups_label references when the groups themselves change
-			To replicate an issue this cause, context-menu > remove field from group, then do that again. It doesn't remove the second time -->
-				{#key settings.edge_field_groups}
-					<div class="flex flex-wrap items-center gap-1.5">
-						<span>Groups</span>
-
-						{#each group_labels as group_label}
-							<div class="flex items-center gap-0.5">
-								<Tag
-									tag={group_label}
-									title="Jump to group. Right click for more actions."
-									onclick={() =>
-										actions.groups.scroll_to(group_label)}
-									oncontextmenu={context_menus.field_group(
-										field,
-										group_label,
-									)}
-								/>
-							</div>
-						{/each}
-
-						{#if !group_labels.length}
-							<span class="search-empty-state my-0">
-								{"<none>"}
-							</span>
-						{/if}
-
-						<select
-							class="dropdown"
-							value=""
-							onchange={(e) => {
-								if (e.currentTarget.value) {
-									actions.groups.add_field(
-										settings.edge_field_groups.find(
-											(g) =>
-												g.label ===
-												e.currentTarget.value,
-										),
-										field.label,
-									);
-
-									e.currentTarget.value = "";
-								}
-							}}
-						>
-							<option value="" disabled>Add to Group</option>
-
-							{#each settings.edge_field_groups as group}
-								{#if !group.fields.includes(field.label)}
-									<option value={group.label}>
-										{group.label}
-									</option>
-								{/if}
-							{/each}
-						</select>
-					</div>
-				{/key}
-			</div>
+			{/key}
 		{/each}
 
-		<button class="flex items-center gap-1" onclick={actions.fields.add}>
+		<button class="mt-2 flex items-center gap-1" onclick={actions.fields.add}>
 			<PlusIcon size={ICON_SIZE} />
 			New Edge Field
 		</button>
