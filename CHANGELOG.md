@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.0-beta.3](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.2...4.13.0-beta.3) (2026-05-29)
+
+### Features
+
+* **Traverse note builder** — a new explicit edge source. Annotate any note with `BC-traverse-note-field: <field>` to make it a traversal root. Breadcrumbs performs a DFS walk of the Obsidian vault link graph (resolved wikilinks) starting from that note, generating one edge per parent→child hop in the traversal tree. No special frontmatter required on linked notes.
+
 ### [4.13.0-beta.2](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.1...4.13.0-beta.2) (2026-05-29)
 
 ### Features
