@@ -23,6 +23,7 @@ import { _add_settings_rebuild_graph } from "./RebuildGraphSettings";
 import { _add_settings_regex_note } from "./RegexNoteSettings";
 import { _add_settings_tag_note } from "./TagNoteSettings";
 import { _add_settings_thread } from "./ThreadSettings";
+import { _add_settings_traverse_note } from "./TraverseNoteSettings";
 import { _add_settings_tree_view } from "./TreeViewSettings";
 
 class ImpSettingPage extends SettingPage {
@@ -192,6 +193,15 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 							new ImpSettingPage(
 								plugin,
 								_add_settings_johnny_decimal_note,
+							),
+					},
+					{
+						type: "page",
+						name: "Traverse notes",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_traverse_note,
 							),
 					},
 				],
@@ -438,6 +448,15 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				plugin,
 				make_details_el(containerEl, {
 					s: { text: "> Johnny.Decimal Notes" },
+				}).children,
+			),
+		);
+
+		perf_sync("section:traverse_note", () =>
+			_add_settings_traverse_note(
+				plugin,
+				make_details_el(containerEl, {
+					s: { text: "> Traverse Notes" },
 				}).children,
 			),
 		);

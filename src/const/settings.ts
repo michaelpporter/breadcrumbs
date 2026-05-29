@@ -149,6 +149,9 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 				up_field: "up",
 			},
 		},
+		traverse_note: {
+			default_field: "up",
+		},
 	},
 
 	views: {

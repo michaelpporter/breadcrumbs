@@ -198,6 +198,9 @@ describe("migration", () => {
 					default_field: "up",
 					default_sibling_field: "",
 				},
+				traverse_note: {
+					default_field: "up",
+				},
 			},
 			views: {
 				page: {
@@ -423,6 +426,9 @@ describe("migration", () => {
 					delimiter: ".",
 					default_field: "up",
 					default_sibling_field: "",
+				},
+				traverse_note: {
+					default_field: "up",
 				},
 			},
 			views: {
