@@ -2,7 +2,6 @@
   "name": "breadcrumbs_graph_wasm",
   "type": "module",
   "collaborators": [
-    "Michael Porter <github@michaelpporter.com>",
     "Moritz Jung <m.projects.code@gmail.com>",
     "SkepticMystic"
   ],

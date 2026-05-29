@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.0-beta.2](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.1...4.13.0-beta.2) (2026-05-29)
+
+### Features
+
+* **Compact edge fields UI** — groups row merged inline with the field row; the "Add to Group" dropdown replaced with a `+` button that opens an Obsidian context menu listing available groups. Spacing tightened to an `<hr>` separator between items. Move-up/move-down arrow buttons added for keyboard-accessible reordering (splice-based, correct when the name filter is active).
+
 ### [4.13.0-beta.1](https://github.com/michaelpporter/breadcrumbs/compare/4.12.3...4.13.0-beta.1) (2026-05-29)
 
 ### Features
