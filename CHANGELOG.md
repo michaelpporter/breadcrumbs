@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.0-beta.1](https://github.com/michaelpporter/breadcrumbs/compare/4.12.3...4.13.0-beta.1) (2026-05-29)
+
+### Features
+
+* **Obsidian 1.13 declarative settings** — `BreadcrumbsSettingTab` now implements `getSettingDefinitions()`, enabling page-based navigation, global settings search, and proper `hide()` lifecycle on Obsidian 1.12.3+. All sections (Edge fields, Implied relations, Edge sources, Views, Commands, Suggestors, Debug) are surfaced as navigable pages. The existing imperative `display()` is retained as a fallback for Obsidian versions below 1.13.0.
+
+### Chores
+
+* **Upgrade obsidian dev dependency to 1.13.0** — picks up new `SettingPage`, `SettingDefinitionItem`, and related declarative-settings types.
+* **Fix `Plugin.settings` accessor conflict** — Obsidian 1.13.0 introduces `settings?: unknown` on the base `Plugin` class. `BreadcrumbsPlugin` replaced the `get`/`set` accessor with `declare settings: BreadcrumbsSettings`; `loadSettings()` now calls `reactive_settings.init()` explicitly to keep the Svelte 5 reactive store in sync.
+* **Update author in `package.json`** to `michaelpporter`.
+
+### CI
+
+* **Add `workflow_dispatch` trigger** to release workflow.
+
+### Documentation
+
+* **Correct maintainer takeover date** in README to May 2026.
+
 ### [4.12.3](https://github.com/michaelpporter/breadcrumbs/compare/4.12.2...4.12.3) (2026-05-28)
 
 ### Chores

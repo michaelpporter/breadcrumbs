@@ -1,6 +1,6 @@
-import type { App } from "obsidian";
-import { Notice, PluginSettingTab, Setting } from "obsidian";
-import { log } from "src/logger";
+import type { App, SettingDefinitionItem } from "obsidian";
+import { Notice, PluginSettingTab, Setting, SettingPage } from "obsidian";
+import { LOG_LEVELS, log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { perf_start, perf_end, perf_sync } from "src/utils/perf";
 import { mount, unmount } from "svelte";
@@ -24,6 +24,68 @@ import { _add_settings_regex_note } from "./RegexNoteSettings";
 import { _add_settings_tag_note } from "./TagNoteSettings";
 import { _add_settings_thread } from "./ThreadSettings";
 import { _add_settings_tree_view } from "./TreeViewSettings";
+
+class ImpSettingPage extends SettingPage {
+	constructor(
+		private plugin: BreadcrumbsPlugin,
+		private addFn: (plugin: BreadcrumbsPlugin, el: HTMLElement) => void,
+	) {
+		super();
+	}
+
+	display(): void {
+		this.containerEl.empty();
+		this.addFn(this.plugin, this.containerEl);
+	}
+}
+
+class SvelteSettingPage extends SettingPage {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	private comp: any;
+
+	constructor(
+		private plugin: BreadcrumbsPlugin,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		private SvelteComponent: any,
+	) {
+		super();
+	}
+
+	display(): void {
+		this.containerEl.empty();
+		this.comp = mount(this.SvelteComponent, {
+			props: { plugin: this.plugin },
+			target: this.containerEl,
+		});
+	}
+
+	hide(): void {
+		if (this.comp) {
+			void unmount(this.comp);
+			this.comp = undefined;
+		}
+	}
+}
+
+class PageViewsSettingPage extends SettingPage {
+	constructor(private plugin: BreadcrumbsPlugin) {
+		super();
+	}
+
+	display(): void {
+		const el = this.containerEl;
+		el.empty();
+
+		new Setting(el).setHeading().setName("General");
+		_add_settings_page_views(this.plugin, el);
+
+		new Setting(el).setHeading().setName("Trail");
+		_add_settings_trail_view(this.plugin, el);
+
+		new Setting(el).setHeading().setName("Previous/next");
+		_add_settings_prev_next_view(this.plugin, el);
+	}
+}
 
 function make_details_el(
 	parent: HTMLElement,
@@ -57,6 +119,197 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: BreadcrumbsPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+	}
+
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		const { plugin } = this;
+
+		return [
+			{
+				type: "page",
+				name: "Edge fields",
+				page: () => new SvelteSettingPage(plugin, EdgeFieldSettings),
+			},
+			{
+				type: "group",
+				heading: "Implied relations",
+				items: [
+					{
+						type: "page",
+						name: "Transitive",
+						page: () =>
+							new SvelteSettingPage(
+								plugin,
+								TransitiveImpliedRelations,
+							),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Edge sources",
+				items: [
+					{
+						type: "page",
+						name: "Tag notes",
+						page: () =>
+							new ImpSettingPage(plugin, _add_settings_tag_note),
+					},
+					{
+						type: "page",
+						name: "List notes",
+						page: () =>
+							new ImpSettingPage(plugin, _add_settings_list_note),
+					},
+					{
+						type: "page",
+						name: "Date notes",
+						page: () =>
+							new ImpSettingPage(plugin, _add_settings_date_note),
+					},
+					{
+						type: "page",
+						name: "Regex notes",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_regex_note,
+							),
+					},
+					{
+						type: "page",
+						name: "Dendron notes",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_dendron_note,
+							),
+					},
+					{
+						type: "page",
+						name: "Johnny.Decimal notes",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_johnny_decimal_note,
+							),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Views",
+				items: [
+					{
+						type: "page",
+						name: "Matrix",
+						page: () =>
+							new ImpSettingPage(plugin, _add_settings_matrix),
+					},
+					{
+						type: "page",
+						name: "Page",
+						page: () => new PageViewsSettingPage(plugin),
+					},
+					{
+						type: "page",
+						name: "Tree",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_tree_view,
+							),
+					},
+					{
+						type: "page",
+						name: "Codeblocks",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_codeblocks,
+							),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Commands",
+				items: [
+					{
+						type: "page",
+						name: "Rebuild graph",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_rebuild_graph,
+							),
+					},
+					{
+						type: "page",
+						name: "List index",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_list_index,
+							),
+					},
+					{
+						type: "page",
+						name: "Freeze implied edges",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_freeze_implied_edges,
+							),
+					},
+					{
+						type: "page",
+						name: "Thread",
+						page: () =>
+							new ImpSettingPage(plugin, _add_settings_thread),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Suggestors",
+				items: [
+					{
+						type: "page",
+						name: "Edge field suggestor",
+						page: () =>
+							new ImpSettingPage(
+								plugin,
+								_add_settings_edge_field_suggestor,
+							),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Debug",
+				items: [
+					{
+						name: "Debug level",
+						desc: "Set the level of debug logging",
+						render: (setting) => {
+							setting.addDropdown((d) => {
+								const opts = Object.fromEntries(
+									LOG_LEVELS.map((l) => [l, l]),
+								);
+								d.addOptions(opts)
+									.setValue(plugin.settings.debug.level)
+									.onChange(async (value) => {
+										log.set_level(value as (typeof LOG_LEVELS)[number]);
+										plugin.settings.debug.level = value as (typeof LOG_LEVELS)[number];
+										await plugin.saveSettings();
+									});
+							});
+						},
+					},
+				],
+			},
+		];
 	}
 
 	display(): void {
