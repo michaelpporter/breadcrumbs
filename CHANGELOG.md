@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.1](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0...4.13.1) (2026-05-30)
+
+### Bug Fixes
+
+* **`type: markmap` with `dataview-from`** — the markmap now uses the Dataview query results as traversal entry nodes instead of the codeblock's own note, and suppresses the spurious `# [[current-note]]` root heading. The Dataview query is re-evaluated on every update so it is never stale from plugin load time. Fixes notes where the codeblock has no direct edges into the queried scope.
+* **`type: markmap` render error** — `CodeblockMDRC` (a `MarkdownRenderChild`) is now threaded as the parent component to `MarkdownRenderer.render()`. This gives the markmap-obsidian codeblock processor the MarkdownView context it needs, fixing `"Couldn't find MarkdownView containing code block"` (issue [#703](https://github.com/michaelpporter/breadcrumbs/issues/703)).
+
 ### [4.13.0](https://github.com/michaelpporter/breadcrumbs/compare/4.12.3...4.13.0) (2026-05-30)
 
 ### Features
