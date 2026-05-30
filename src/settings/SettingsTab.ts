@@ -1,5 +1,5 @@
 import type { App, SettingDefinitionItem } from "obsidian";
-import { Notice, PluginSettingTab, Setting, SettingPage } from "obsidian";
+import { Notice, PluginSettingTab, Setting } from "obsidian";
 import { LOG_LEVELS, log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { perf_start, perf_end, perf_sync } from "src/utils/perf";
@@ -26,67 +26,6 @@ import { _add_settings_thread } from "./ThreadSettings";
 import { _add_settings_traverse_note } from "./TraverseNoteSettings";
 import { _add_settings_tree_view } from "./TreeViewSettings";
 
-class ImpSettingPage extends SettingPage {
-	constructor(
-		private plugin: BreadcrumbsPlugin,
-		private addFn: (plugin: BreadcrumbsPlugin, el: HTMLElement) => void,
-	) {
-		super();
-	}
-
-	display(): void {
-		this.containerEl.empty();
-		this.addFn(this.plugin, this.containerEl);
-	}
-}
-
-class SvelteSettingPage extends SettingPage {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	private comp: any;
-
-	constructor(
-		private plugin: BreadcrumbsPlugin,
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		private SvelteComponent: any,
-	) {
-		super();
-	}
-
-	display(): void {
-		this.containerEl.empty();
-		this.comp = mount(this.SvelteComponent, {
-			props: { plugin: this.plugin },
-			target: this.containerEl,
-		});
-	}
-
-	hide(): void {
-		if (this.comp) {
-			void unmount(this.comp);
-			this.comp = undefined;
-		}
-	}
-}
-
-class PageViewsSettingPage extends SettingPage {
-	constructor(private plugin: BreadcrumbsPlugin) {
-		super();
-	}
-
-	display(): void {
-		const el = this.containerEl;
-		el.empty();
-
-		new Setting(el).setHeading().setName("General");
-		_add_settings_page_views(this.plugin, el);
-
-		new Setting(el).setHeading().setName("Trail");
-		_add_settings_trail_view(this.plugin, el);
-
-		new Setting(el).setHeading().setName("Previous/next");
-		_add_settings_prev_next_view(this.plugin, el);
-	}
-}
 
 function make_details_el(
 	parent: HTMLElement,
@@ -125,11 +64,44 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	getSettingDefinitions(): SettingDefinitionItem[] {
 		const { plugin } = this;
 
+		// Sentinel row: invisible, mounts a Svelte component into the page container,
+		// returns cleanup. Using items[] instead of page() factory ensures Obsidian's
+		// search navigation calls display correctly.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const svelte_items = (Component: any): SettingDefinitionItem[] => [
+			{
+				name: "",
+				searchable: false,
+				render: (setting, group) => {
+					setting.settingEl.detach();
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					const comp = mount(Component as any, {
+						props: { plugin },
+						target: group.listEl,
+					});
+					return () => { void unmount(comp); };
+				},
+			},
+		];
+
+		const imp_items = (
+			addFn: (plugin: BreadcrumbsPlugin, el: HTMLElement) => void,
+		): SettingDefinitionItem[] => [
+			{
+				name: "",
+				searchable: false,
+				render: (setting, group) => {
+					setting.settingEl.detach();
+					addFn(plugin, group.listEl);
+				},
+			},
+		];
+
 		return [
 			{
 				type: "page",
 				name: "Edge fields",
-				page: () => new SvelteSettingPage(plugin, EdgeFieldSettings),
+				items: svelte_items(EdgeFieldSettings),
 			},
 			{
 				type: "group",
@@ -138,11 +110,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Transitive",
-						page: () =>
-							new SvelteSettingPage(
-								plugin,
-								TransitiveImpliedRelations,
-							),
+						items: svelte_items(TransitiveImpliedRelations),
 					},
 				],
 			},
@@ -153,56 +121,37 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Tag notes",
-						page: () =>
-							new ImpSettingPage(plugin, _add_settings_tag_note),
+						items: imp_items(_add_settings_tag_note),
 					},
 					{
 						type: "page",
 						name: "List notes",
-						page: () =>
-							new ImpSettingPage(plugin, _add_settings_list_note),
+						items: imp_items(_add_settings_list_note),
 					},
 					{
 						type: "page",
 						name: "Date notes",
-						page: () =>
-							new ImpSettingPage(plugin, _add_settings_date_note),
+						items: imp_items(_add_settings_date_note),
 					},
 					{
 						type: "page",
 						name: "Regex notes",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_regex_note,
-							),
+						items: imp_items(_add_settings_regex_note),
 					},
 					{
 						type: "page",
 						name: "Dendron notes",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_dendron_note,
-							),
+						items: imp_items(_add_settings_dendron_note),
 					},
 					{
 						type: "page",
 						name: "Johnny.Decimal notes",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_johnny_decimal_note,
-							),
+						items: imp_items(_add_settings_johnny_decimal_note),
 					},
 					{
 						type: "page",
 						name: "Traverse notes",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_traverse_note,
-							),
+						items: imp_items(_add_settings_traverse_note),
 					},
 				],
 			},
@@ -213,31 +162,37 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Matrix",
-						page: () =>
-							new ImpSettingPage(plugin, _add_settings_matrix),
+						items: imp_items(_add_settings_matrix),
 					},
 					{
 						type: "page",
 						name: "Page",
-						page: () => new PageViewsSettingPage(plugin),
+						items: [
+							{
+								name: "",
+								searchable: false,
+								render: (setting, group) => {
+									setting.settingEl.detach();
+									const el = group.listEl;
+									new Setting(el).setHeading().setName("General");
+									_add_settings_page_views(plugin, el);
+									new Setting(el).setHeading().setName("Trail");
+									_add_settings_trail_view(plugin, el);
+									new Setting(el).setHeading().setName("Previous/next");
+									_add_settings_prev_next_view(plugin, el);
+								},
+							},
+						],
 					},
 					{
 						type: "page",
 						name: "Tree",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_tree_view,
-							),
+						items: imp_items(_add_settings_tree_view),
 					},
 					{
 						type: "page",
 						name: "Codeblocks",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_codeblocks,
-							),
+						items: imp_items(_add_settings_codeblocks),
 					},
 				],
 			},
@@ -248,35 +203,22 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Rebuild graph",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_rebuild_graph,
-							),
+						items: imp_items(_add_settings_rebuild_graph),
 					},
 					{
 						type: "page",
 						name: "List index",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_list_index,
-							),
+						items: imp_items(_add_settings_list_index),
 					},
 					{
 						type: "page",
 						name: "Freeze implied edges",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_freeze_implied_edges,
-							),
+						items: imp_items(_add_settings_freeze_implied_edges),
 					},
 					{
 						type: "page",
 						name: "Thread",
-						page: () =>
-							new ImpSettingPage(plugin, _add_settings_thread),
+						items: imp_items(_add_settings_thread),
 					},
 				],
 			},
@@ -287,11 +229,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Edge field suggestor",
-						page: () =>
-							new ImpSettingPage(
-								plugin,
-								_add_settings_edge_field_suggestor,
-							),
+						items: imp_items(_add_settings_edge_field_suggestor),
 					},
 				],
 			},

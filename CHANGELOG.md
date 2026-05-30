@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.0-beta.4](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.3...4.13.0-beta.4) (2026-05-30)
+
+### Bug Fixes
+
+* **Settings search navigation** — sub-pages (Edge fields, Transitive, all edge sources, views, commands, suggestors) now load correctly when reached via Obsidian 1.13's global settings search. Root cause: Obsidian skips `display()` on `SettingPage` subclasses returned from a `page` factory when navigating from search results. All page definitions now use `items` with a sentinel `render` row (matching the pattern used by notebook-navigator) so search navigation and direct navigation both work.
+
 ### [4.13.0-beta.3](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.2...4.13.0-beta.3) (2026-05-29)
 
 ### Features
