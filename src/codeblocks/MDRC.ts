@@ -125,6 +125,7 @@ export class CodeblockMDRC extends MarkdownRenderChild {
 					options,
 					file_path,
 					plugin: this.plugin,
+					parent_component: this,
 				},
 			});
 		} else {

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from "svelte/legacy";
-
 	import { Component, MarkdownRenderer } from "obsidian";
 	import { log } from "src/logger";
 	import type BreadcrumbsPlugin from "src/main";
@@ -13,6 +11,7 @@
 		markdown: string;
 		plugin: BreadcrumbsPlugin;
 		source_path?: string | undefined;
+		parent_component?: Component | undefined;
 	}
 
 	let {
@@ -20,6 +19,7 @@
 		markdown,
 		plugin,
 		source_path = undefined,
+		parent_component = undefined,
 	}: Props = $props();
 
 	let el: HTMLElement | undefined = $state();
@@ -36,12 +36,12 @@
 
 		el.empty();
 
-		if (component) {
+		if (component && !parent_component) {
 			component.unload();
 			component = undefined;
 		}
-		component = new Component();
-		component.load();
+		component = parent_component ?? new Component();
+		if (!parent_component) component.load();
 
 		return MarkdownRenderer.render(
 			plugin.app,
@@ -59,7 +59,7 @@
 	});
 
 	onDestroy(() => {
-		if (component) {
+		if (component && !parent_component) {
 			component.unload();
 			component = undefined;
 		}

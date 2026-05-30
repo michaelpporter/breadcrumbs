@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Component } from "obsidian";
 	import type { ICodeblock } from "src/codeblocks/schema";
 	import { edge_tree_to_list_index } from "src/commands/list_index";
 	import { to_node_stringify_options } from "src/graph/utils";
@@ -16,6 +17,9 @@
 		TraversalOptions,
 		TraversalPostprocessOptions,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
+	import { dataview_plugin } from "src/external/dataview";
+	import { dataview_pages_to_plain_array } from "src/external/dataview/pages_to_array";
+	import type { IDataview } from "src/external/dataview/interfaces";
 	import { log } from "src/logger";
 	import { Links } from "src/utils/links";
 
@@ -24,9 +28,10 @@
 		options: ICodeblock["Options"];
 		errors: BreadcrumbsError[];
 		file_path: string;
+		parent_component?: Component | undefined;
 	}
 
-	let { plugin, options, errors, file_path }: Props = $props();
+	let { plugin, options, errors, file_path, parent_component = undefined }: Props = $props();
 
 	let sort = $derived(
 		create_edge_sorter(options.sort.field, options.sort.order === -1),
@@ -39,6 +44,7 @@
 
 	let data: FlatTraversalResult | undefined = $state(undefined);
 	let error: string | undefined = $state(undefined);
+	let active_dv_paths: string[] | undefined = $state(undefined);
 
 	let active_file = $derived($active_file_store);
 
@@ -51,19 +57,50 @@
 		const source_path =
 			options["start-note"] || file_path || active_file?.path || "";
 
-		if (!plugin.graph.has_node(source_path)) {
+		// Re-query Dataview on every update so we pick up a fresh index
+		// (the paths pre-computed in postprocess_options may be stale if DV
+		// wasn't ready when the MDRC first loaded).
+		let live_dv_paths: string[] | undefined;
+		if (options["dataview-from"]) {
+			try {
+				const pages = dataview_pages_to_plain_array(
+					dataview_plugin
+						.get_api(plugin.app)
+						?.pages(options["dataview-from"], file_path),
+				) as IDataview.Page[];
+				live_dv_paths = pages.map((p) => p.file.path);
+			} catch (_) {
+				// DV not available; fall through to source_path traversal
+			}
+		}
+
+		const has_dv_paths = !!live_dv_paths?.length;
+		active_dv_paths = live_dv_paths;
+
+		if (has_dv_paths) {
+			const any_in_graph = live_dv_paths!.some((p) =>
+				plugin.graph.has_node(p),
+			);
+			if (!any_in_graph) {
+				data = undefined;
+				error = "None of the dataview-from notes exist in the graph.";
+				return;
+			}
+		} else if (!plugin.graph.has_node(source_path)) {
 			data = undefined;
 			error = "The file does not exist in the graph.";
 			return;
 		}
 
+		const entry_nodes = has_dv_paths ? live_dv_paths! : [source_path];
+
 		const traversal_options = new TraversalOptions(
-			[source_path],
+			entry_nodes,
 			options.fields,
 			max_depth,
 			100, // max nodes to traverse
 			!options["merge-fields"],
-			options["dataview-from-paths"],
+			undefined,
 		);
 
 		const postprocess_options = new TraversalPostprocessOptions(
@@ -94,33 +131,44 @@
 
 	let code = $derived.by(() => {
 		if (data) {
+			const has_dv_paths = !!active_dv_paths?.length;
+
+			const list = edge_tree_to_list_index(
+				plugin.graph,
+				data,
+				plugin.settings,
+				{
+					...plugin.settings.commands.list_index.default_options,
+					show_node_options,
+					show_attributes: options["show-attributes"] ?? [],
+				},
+			);
+
+			if (has_dv_paths) {
+				return (options.title ? "# " + options.title + "\n" : "") + list;
+			}
+
+			const source_path =
+				options["start-note"] || file_path || active_file?.path || "";
 			const stringify_options = to_node_stringify_options(
 				plugin.settings,
 				show_node_options,
 			);
-			const node_data = plugin.graph.get_node(file_path)!;
-
-			const link = Links.ify(
-				file_path,
-				stringify_options.stringify_node(node_data),
-				{
-					link_kind:
-						plugin.settings.commands.list_index.default_options
-							.link_kind,
-				},
-			);
+			const node_data = plugin.graph.get_node(source_path);
+			const link = node_data
+				? Links.ify(
+						source_path,
+						stringify_options.stringify_node(node_data),
+						{
+							link_kind:
+								plugin.settings.commands.list_index
+									.default_options.link_kind,
+						},
+					)
+				: source_path;
 			stringify_options.free();
 
-			return (
-				"# " +
-				link +
-				"\n" +
-				edge_tree_to_list_index(plugin.graph, data, plugin.settings, {
-					...plugin.settings.commands.list_index.default_options,
-					show_node_options,
-					show_attributes: options["show-attributes"] ?? [],
-				})
-			);
+			return "# " + link + "\n" + list;
 		} else {
 			return "";
 		}
@@ -227,6 +275,7 @@
 				{plugin}
 				source_path={file_path}
 				type="markmap"
+				{parent_component}
 			/>
 		</div>
 	{:else if error}
