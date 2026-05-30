@@ -24,6 +24,8 @@ export const METADATA_FIELDS_LIST = [
 	"BC-dataview-note-query",
 	"BC-dataview-note-field",
 	//
+	"BC-traverse-note-field",
+	//
 	"BC-ignore-in-edges",
 	"BC-ignore-out-edges",
 ] as const;
@@ -91,6 +93,10 @@ export const METADATA_FIELDS_MAP: Record<
 		property_type: "text",
 	},
 	//
+	"BC-traverse-note-field": {
+		property_type: "text",
+	},
+	//
 	"BC-ignore-in-edges": {
 		property_type: "checkbox",
 	},
@@ -122,6 +128,8 @@ export const META_ALIAS = {
 	//
 	"dataview-note-query": "BC-dataview-note-query",
 	"dataview-note-field": "BC-dataview-note-field",
+	//
+	"traverse-note-field": "BC-traverse-note-field",
 	//
 	"ignore-in-edges": "BC-ignore-in-edges",
 	"ignore-out-edges": "BC-ignore-out-edges",

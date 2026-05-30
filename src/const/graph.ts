@@ -8,6 +8,7 @@ export const EXPLICIT_EDGE_SOURCES = [
 	"date_note",
 	"folder_note",
 	"regex_note",
+	"traverse_note",
 	// TODO: "zetel_note", // Can date_notes do this already?
 ] as const;
 

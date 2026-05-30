@@ -1,6 +1,6 @@
-import type { App } from "obsidian";
+import type { App, SettingDefinitionItem } from "obsidian";
 import { Notice, PluginSettingTab, Setting } from "obsidian";
-import { log } from "src/logger";
+import { LOG_LEVELS, log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { perf_start, perf_end, perf_sync } from "src/utils/perf";
 import { mount, unmount } from "svelte";
@@ -23,7 +23,9 @@ import { _add_settings_rebuild_graph } from "./RebuildGraphSettings";
 import { _add_settings_regex_note } from "./RegexNoteSettings";
 import { _add_settings_tag_note } from "./TagNoteSettings";
 import { _add_settings_thread } from "./ThreadSettings";
+import { _add_settings_traverse_note } from "./TraverseNoteSettings";
 import { _add_settings_tree_view } from "./TreeViewSettings";
+
 
 function make_details_el(
 	parent: HTMLElement,
@@ -57,6 +59,205 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: BreadcrumbsPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+	}
+
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		const { plugin } = this;
+
+		// Sentinel row: invisible, mounts a Svelte component into the page container,
+		// returns cleanup. Using items[] instead of page() factory ensures Obsidian's
+		// search navigation calls display correctly.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const svelte_items = (Component: any): SettingDefinitionItem[] => [
+			{
+				name: "",
+				searchable: false,
+				render: (setting, group) => {
+					setting.settingEl.detach();
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					const comp = mount(Component as any, {
+						props: { plugin },
+						target: group.listEl,
+					});
+					return () => { void unmount(comp); };
+				},
+			},
+		];
+
+		const imp_items = (
+			addFn: (plugin: BreadcrumbsPlugin, el: HTMLElement) => void,
+		): SettingDefinitionItem[] => [
+			{
+				name: "",
+				searchable: false,
+				render: (setting, group) => {
+					setting.settingEl.detach();
+					addFn(plugin, group.listEl);
+				},
+			},
+		];
+
+		return [
+			{
+				type: "page",
+				name: "Edge fields",
+				items: svelte_items(EdgeFieldSettings),
+			},
+			{
+				type: "group",
+				heading: "Implied relations",
+				items: [
+					{
+						type: "page",
+						name: "Transitive",
+						items: svelte_items(TransitiveImpliedRelations),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Edge sources",
+				items: [
+					{
+						type: "page",
+						name: "Tag notes",
+						items: imp_items(_add_settings_tag_note),
+					},
+					{
+						type: "page",
+						name: "List notes",
+						items: imp_items(_add_settings_list_note),
+					},
+					{
+						type: "page",
+						name: "Date notes",
+						items: imp_items(_add_settings_date_note),
+					},
+					{
+						type: "page",
+						name: "Regex notes",
+						items: imp_items(_add_settings_regex_note),
+					},
+					{
+						type: "page",
+						name: "Dendron notes",
+						items: imp_items(_add_settings_dendron_note),
+					},
+					{
+						type: "page",
+						name: "Johnny.Decimal notes",
+						items: imp_items(_add_settings_johnny_decimal_note),
+					},
+					{
+						type: "page",
+						name: "Traverse notes",
+						items: imp_items(_add_settings_traverse_note),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Views",
+				items: [
+					{
+						type: "page",
+						name: "Matrix",
+						items: imp_items(_add_settings_matrix),
+					},
+					{
+						type: "page",
+						name: "Page",
+						items: [
+							{
+								name: "",
+								searchable: false,
+								render: (setting, group) => {
+									setting.settingEl.detach();
+									const el = group.listEl;
+									new Setting(el).setHeading().setName("General");
+									_add_settings_page_views(plugin, el);
+									new Setting(el).setHeading().setName("Trail");
+									_add_settings_trail_view(plugin, el);
+									new Setting(el).setHeading().setName("Previous/next");
+									_add_settings_prev_next_view(plugin, el);
+								},
+							},
+						],
+					},
+					{
+						type: "page",
+						name: "Tree",
+						items: imp_items(_add_settings_tree_view),
+					},
+					{
+						type: "page",
+						name: "Codeblocks",
+						items: imp_items(_add_settings_codeblocks),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Commands",
+				items: [
+					{
+						type: "page",
+						name: "Rebuild graph",
+						items: imp_items(_add_settings_rebuild_graph),
+					},
+					{
+						type: "page",
+						name: "List index",
+						items: imp_items(_add_settings_list_index),
+					},
+					{
+						type: "page",
+						name: "Freeze implied edges",
+						items: imp_items(_add_settings_freeze_implied_edges),
+					},
+					{
+						type: "page",
+						name: "Thread",
+						items: imp_items(_add_settings_thread),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Suggestors",
+				items: [
+					{
+						type: "page",
+						name: "Edge field suggestor",
+						items: imp_items(_add_settings_edge_field_suggestor),
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: "Debug",
+				items: [
+					{
+						name: "Debug level",
+						desc: "Set the level of debug logging",
+						render: (setting) => {
+							setting.addDropdown((d) => {
+								const opts = Object.fromEntries(
+									LOG_LEVELS.map((l) => [l, l]),
+								);
+								d.addOptions(opts)
+									.setValue(plugin.settings.debug.level)
+									.onChange(async (value) => {
+										log.set_level(value as (typeof LOG_LEVELS)[number]);
+										plugin.settings.debug.level = value as (typeof LOG_LEVELS)[number];
+										await plugin.saveSettings();
+									});
+							});
+						},
+					},
+				],
+			},
+		];
 	}
 
 	display(): void {
@@ -185,6 +386,15 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				plugin,
 				make_details_el(containerEl, {
 					s: { text: "> Johnny.Decimal Notes" },
+				}).children,
+			),
+		);
+
+		perf_sync("section:traverse_note", () =>
+			_add_settings_traverse_note(
+				plugin,
+				make_details_el(containerEl, {
+					s: { text: "> Traverse Notes" },
 				}).children,
 			),
 		);

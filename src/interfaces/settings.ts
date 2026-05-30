@@ -116,6 +116,10 @@ export interface BreadcrumbsSettings {
 		regex_note: {
 			default_field: string;
 		};
+
+		traverse_note: {
+			default_field: string;
+		};
 	};
 
 	views: {

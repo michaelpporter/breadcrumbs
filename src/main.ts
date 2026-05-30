@@ -43,12 +43,7 @@ export enum BCEvent {
 }
 
 export default class BreadcrumbsPlugin extends Plugin {
-	get settings(): BreadcrumbsSettings {
-		return reactive_settings.current;
-	}
-	set settings(value: BreadcrumbsSettings) {
-		reactive_settings.init(value);
-	}
+	declare settings: BreadcrumbsSettings;
 	graph!: NoteGraph;
 	api!: BCAPI;
 	events!: Events;
@@ -330,10 +325,12 @@ export default class BreadcrumbsPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = deep_merge_objects<BreadcrumbsSettings>(
+		const merged = deep_merge_objects<BreadcrumbsSettings>(
 			((await this.loadData()) ?? {}) as BreadcrumbsSettings,
 			DEFAULT_SETTINGS,
 		);
+		reactive_settings.init(merged);
+		this.settings = reactive_settings.current;
 	}
 
 	private handleFileMenu(menu: Menu, file: TAbstractFile): void {

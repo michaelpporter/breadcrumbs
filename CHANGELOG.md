@@ -4,6 +4,63 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.0](https://github.com/michaelpporter/breadcrumbs/compare/4.12.3...4.13.0) (2026-05-30)
+
+### Features
+
+* **Obsidian 1.13 declarative settings** — `BreadcrumbsSettingTab` now implements `getSettingDefinitions()`, enabling page-based navigation, global settings search, and proper `hide()` lifecycle. All sections (Edge fields, Implied relations, Edge sources, Views, Commands, Suggestors, Debug) are navigable pages. The existing `display()` is retained as a fallback for Obsidian < 1.13. Settings search navigation uses an `items`-based sentinel row pattern — the `page` factory approach silently skipped `display()` on search navigation in Obsidian 1.13.
+* **Traverse note builder** — a new explicit edge source. Annotate any note with `BC-traverse-note-field: <field>` to make it a traversal root. Breadcrumbs performs a DFS walk of the Obsidian vault link graph starting from that note, generating one edge per parent→child hop.
+* **Compact edge fields UI** — groups row merged inline with the field row; the "Add to Group" dropdown replaced with a `+` button that opens an Obsidian context menu listing available groups. Spacing tightened to an `<hr>` separator between items. Move-up/move-down arrow buttons added for keyboard-accessible reordering.
+
+### Bug Fixes
+
+* **Settings search navigation** — sub-pages now load correctly when reached via Obsidian 1.13's global settings search.
+* **`Plugin.settings` accessor conflict** — Obsidian 1.13.0 introduced `settings?: unknown` on the base `Plugin` class. `BreadcrumbsPlugin` replaced the `get`/`set` accessor with `declare settings: BreadcrumbsSettings`.
+
+### Chores
+
+* **Upgrade obsidian dev dependency to 1.13.0** — picks up `SettingPage`, `SettingDefinitionItem`, and related declarative-settings types.
+* **Add `workflow_dispatch` trigger** to release workflow.
+* **Correct maintainer takeover date** in README to May 2026.
+
+### [4.13.0-beta.4](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.3...4.13.0-beta.4) (2026-05-30)
+
+### Bug Fixes
+
+* **Settings search navigation** — sub-pages (Edge fields, Transitive, all edge sources, views, commands, suggestors) now load correctly when reached via Obsidian 1.13's global settings search. Root cause: Obsidian skips `display()` on `SettingPage` subclasses returned from a `page` factory when navigating from search results. All page definitions now use `items` with a sentinel `render` row (matching the pattern used by notebook-navigator) so search navigation and direct navigation both work.
+
+### [4.13.0-beta.3](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.2...4.13.0-beta.3) (2026-05-29)
+
+### Features
+
+* **Traverse note builder** — a new explicit edge source. Annotate any note with `BC-traverse-note-field: <field>` to make it a traversal root. Breadcrumbs performs a DFS walk of the Obsidian vault link graph (resolved wikilinks) starting from that note, generating one edge per parent→child hop in the traversal tree. No special frontmatter required on linked notes.
+
+### [4.13.0-beta.2](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.1...4.13.0-beta.2) (2026-05-29)
+
+### Features
+
+* **Compact edge fields UI** — groups row merged inline with the field row; the "Add to Group" dropdown replaced with a `+` button that opens an Obsidian context menu listing available groups. Spacing tightened to an `<hr>` separator between items. Move-up/move-down arrow buttons added for keyboard-accessible reordering (splice-based, correct when the name filter is active).
+
+### [4.13.0-beta.1](https://github.com/michaelpporter/breadcrumbs/compare/4.12.3...4.13.0-beta.1) (2026-05-29)
+
+### Features
+
+* **Obsidian 1.13 declarative settings** — `BreadcrumbsSettingTab` now implements `getSettingDefinitions()`, enabling page-based navigation, global settings search, and proper `hide()` lifecycle on Obsidian 1.12.3+. All sections (Edge fields, Implied relations, Edge sources, Views, Commands, Suggestors, Debug) are surfaced as navigable pages. The existing imperative `display()` is retained as a fallback for Obsidian versions below 1.13.0.
+
+### Chores
+
+* **Upgrade obsidian dev dependency to 1.13.0** — picks up new `SettingPage`, `SettingDefinitionItem`, and related declarative-settings types.
+* **Fix `Plugin.settings` accessor conflict** — Obsidian 1.13.0 introduces `settings?: unknown` on the base `Plugin` class. `BreadcrumbsPlugin` replaced the `get`/`set` accessor with `declare settings: BreadcrumbsSettings`; `loadSettings()` now calls `reactive_settings.init()` explicitly to keep the Svelte 5 reactive store in sync.
+* **Update author in `package.json`** to `michaelpporter`.
+
+### CI
+
+* **Add `workflow_dispatch` trigger** to release workflow.
+
+### Documentation
+
+* **Correct maintainer takeover date** in README to May 2026.
+
 ### [4.12.3](https://github.com/michaelpporter/breadcrumbs/compare/4.12.2...4.12.3) (2026-05-28)
 
 ### Chores

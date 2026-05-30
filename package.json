@@ -1,6 +1,6 @@
 {
 	"name": "breadcrumbs",
-	"version": "4.12.3",
+	"version": "4.13.0",
 	"description": "Add typed-links to your Obsidian notes",
 	"main": "main.js",
 	"scripts": {
@@ -31,7 +31,7 @@
 		"wasm:test": "cd wasm && wasm-pack test --node --features test"
 	},
 	"keywords": [],
-	"author": "SkepticMystic",
+	"author": "michaelpporter",
 	"license": "MIT",
 	"engines": {
 		"node": ">=24"
@@ -54,7 +54,7 @@
 		"eslint-plugin-only-warn": "^1.2.1",
 		"eslint-plugin-svelte": "^3.17.1",
 		"npm-run-all2": "^7.0.2",
-		"obsidian": "^1.12.3",
+		"obsidian": "1.13.0",
 		"obsidian-dataview": "^0.5.68",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^3.5.2",
