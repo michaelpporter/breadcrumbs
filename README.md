@@ -12,6 +12,14 @@ As of May 2026, Breadcrumbs is maintained by [michaelpporter](https://github.com
 > git remote set-head origin -a
 > ```
 
+## Obsidian 1.13
+
+Breadcrumbs 4.13.0 is fully compatible with Obsidian 1.13. The settings tab uses the new declarative settings API — all sections appear in global settings search and support page-based navigation. The existing display() fallback remains for older Obsidian versions (minAppVersion stays 1.12.3).
+
+## Demo Vault
+
+Want to see Breadcrumbs in action before configuring your own vault? The [Breadcrumbs Demo Vault](https://github.com/michaelpporter/breadcrumbs-demo) is a ready-to-open vault with pre-configured edge fields, example notes, and working graph structure.
+
 ## Documentation
 
 Breadcrumbs has its own docs site!✨ All detailed documentation lives there: https://breadcrumbs-docs.michaelpporter.com

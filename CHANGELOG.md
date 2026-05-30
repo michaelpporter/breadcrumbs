@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.0](https://github.com/michaelpporter/breadcrumbs/compare/4.12.3...4.13.0) (2026-05-30)
+
+### Features
+
+* **Obsidian 1.13 declarative settings** — `BreadcrumbsSettingTab` now implements `getSettingDefinitions()`, enabling page-based navigation, global settings search, and proper `hide()` lifecycle. All sections (Edge fields, Implied relations, Edge sources, Views, Commands, Suggestors, Debug) are navigable pages. The existing `display()` is retained as a fallback for Obsidian < 1.13. Settings search navigation uses an `items`-based sentinel row pattern — the `page` factory approach silently skipped `display()` on search navigation in Obsidian 1.13.
+* **Traverse note builder** — a new explicit edge source. Annotate any note with `BC-traverse-note-field: <field>` to make it a traversal root. Breadcrumbs performs a DFS walk of the Obsidian vault link graph starting from that note, generating one edge per parent→child hop.
+* **Compact edge fields UI** — groups row merged inline with the field row; the "Add to Group" dropdown replaced with a `+` button that opens an Obsidian context menu listing available groups. Spacing tightened to an `<hr>` separator between items. Move-up/move-down arrow buttons added for keyboard-accessible reordering.
+
+### Bug Fixes
+
+* **Settings search navigation** — sub-pages now load correctly when reached via Obsidian 1.13's global settings search.
+* **`Plugin.settings` accessor conflict** — Obsidian 1.13.0 introduced `settings?: unknown` on the base `Plugin` class. `BreadcrumbsPlugin` replaced the `get`/`set` accessor with `declare settings: BreadcrumbsSettings`.
+
+### Chores
+
+* **Upgrade obsidian dev dependency to 1.13.0** — picks up `SettingPage`, `SettingDefinitionItem`, and related declarative-settings types.
+* **Add `workflow_dispatch` trigger** to release workflow.
+* **Correct maintainer takeover date** in README to May 2026.
+
 ### [4.13.0-beta.4](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0-beta.3...4.13.0-beta.4) (2026-05-30)
 
 ### Bug Fixes
