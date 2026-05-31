@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.2](https://github.com/michaelpporter/breadcrumbs/compare/4.13.1...4.13.2) (2026-05-30)
+
+### Features
+
+* **`type: markmap` — native interactive SVG rendering** — markmap graphs are now rendered directly via the bundled `markmap-lib` + `markmap-view` libraries. No external plugin (markmap-obsidian) required. The SVG supports zoom, pan, and node collapse out of the box. Clicking any node text navigates to the corresponding note; Ctrl/Cmd+click opens in a new pane.
+
+### Bug Fixes
+
+* **`type: markmap` — wikilink display** — `[[path|alias]]` wikilinks in node labels are now stripped to clean display names (alias or basename) before rendering.
+* **`type: markmap` — WASM revision mismatch** — fixed an illegal `$state` mutation inside `$derived.by()` that caused `"Edge was created in revision N, but current revision is N+1"` errors on graph updates. Now uses a single pure derivation. Old `FlatTraversalResult` is freed after state is updated so reactive reads always see valid WASM memory.
+
 ### [4.13.1](https://github.com/michaelpporter/breadcrumbs/compare/4.13.0...4.13.1) (2026-05-30)
 
 ### Bug Fixes
