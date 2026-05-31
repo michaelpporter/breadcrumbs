@@ -34,8 +34,10 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 	plugin.addCommand({
 		id: "create-list-index",
 		name: "Create list index",
-		callback: () => {
-			new CreateListIndexModal(plugin.app, plugin).open();
+		checkCallback: (checking) => {
+			if (!get(active_file_store)) return false;
+			if (!checking) new CreateListIndexModal(plugin.app, plugin).open();
+			return true;
 		},
 	});
 

@@ -121,22 +121,13 @@
 			class="mb-1 flex flex-wrap justify-between gap-3"
 			class:hidden={!settings.show_controls}
 		>
-			<!-- TODO: make states out of these binds and add an effect to update the actual settings  -->
-			<select
-				class="dropdown"
-				bind:value={settings.format}
-				onchange={async () => await plugin.saveSettings()}
-			>
+			<select class="dropdown" bind:value={settings.format}>
 				{#each ["grid", "path"] as format}
 					<option value={format}> {format} </option>
 				{/each}
 			</select>
 
-			<select
-				class="dropdown"
-				bind:value={settings.selection}
-				onchange={async () => await plugin.saveSettings()}
-			>
+			<select class="dropdown" bind:value={settings.selection}>
 				{#each ["all", "shortest", "longest"] as s}
 					<option value={s}> {s} </option>
 				{/each}

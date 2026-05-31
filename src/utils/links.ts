@@ -16,12 +16,10 @@ const resolve_to_absolute_path = (
 	return Paths.build(folder.path, Paths.basename(relative_path), "md");
 };
 
-// TODO: Should I be using app.fileManager.generateMarkdownLink here?
-//   I don't think it does 'markdown' links, but use it for wiki
 const ify = (
 	path: string,
 	display: string,
-	options: { link_kind: LinkKind },
+	options: { link_kind: LinkKind; app?: App; source_path?: string },
 ) => {
 	switch (options.link_kind) {
 		case "none": {
@@ -35,6 +33,18 @@ const ify = (
 				: `[[${no_ext}|${display}]]`;
 		}
 		case "markdown": {
+			if (options.app && options.source_path) {
+				const file = options.app.vault.getFileByPath(path);
+				if (file) {
+					const alias = display !== path ? display : undefined;
+					return options.app.fileManager.generateMarkdownLink(
+						file,
+						options.source_path,
+						undefined,
+						alias,
+					);
+				}
+			}
 			return display === path
 				? `[${path}](${path})`
 				: `[${display}](${path})`;

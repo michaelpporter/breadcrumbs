@@ -30,9 +30,7 @@ export class CreateListIndexModal extends Modal {
 	}
 
 	onOpen() {
-		// TODO: Rather don't show the command at all
 		if (!this.active_file) {
-			new Notice("No active file");
 			this.close();
 			return;
 		}
@@ -122,6 +120,7 @@ export class CreateListIndexModal extends Modal {
 						this.active_file!.path,
 						plugin.settings,
 						this.options,
+						plugin.app,
 					);
 
 					if (list_index) {

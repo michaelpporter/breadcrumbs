@@ -1,3 +1,4 @@
+import type { App } from "obsidian";
 import type { EdgeSortId } from "src/const/graph";
 import type { EdgeAttribute } from "src/graph/utils";
 import { to_node_stringify_options } from "src/graph/utils";
@@ -58,6 +59,7 @@ export function edge_tree_to_list_index(
 		ListIndexOptions,
 		"link_kind" | "indent" | "show_node_options" | "show_attributes"
 	>,
+	app?: App,
 ): string {
 	if (!tree) {
 		return "";
@@ -80,6 +82,7 @@ export function edge_tree_to_list_index(
 		current_nodes,
 		stringify_options,
 		options,
+		app,
 	);
 	stringify_options.free();
 	return result;
@@ -94,6 +97,7 @@ function edge_tree_to_list_index_inner(
 		ListIndexOptions,
 		"link_kind" | "indent" | "show_node_options" | "show_attributes"
 	>,
+	app?: App,
 ): string {
 	let index = "";
 	const real_indent = options.indent.replace(/\\t/g, "\t");
@@ -105,6 +109,8 @@ function edge_tree_to_list_index_inner(
 
 		const link = Links.ify(edge.target_path(graph), display, {
 			link_kind: options.link_kind,
+			app,
+			source_path: edge.source_path(graph),
 		});
 
 		const attr = edge.get_attribute_label(graph, options.show_attributes);
@@ -123,6 +129,7 @@ function edge_tree_to_list_index_inner(
 			new_children,
 			stringify_options,
 			options,
+			app,
 		);
 	});
 
@@ -134,6 +141,7 @@ export function build_list_index(
 	start_node: string,
 	plugin_settings: BreadcrumbsSettings | undefined,
 	options: ListIndexOptions,
+	app?: App,
 ): string {
 	const traversal_options = new TraversalOptions(
 		[start_node],
@@ -162,6 +170,7 @@ export function build_list_index(
 		traversal_result,
 		plugin_settings,
 		options,
+		app,
 	);
 	traversal_result.free();
 	return result;

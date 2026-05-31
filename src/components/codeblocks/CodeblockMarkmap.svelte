@@ -148,6 +148,7 @@
 					show_node_options,
 					show_attributes: options["show-attributes"] ?? [],
 				},
+				plugin.app,
 			);
 
 			if (has_dv_paths) {
@@ -269,6 +270,10 @@
 	{:else if error}
 		<p class="search-empty-state">{error}</p>
 	{:else}
-		<p class="search-empty-state">No paths found.</p>
+		<p class="search-empty-state">
+			No paths found{options.fields?.length
+				? ` for field(s): ${options.fields.join(", ")}`
+				: ""}.
+		</p>
 	{/if}
 </div>

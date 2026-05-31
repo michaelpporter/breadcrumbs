@@ -92,20 +92,35 @@ export async function drop_crumbs(
 		}
 
 		case "dataview-inline": {
-			// TODO: Dedupe links using dv page API
-			const dataview_fields = Object.entries(links_by_field)
-				.map(([field, links]) => {
-					if (!links?.length) return "";
-					if (included_fields.length && !included_fields.includes(field)) return "";
-					else return `${field}:: ${links.join(", ")}`;
-				})
-				.filter(Boolean);
-
-			// NOTE: Just appends for now
 			await plugin.app.vault.process(destination_file, (content) => {
-				content += "\n\n" + dataview_fields.join("\n");
+				let result = content;
+				const to_append: string[] = [];
 
-				return content;
+				Object.entries(links_by_field).forEach(([field, links]) => {
+					if (!links?.length) return;
+					if (included_fields.length && !included_fields.includes(field)) return;
+
+					const escaped = field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+					const regex = new RegExp(`^(${escaped}:: )(.+)$`, "m");
+					const match = result.match(regex);
+
+					if (match) {
+						const existing = match[2]
+							.split(",")
+							.map((s) => s.trim())
+							.filter(Boolean);
+						const merged = remove_duplicates([...existing, ...links]);
+						result = result.replace(regex, `${match[1]}${merged.join(", ")}`);
+					} else {
+						to_append.push(`${field}:: ${links.join(", ")}`);
+					}
+				});
+
+				if (to_append.length) {
+					result += "\n\n" + to_append.join("\n");
+				}
+
+				return result;
 			});
 
 			break;

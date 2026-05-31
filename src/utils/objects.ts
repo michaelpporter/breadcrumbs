@@ -8,17 +8,17 @@ export function deep_merge_objects<T>(obj1: T, obj2: T): T {
 		const val1 = obj1[key];
 		const val2 = obj2[key];
 
-		if (
+		if (val1 === undefined || val1 === null) {
+			result[key] = val2;
+		} else if (
 			typeof val1 === "object" &&
 			typeof val2 === "object" &&
+			val2 !== null &&
 			!Array.isArray(val1) &&
 			!Array.isArray(val2)
 		) {
 			result[key] = deep_merge_objects(val1, val2);
-		} else if (val1 === undefined) {
-			result[key] = val2;
 		}
-		// TODO: Somewhere here, I can handle the array case
 	}
 
 	return result;

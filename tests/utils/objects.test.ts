@@ -29,5 +29,31 @@ describe("deep_merge_objects", () => {
 		});
 	});
 
-	// TODO: Implement and test arrays
+	test("arrays: obj1 array kept as-is", (t) => {
+		const obj1: Record<string, any> = { items: ["a", "b"] };
+		const obj2: Record<string, any> = { items: ["c", "d", "e"] };
+
+		t.expect(deep_merge_objects(obj1, obj2)).toEqual({ items: ["a", "b"] });
+	});
+
+	test("arrays: missing in obj1 uses obj2", (t) => {
+		const obj1: Record<string, any> = {};
+		const obj2: Record<string, any> = { items: ["c", "d"] };
+
+		t.expect(deep_merge_objects(obj1, obj2)).toEqual({ items: ["c", "d"] });
+	});
+
+	test("arrays: null in obj1 uses obj2", (t) => {
+		const obj1: Record<string, any> = { items: null };
+		const obj2: Record<string, any> = { items: ["c", "d"] };
+
+		t.expect(deep_merge_objects(obj1, obj2)).toEqual({ items: ["c", "d"] });
+	});
+
+	test("objects: null in obj1 uses obj2 object", (t) => {
+		const obj1: Record<string, any> = { nested: null };
+		const obj2: Record<string, any> = { nested: { a: 1 } };
+
+		t.expect(deep_merge_objects(obj1, obj2)).toEqual({ nested: { a: 1 } });
+	});
 });

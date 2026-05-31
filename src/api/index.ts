@@ -52,6 +52,7 @@ export class BCAPI {
 			start_node,
 			this.plugin.settings,
 			Object.assign({ ...LIST_INDEX_DEFAULT_OPTIONS }, options),
+			this.plugin.app,
 		);
 	}
 
