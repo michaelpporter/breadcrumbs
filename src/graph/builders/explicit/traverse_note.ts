@@ -16,7 +16,7 @@ function dfs_edges(
 ): [string, string][] {
 	const edges: [string, string][] = [];
 	const visited = new Set<string>();
-	const stack: Array<{ node: string; parent: string | null }> = [
+	const stack: { node: string; parent: string | null }[] = [
 		{ node: start, parent: null },
 	];
 

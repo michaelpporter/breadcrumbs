@@ -74,8 +74,8 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				searchable: false,
 				render: (setting, group) => {
 					setting.settingEl.detach();
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					const comp = mount(Component as any, {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+					const comp = mount(Component, {
 						props: { plugin },
 						target: group.listEl,
 					});
@@ -304,6 +304,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			const retry = fallback.createEl("button", {
 				text: "Reload settings",
 			});
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			retry.onclick = () => this.display();
 		}
 		perf_end("SettingsTab.display");

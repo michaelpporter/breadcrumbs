@@ -11,10 +11,11 @@ export default tseslint.config(
 	{
 		ignores: ['npm/', 'node_modules/', 'main.js', '**/*.svelte', '**/*.d.ts'],
 	},
-	// Strip `import` plugin from obsidianmd recommended — we use import-x which registers the same namespace
+	// Strip `import` and `@typescript-eslint` from obsidianmd recommended — we register both ourselves
+	// and ESLint flat config disallows redefining a plugin with the same name across config objects.
 	...obsidianmd.configs.recommended.map((c) => {
-		if (!c.plugins || !('import' in c.plugins)) return c;
-		const { import: _dropped, ...rest } = c.plugins;
+		if (!c.plugins) return c;
+		const { import: _i, '@typescript-eslint': _ts, ...rest } = c.plugins;
 		return { ...c, plugins: rest };
 	}),
 	...eslintPluginSvelte.configs['flat/recommended'],

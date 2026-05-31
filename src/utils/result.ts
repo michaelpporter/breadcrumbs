@@ -1,5 +1,4 @@
 import type { BreadcrumbsError } from "src/interfaces/graph";
-import type { Result } from "src/interfaces/result";
 
 /**
  * Wrap a successful value in a `Result`.
