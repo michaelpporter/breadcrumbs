@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.5](https://github.com/michaelpotter/breadcrumbs/compare/4.13.4...4.13.5) (2026-05-31)
+
+### Bug Fixes
+
+* **`link_kind: "markdown"` path format** — list-index and codeblock outputs now use `app.fileManager.generateMarkdownLink`, so vault link-format settings (shortest path / relative / absolute) are respected. Unresolved ghost-node paths fall back to the previous manual form.
+* **`deep_merge_objects` null fields** — settings keys stored as `null` (e.g. from older vault data) now correctly fall back to their defaults instead of being silently retained as `null`, which could previously cause a `TypeError` when the value was expected to be an object.
+* **Dataview-inline drop-crumb deduplication** — running "Drop crumbs" more than once no longer appends duplicate `field::` lines. Existing inline fields are found by regex, merged, and deduped in-place; only genuinely new fields are appended.
+
+### Improvements
+
+* **Codeblock empty state** — when a `breadcrumbs` codeblock finds no paths, the empty-state message now names the fields that were searched (e.g. "No paths found for field(s): up, down"), making misconfigured field names easier to spot.
+* **"Create list index" command** — the command is now hidden from the command palette when no file is active, instead of opening a modal that immediately closes with a notice.
+* **TrailView controls** — removed redundant `onchange` save calls from the format/selection dropdowns; the existing `$effect` writeback already persists every settings change.
+
 ### [4.13.4](https://github.com/michaelpotter/breadcrumbs/compare/4.13.3...4.13.4) (2026-05-31)
 
 ### Bug Fixes
