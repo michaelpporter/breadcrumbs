@@ -150,3 +150,8 @@ Outputs to /styles.css, for Obsidian to use.
 .BC-search-input-container input[type="search"] {
 	width: 100%;
 }
+
+/* markmap node text — inherit Obsidian's theme colour so dark mode is readable */
+.BC-codeblock-markmap svg foreignObject div {
+	color: var(--text-normal);
+}

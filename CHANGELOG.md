@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.3](https://github.com/michaelpporter/breadcrumbs/compare/4.13.2...4.13.3) (2026-05-31)
+
+### Bug Fixes
+
+* **`type: markmap` — dark mode text** — markmap node labels now use `var(--text-normal)` so they are readable in both light and dark Obsidian themes.
+
 ### [4.13.2](https://github.com/michaelpporter/breadcrumbs/compare/4.13.1...4.13.2) (2026-05-30)
 
 ### Features
