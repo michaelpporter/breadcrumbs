@@ -60,7 +60,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 		() => {
 			void this.rebuildGraph();
 		},
-		1500,
+		10000,
 		true,
 	);
 
