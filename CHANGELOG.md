@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.4](https://github.com/michaelpotter/breadcrumbs/compare/4.13.3...4.13.4) (2026-05-31)
+
+### Bug Fixes
+
+* **Graph rebuild on note save** — replaced the blanket 10 s debounce with a `_pending_rebuild` flag that fires `rebuildGraph` only after `metadataCache:resolved`, so the graph updates promptly when the cache finishes processing a save rather than waiting an arbitrary delay.
+
+### Build
+
+* **ES2022 targets** — TypeScript `target` and esbuild `target` both updated from ES6/ES2020 to ES2022, matching the minimum Electron version Obsidian ships.
+* **tsconfig aligned with Obsidian Svelte docs** — added `verbatimModuleSyntax`, `skipLibCheck`, and `**/*.svelte` to `include`; trimmed redundant `lib` entries (ES5/ES6/ES7) superseded by ES2022; added `--tsconfig` flag to `svelte-check` script.
+
 ### [4.13.3](https://github.com/michaelpporter/breadcrumbs/compare/4.13.2...4.13.3) (2026-05-31)
 
 ### Bug Fixes

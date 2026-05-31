@@ -37,7 +37,7 @@ const context = await esbuild.context({
 		...builtins,
 	],
 	format: "cjs",
-	target: "es2020",
+	target: "es2022",
 	// wasm-pack glue uses import.meta.url; Obsidian bundle is CJS and loads WASM via main.ts init
 	define: {
 		"import.meta.url": JSON.stringify(""),

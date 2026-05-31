@@ -60,9 +60,11 @@ export default class BreadcrumbsPlugin extends Plugin {
 		() => {
 			void this.rebuildGraph();
 		},
-		10000,
+		1500,
 		true,
 	);
+
+	private _pending_rebuild = false;
 
 	private _redraw_page_views_debouncer: Debouncer<[], void> = debounce(
 		() => {
@@ -281,9 +283,19 @@ export default class BreadcrumbsPlugin extends Plugin {
 					log.debug("on:metadatacache-changed >", file.path);
 
 					if (
-						this.settings.commands.rebuild_graph.trigger
-							.note_save
+						this.settings.commands.rebuild_graph.trigger.note_save
 					) {
+						this._pending_rebuild = true;
+					}
+				}),
+			);
+
+			this.registerEvent(
+				this.app.metadataCache.on("resolved", () => {
+					log.debug("on:metadatacache-resolved");
+
+					if (this._pending_rebuild) {
+						this._pending_rebuild = false;
 						this.rebuildGraphDebounced();
 					}
 				}),
