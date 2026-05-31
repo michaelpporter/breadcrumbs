@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Keymap } from "obsidian";
 	import type { Component } from "obsidian";
 	import type { ICodeblock } from "src/codeblocks/schema";
 	import { edge_tree_to_list_index } from "src/commands/list_index";
@@ -8,7 +9,6 @@
 	import { active_file_store } from "src/stores/active_file";
 	import { onMount, onDestroy } from "svelte";
 	import CopyToClipboardButton from "../button/CopyToClipboardButton.svelte";
-	import RenderExternalCodeblock from "../obsidian/RenderExternalCodeblock.svelte";
 	import CodeblockErrors from "./CodeblockErrors.svelte";
 	import {
 		create_edge_sorter,
@@ -22,6 +22,11 @@
 	import type { IDataview } from "src/external/dataview/interfaces";
 	import { log } from "src/logger";
 	import { Links } from "src/utils/links";
+	import { Transformer } from "markmap-lib";
+	import { Markmap, globalCSS, loadCSS } from "markmap-view";
+
+	// Inject markmap styles into the document once.
+	loadCSS([{ type: "style", data: globalCSS }]);
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -113,8 +118,9 @@
 				traversal_options,
 				postprocess_options,
 			);
-			data?.free(); // free previous FlatTraversalResult
-			data = new_data;
+			const old_data = data;
+			data = new_data; // update state before freeing so derivations read valid data
+			old_data?.free();
 			error = undefined;
 		} catch (e) {
 			log.error("Error updating codeblock tree", e);
@@ -174,78 +180,64 @@
 		}
 	});
 
-	$inspect(code);
+	// Markmap SVG rendering
+	let svg_el: SVGElement | undefined = $state(undefined);
+	let mm: Markmap | undefined;
+	const transformer = new Transformer();
 
-	// Free final FlatTraversalResult when component unmounts.
-	onDestroy(() => data?.free());
+	// Strip [[path|alias]] wikilinks to clean display names and build a
+	// reverse Map (display → path) for click navigation.
+	function strip_wikilinks(md: string): { clean: string; path_map: Map<string, string> } {
+		const path_map = new Map<string, string>();
+		const clean = md.replace(
+			/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g,
+			(_, path: string, alias?: string) => {
+				const display =
+					alias ?? path.split("/").pop()?.replace(/\.md$/, "") ?? path;
+				if (!path_map.has(display)) path_map.set(display, path);
+				return display;
+			},
+		);
+		return { clean, path_map };
+	}
 
-	// export let plugin: BreadcrumbsPlugin;
-	// export let options: ICodeblock["Options"];
-	// export let errors: BreadcrumbsError[];
-	// export let file_path: string;
+	let processed = $derived.by(() => strip_wikilinks(code));
+	let display_code = $derived(processed.clean);
+	let path_map = $derived(processed.path_map);
 
-	// // TODO(RUST): Translate
+	function handle_node_click(e: MouseEvent) {
+		const target = e.target as HTMLElement | SVGElement;
+		// Circle clicks toggle collapse — don't also navigate
+		if (target instanceof SVGCircleElement) return;
+		const fo = (target as HTMLElement).closest?.("foreignObject");
+		if (!fo) return;
+		const text = (fo as unknown as HTMLElement).textContent?.trim() ?? "";
+		if (!text) return;
+		const path = path_map.get(text);
+		if (!path) return;
+		e.stopPropagation();
+		const newLeaf = Keymap.isModEvent(e);
+		void plugin.app.workspace.openLinkText(path, file_path, newLeaf ?? false);
+	}
 
-	// const sort = get_edge_sorter(options.sort, plugin.graph);
-	// const { show_node_options } = plugin.settings.views.codeblocks;
+	$effect(() => {
+		if (!svg_el || !display_code) return;
+		const { root } = transformer.transform(display_code);
+		if (mm) {
+			mm.setData(root);
+			void mm.fit();
+		} else {
+			mm = Markmap.create(svg_el, undefined, root);
+			svg_el.addEventListener("click", handle_node_click);
+			void mm.fit();
+		}
+	});
 
-	// let tree: EdgeTree[] = [];
-
-	// // if the file_path is an empty string, so the code block is not rendered inside note, we fall back to the active file store
-	// $: source_path = file_path
-	// 	? file_path
-	// 	: $active_file_store
-	// 		? $active_file_store.path
-	// 		: "";
-
-	// // this is an exposed function that we can call from the outside to update the codeblock
-	// export const update = () => {
-	// 	tree = Traverse.sort_edge_tree(get_tree(), sort);
-	// };
-
-	// const base_traversal = (attr: EdgeAttrFilters) =>
-	// 	Traverse.build_tree(
-	// 		plugin.graph,
-	// 		source_path,
-	// 		{ max_depth: options.depth[1] },
-	// 		(e) =>
-	// 			has_edge_attrs(e, {
-	// 				...attr,
-	// 				$or_target_ids: options["dataview-from-paths"],
-	// 			}),
-	// 	);
-
-	// const edge_field_labels =
-	// 	options.fields ?? plugin.settings.edge_fields.map((f) => f.label);
-
-	// const get_tree = () => {
-	// 	if (source_path && plugin.graph.hasNode(source_path)) {
-	// 		const traversal = options["merge-fields"]
-	// 			? base_traversal({ $or_fields: options.fields })
-	// 			: edge_field_labels.flatMap((field) =>
-	// 					base_traversal({ field }),
-	// 				);
-
-	// 		// NOTE: The flattening is done here so that:
-	// 		// - We can use NestedEdgeList for both modes
-	// 		// - ListIndex builds from an EdgeTree[] as well
-	// 		return options.flat
-	// 			? Traverse.flatten_tree(traversal).map((item) => ({
-	// 					depth: 0,
-	// 					children: [],
-	// 					edge: item.edge,
-	// 				}))
-	// 			: traversal;
-	// 	} else {
-	// 		return [];
-	// 	}
-	// };
-
-	// $: code = ListIndex.edge_tree_to_list_index(tree, {
-	// 	...plugin.settings.commands.list_index.default_options,
-	// 	show_node_options,
-	// 	show_attributes: options["show-attributes"] ?? [],
-	// });
+	onDestroy(() => {
+		svg_el?.removeEventListener("click", handle_node_click);
+		mm?.destroy();
+		data?.free();
+	});
 
 	onMount(() => {
 		update();
@@ -263,20 +255,16 @@
 
 	{#if code}
 		<div class="relative">
-			<div class="absolute left-2 top-2 flex">
+			<div class="absolute left-2 top-2 flex" style="z-index: 1;">
 				<CopyToClipboardButton
 					text={code}
 					cls="clickable-icon nav-action-button"
 				/>
-			</div>
-
-			<RenderExternalCodeblock
-				{code}
-				{plugin}
-				source_path={file_path}
-				type="markmap"
-				{parent_component}
-			/>
+				</div>
+			<svg
+				bind:this={svg_el}
+				style="width: 100%; height: 400px; display: block;"
+			></svg>
 		</div>
 	{:else if error}
 		<p class="search-empty-state">{error}</p>

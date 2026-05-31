@@ -74,6 +74,8 @@
 		"caniuse-lite": "^1.0.30001793",
 		"lucide-svelte": "^1.0.1",
 		"luxon": "^3.7.2",
+		"markmap-lib": "^0.18.12",
+		"markmap-view": "^0.18.12",
 		"obsidian-typings": "^3.16.6",
 		"zod": "^4.4.3"
 	}
