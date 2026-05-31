@@ -14,6 +14,16 @@ Outputs to /styles.css, for Obsidian to use.
 	display: none;
 }
 
+/* Container must never intercept clicks on underlying plugin elements (e.g. Pretty Properties cover image).
+ * Restore pointer-events on actual BC content so trail links and prev/next buttons still work. */
+.BC-page-views {
+	pointer-events: none;
+}
+
+.BC-page-views * {
+	pointer-events: auto;
+}
+
 .BC-page-views.BC-page-views-sticky {
 	z-index: 50;
 	position: sticky;

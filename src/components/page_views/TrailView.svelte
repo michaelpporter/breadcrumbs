@@ -115,8 +115,8 @@
 	});
 </script>
 
-<div>
-	{#if sorted_paths && sorted_paths.length}
+{#if sorted_paths && sorted_paths.length}
+	<div>
 		<div
 			class="mb-1 flex flex-wrap justify-between gap-3"
 			class:hidden={!settings.show_controls}
@@ -173,9 +173,9 @@
 				<TrailViewPath {plugin} all_paths={sorted_paths} />
 			{/if}
 		{/key}
-	{:else if settings.no_path_message}
-		<p class="BC-trail-view-no-path search-empty-state">
-			{settings.no_path_message}
-		</p>
-	{/if}
-</div>
+	</div>
+{:else if settings.no_path_message}
+	<p class="BC-trail-view-no-path search-empty-state">
+		{settings.no_path_message}
+	</p>
+{/if}

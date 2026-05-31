@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.6](https://github.com/michaelpotter/breadcrumbs/compare/4.13.5...4.13.6) (2026-05-31)
+
+### Bug Fixes
+
+* **Pretty Properties cover image click conflict** — the `.BC-page-views` container now sets `pointer-events: none` on itself and restores `pointer-events: auto` on its children, so the empty wrapper never intercepts clicks on underlying plugin elements (e.g. the Pretty Properties cover image). When both Trail and Prev/Next views are disabled, the container is no longer inserted into the DOM at all. TrailView also no longer renders a bare `<div>` wrapper when it has no paths to display, eliminating invisible empty nodes that could contribute to the interference (closes [#704](https://github.com/michaelpotter/breadcrumbs/issues/704)).
+
 ### [4.13.5](https://github.com/michaelpotter/breadcrumbs/compare/4.13.4...4.13.5) (2026-05-31)
 
 ### Bug Fixes

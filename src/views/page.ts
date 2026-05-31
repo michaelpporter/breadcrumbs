@@ -39,9 +39,21 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 		const markdown_view = leaf.view;
 		const mode = markdown_view.getMode();
 		const sticky = plugin.settings.views.page.all.sticky;
-
 		const file_path = markdown_view.file?.path ?? "";
 		const existing = mounted_page_views.get(markdown_view);
+
+		// When both page views are disabled, remove any existing mount and bail out.
+		// This avoids inserting an empty container that can block other plugins' click targets.
+		if (
+			!plugin.settings.views.page.trail.enabled &&
+			!plugin.settings.views.page.prev_next.enabled
+		) {
+			if (existing) {
+				mounted_page_views.delete(markdown_view);
+				void unmount(existing.view);
+			}
+			return;
+		}
 
 		// Skip remount if mode, sticky, and file_path haven't changed and the element is still in the DOM.
 		// layout-change fires on every CM6 cursor/scroll update; remounting on each one
