@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.7](https://github.com/michaelpotter/breadcrumbs/compare/4.13.6...4.13.7) (2026-05-31)
+
+### Chores
+
+* **ESLint** — integrated `eslint-plugin-obsidianmd` recommended config. Fixed plugin registration conflict (`@typescript-eslint` was being registered twice — once by obsidianmd's config and once by our own); now both `import` and `@typescript-eslint` plugins are stripped from obsidianmd's spread before our own registrations. Resolved all resulting warnings: `Array<T>` → `T[]` in `traverse_note.ts`, removed unused `Result` import in `result.ts`, dropped unnecessary `as any` cast in `SettingsTab`, and suppressed `no-deprecated` on the intentional `this.display()` fallback call that supports Obsidian < 1.13.
+
 ### [4.13.6](https://github.com/michaelpotter/breadcrumbs/compare/4.13.5...4.13.6) (2026-05-31)
 
 ### Bug Fixes
