@@ -77,6 +77,7 @@ Update `version` in both files to the new version string:
 
 ### 8. Update CHANGELOG.md
 
+
 Insert a new section at the top of the `## 4.X` block (or a new top-level `## X.Y` block for major bumps):
 
 ```
@@ -98,32 +99,56 @@ Group commits into CHANGELOG sections using conventional-commit prefixes:
 
 Use the existing CHANGELOG entries as style reference. Write descriptive bullets, not raw commit subjects.
 
-### 9. Commit
+### 9. Copy plugin files to demo vault
+
+Copy the built artifacts and updated manifest to the demo vault, then commit it:
+
+```
+cp main.js styles.css manifest.json \
+  /Users/michaelporter/git/michaelpporter/breadcrumbs-demo/.obsidian/plugins/breadcrumbs/
+
+git -C /Users/michaelporter/git/michaelpporter/breadcrumbs-demo \
+  add .obsidian/plugins/breadcrumbs/main.js \
+      .obsidian/plugins/breadcrumbs/styles.css \
+      .obsidian/plugins/breadcrumbs/manifest.json && \
+git -C /Users/michaelporter/git/michaelpporter/breadcrumbs-demo \
+  commit -m "chore: update breadcrumbs plugin to <version>" && \
+git -C /Users/michaelporter/git/michaelpporter/breadcrumbs-demo push
+```
+
+### 10. Commit
 
 ```
 git add package.json manifest.json CHANGELOG.md wasm/pkg/
 git commit -m "release: <version>"
 ```
 
-### 10. Tag
+### 11. Tag
 
 ```
 git tag <version>
 ```
 
-### 11. Push
+### 12. Push
 
 ```
 git push origin master --tags
 ```
 
-### 12. Confirm
+### 13. Confirm
 
 Report:
 - Tag pushed: `<version>`
 - Release type: stable / beta
 - GitHub Actions will build and publish the GitHub Release automatically.
 - Remind: for Obsidian community plugin updates, the release workflow uploads `main.js`, `manifest.json`, `styles.css` — no extra steps needed.
+
+#### Docs — What's New table
+
+If updating the docs site "What's New" table or any announcement links, Astro strips dots from auto-generated slugs. Use the sanitized form in hrefs:
+
+- Version `4.13.8` → slug fragment `v4138` (remove all dots from the version portion)
+- Example link: `/announcements/announcement-2026-06-01-v4138/`
 
 ---
 
