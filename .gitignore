@@ -31,3 +31,6 @@ meta.txt
 
 # Claude settings
 .claude/settings.local.json
+
+# Personal Claude skills (local paths, not for public contributors)
+.claude/skills/copy-to-demo/

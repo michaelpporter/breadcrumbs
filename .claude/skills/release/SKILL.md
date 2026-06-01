@@ -99,43 +99,26 @@ Group commits into CHANGELOG sections using conventional-commit prefixes:
 
 Use the existing CHANGELOG entries as style reference. Write descriptive bullets, not raw commit subjects.
 
-### 9. Copy plugin files to demo vault
-
-Copy the built artifacts and updated manifest to the demo vault, then commit it:
-
-```
-cp main.js styles.css manifest.json \
-  /Users/michaelporter/git/michaelpporter/breadcrumbs-demo/.obsidian/plugins/breadcrumbs/
-
-git -C /Users/michaelporter/git/michaelpporter/breadcrumbs-demo \
-  add .obsidian/plugins/breadcrumbs/main.js \
-      .obsidian/plugins/breadcrumbs/styles.css \
-      .obsidian/plugins/breadcrumbs/manifest.json && \
-git -C /Users/michaelporter/git/michaelpporter/breadcrumbs-demo \
-  commit -m "chore: update breadcrumbs plugin to <version>" && \
-git -C /Users/michaelporter/git/michaelpporter/breadcrumbs-demo push
-```
-
-### 10. Commit
+### 9. Commit
 
 ```
 git add package.json manifest.json CHANGELOG.md wasm/pkg/
 git commit -m "release: <version>"
 ```
 
-### 11. Tag
+### 10. Tag
 
 ```
 git tag <version>
 ```
 
-### 12. Push
+### 11. Push
 
 ```
 git push origin master --tags
 ```
 
-### 13. Confirm
+### 12. Confirm
 
 Report:
 - Tag pushed: `<version>`
