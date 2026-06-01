@@ -1,6 +1,7 @@
 import { Notice, Setting } from "obsidian";
 import type { PeriodNoteConfig } from "src/interfaces/settings";
 import type BreadcrumbsPlugin from "src/main";
+import { DateNoteSetupModal } from "src/modals/DateNoteSetupModal";
 import { new_setting } from "src/utils/settings";
 
 type PeriodKind = "week" | "month" | "quarter" | "year";
@@ -114,6 +115,18 @@ export const _add_settings_date_note = (
 	plugin: BreadcrumbsPlugin,
 	containerEl: HTMLElement,
 ) => {
+	new Setting(containerEl)
+		.setName("Quick setup")
+		.setDesc(
+			"Enable date notes with period hierarchy and transitive rules",
+		)
+		.addButton((btn) =>
+			btn
+				.setButtonText("Set up...")
+				.setCta()
+				.onClick(() => new DateNoteSetupModal(plugin).open()),
+		);
+
 	new_setting(containerEl, {
 		name: "Enabled",
 		desc: "Look for date notes to use as edge sources",
@@ -185,6 +198,28 @@ export const _add_settings_date_note = (
 			},
 		},
 	});
+
+	new Setting(containerEl)
+		.setName("Week starts on")
+		.setDesc(
+			"Monday uses ISO week numbering. Sunday shifts Sundays into the following week to match US-style week files.",
+		)
+		.addDropdown((d) =>
+			d
+				.addOption("monday", "Monday (ISO)")
+				.addOption("sunday", "Sunday (US)")
+				.setValue(
+					plugin.settings.explicit_edge_sources.date_note.week_start,
+				)
+				.onChange(async (value) => {
+					plugin.settings.explicit_edge_sources.date_note.week_start =
+						value as "monday" | "sunday";
+					await Promise.all([
+						plugin.rebuildGraph(),
+						plugin.saveSettings(),
+					]);
+				}),
+		);
 
 	new Setting(containerEl).setHeading().setName("Period notes");
 	for (const kind of ["week", "month", "quarter", "year"] as PeriodKind[]) {

@@ -163,6 +163,7 @@ describe("migration", () => {
 					date_format: "yyyy-MM-dd 'DN'",
 					default_field: "next",
 					stretch_to_existing: false,
+					week_start: "monday",
 					week: {
 						enabled: false,
 						date_format: "kkkk-'W'WW",
@@ -392,6 +393,7 @@ describe("migration", () => {
 					date_format: "yyyy-MM-dd",
 					default_field: "next",
 					stretch_to_existing: false,
+					week_start: "monday",
 					week: {
 						enabled: false,
 						date_format: "kkkk-'W'WW",

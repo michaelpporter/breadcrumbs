@@ -107,6 +107,8 @@ export interface BreadcrumbsSettings {
 			// e.g. 2024-03-30 -> 2024-03-31 (unresolved)
 			// vs   2024-03-30 -> 2024-04-01 (resolved)
 			stretch_to_existing: boolean;
+			/** First day of the week. "sunday" shifts Sundays forward 1 day before computing the ISO week, so Sunday is treated as the start of the next week. */
+			week_start: "monday" | "sunday";
 			week: PeriodNoteConfig;
 			month: PeriodNoteConfig;
 			quarter: PeriodNoteConfig;

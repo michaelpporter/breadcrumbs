@@ -114,12 +114,19 @@ function add_period_edges(
 			daily_notes.push({ date, path: file.path, basename: file.name, ext: file.ext, folder: file.folder });
 		});
 
+		// When week starts Sunday, a Sunday should map to the *next* ISO week
+		const week_date = (date: DateTime) =>
+			cfg.week_start === "sunday" && date.weekday === 7
+				? date.plus({ days: 1 })
+				: date;
+
 		for (const daily of daily_notes) {
 			for (const kind of PERIOD_KINDS) {
 				const notes = period_notes[kind];
 				if (!notes) continue;
 				const period_cfg = cfg[kind];
-				const target_basename = daily.date.toFormat(period_cfg.date_format);
+				const lookup_date = kind === "week" ? week_date(daily.date) : daily.date;
+				const target_basename = lookup_date.toFormat(period_cfg.date_format);
 				const target = notes.find((n) => n.basename === target_basename);
 				if (target) {
 					results.edges.push(new GCEdgeData(daily.path, target.path, period_cfg.up_field, "date_note"));
