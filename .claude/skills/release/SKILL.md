@@ -37,11 +37,21 @@ Ask the user if not clear from arguments:
 - Validate format: `MAJOR.MINOR.PATCH` or `MAJOR.MINOR.PATCH-beta.N`.
 - Check no existing git tag matches: `git tag -l <version>`.
 
-### 3. Check working tree
+### 3. Check branch
+
+```
+git branch --show-current
+```
+
+- **Full release**: current branch MUST be `main`. If not, stop with:
+  > "Stable releases must be cut from `main`. Currently on `<branch>`. Switch branches or use `--beta`."
+- **Beta release**: any branch is allowed.
+
+### 4. Check working tree
 
 Run `git status --short`. If there are uncommitted changes, ask the user whether to proceed (they may want to commit first, or include them in the release commit).
 
-### 4. Rebuild WASM (if Rust changed)
+### 5. Rebuild WASM (if Rust changed)
 
 Check if Rust sources changed since last tag:
 ```
@@ -52,7 +62,7 @@ If changes exist, or if user explicitly requested a WASM rebuild:
 - Run `bun run wasm:build`
 - Stage `wasm/pkg/` changes
 
-### 5. Run all tests
+### 6. Run all tests
 
 ```
 bun run wasm:test
@@ -61,7 +71,7 @@ bun run test
 
 Stop on any failure.
 
-### 6. Run build
+### 7. Run build
 
 ```
 bun run build
@@ -69,13 +79,13 @@ bun run build
 
 Stop on failure.
 
-### 7. Bump version
+### 8. Bump version
 
 Update `version` in both files to the new version string:
 - `package.json`
 - `manifest.json`
 
-### 8. Update CHANGELOG.md
+### 9. Update CHANGELOG.md
 
 
 Insert a new section at the top of the `## 4.X` block (or a new top-level `## X.Y` block for major bumps):
@@ -99,26 +109,26 @@ Group commits into CHANGELOG sections using conventional-commit prefixes:
 
 Use the existing CHANGELOG entries as style reference. Write descriptive bullets, not raw commit subjects.
 
-### 9. Commit
+### 10. Commit
 
 ```
 git add package.json manifest.json CHANGELOG.md wasm/pkg/
 git commit -m "release: <version>"
 ```
 
-### 10. Tag
+### 11. Tag
 
 ```
 git tag <version>
 ```
 
-### 11. Push
+### 12. Push
 
 ```
 git push origin master --tags
 ```
 
-### 12. Confirm
+### 13. Confirm
 
 Report:
 - Tag pushed: `<version>`

@@ -47,6 +47,13 @@ jobs:
                   prerelease_flag=""
                   if [[ "$tag" == *beta* ]]; then
                     prerelease_flag="--prerelease"
+                  else
+                    # Stable releases must originate from main
+                    branch=$(git branch -r --contains "$GITHUB_SHA" | grep -E '^\s*origin/main$' || true)
+                    if [[ -z "$branch" ]]; then
+                      echo "ERROR: Stable tag '$tag' was not pushed from main. Aborting."
+                      exit 1
+                    fi
                   fi
 
                   gh release create "$tag" \
