@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.8](https://github.com/michaelpotter/breadcrumbs/compare/4.13.7...4.13.8) (2026-06-01)
+
+### Features
+
+* **Date Notes quick setup** — a "Set up…" button at the top of the Date Notes settings section opens a modal for one-click hierarchy configuration. Choose which period levels to enable (week / month / quarter / year), opt in to period-specific edge fields (`next_week` / `prev_week`, `next_month` / `prev_month`, etc. — created automatically and added to the `nexts` / `prevs` field groups), and pick the week start day. On confirm, the modal enables the selected periods, bumps the `up` / `down` transitive-rule rounds to 3 for full daily → week → month → quarter → year chaining, and adds `next ↔ prev` reversal rules for each period-specific field. Modal choices are remembered across opens.
+* **`week_start` setting** — new "Week starts on" option (Monday / Sunday) in Date Notes settings and in the quick-setup modal. When set to Sunday, daily notes that fall on a Sunday are shifted forward one day before the ISO week lookup, so they map to the _following_ week's note — matching US-style week file numbering. Available in both the quick-setup modal and the main Date Notes settings panel.
+
 ### [4.13.7](https://github.com/michaelpotter/breadcrumbs/compare/4.13.6...4.13.7) (2026-05-31)
 
 ### Chores

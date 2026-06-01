@@ -1,6 +1,6 @@
 {
 	"name": "breadcrumbs",
-	"version": "4.13.7",
+	"version": "4.13.8",
 	"description": "Add typed-links to your Obsidian notes",
 	"main": "main.js",
 	"scripts": {
