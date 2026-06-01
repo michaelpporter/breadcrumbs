@@ -44,8 +44,8 @@
 		"@types/luxon": "^3.7.1",
 		"@types/node": "^25.9.1",
 		"@types/obsidian-typings": "npm:obsidian-typings@^3.16.6",
-		"@vitest/coverage-v8": "^4.1.7",
-		"@vitest/ui": "^4.1.7",
+		"@vitest/coverage-v8": "4.1.8",
+		"@vitest/ui": "4.1.8",
 		"esbuild": "^0.28.0",
 		"esbuild-svelte": "^0.9.5",
 		"eslint": "^10.4.1",
@@ -60,14 +60,14 @@
 		"prettier-plugin-svelte": "^3.5.2",
 		"prettier-plugin-tailwindcss": "^0.6.14",
 		"svelte": "^5.56.0",
-		"svelte-check": "^4.4.8",
-		"svelte-preprocess": "6.0.3",
+		"svelte-check": "4.5.0",
+		"svelte-preprocess": "6.0.5",
 		"tailwindcss": "^4.3.0",
 		"tslib": "2.8.1",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.60.0",
 		"vite-plugin-wasm": "^3.6.0",
-		"vitest": "^4.1.7"
+		"vitest": "4.1.8"
 	},
 	"dependencies": {
 		"baseline-browser-mapping": "^2.10.33",
