@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.9-beta.1](https://github.com/michaelpotter/breadcrumbs/compare/4.13.8...4.13.9-beta.1) (2026-06-01)
+
+### Chores
+
+* **Dependency updates** — bumped all outdated dev dependencies: `npm-run-all2` 7 → 9, `prettier-plugin-svelte` 3 → 4, `prettier-plugin-tailwindcss` 0.6 → 0.8, `obsidian-typings` 3 → 6, plus minor/patch bumps for `vitest`, `svelte-check`, and `svelte-preprocess`.
+
+### Tests
+
+* **`typed_link` builder** — added 18 test cases covering the Obsidian `frontmatterLinks` branch (unresolved links, resolved links, list-type keys, multiple edges) and the Dataview branch (Link objects, markdown link strings, invalid values, dedup logic). Extended test helpers with `frontmatterLinks` support in `mock_file` and `resolve_link`/`fileManager` in `make_plugin`.
+
 ### [4.13.8](https://github.com/michaelpotter/breadcrumbs/compare/4.13.7...4.13.8) (2026-06-01)
 
 ### Features
