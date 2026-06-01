@@ -59,12 +59,8 @@ fn test_has_node_missing() {
 fn test_has_node_unresolved_target_exists() {
     // C is not in node list — created as unresolved by the edge
     let mut g = NoteGraph::new();
-    g.build_graph(
-        vec![node("A")],
-        vec![edge("A", "C", "up")],
-        vec![],
-    )
-    .unwrap();
+    g.build_graph(vec![node("A")], vec![edge("A", "C", "up")], vec![])
+        .unwrap();
     assert!(g.has_node("C".to_owned()));
 }
 
@@ -80,12 +76,8 @@ fn test_is_node_resolved_resolved_node() {
 #[wasm_bindgen_test]
 fn test_is_node_resolved_unresolved_target() {
     let mut g = NoteGraph::new();
-    g.build_graph(
-        vec![node("A")],
-        vec![edge("A", "B", "up")],
-        vec![],
-    )
-    .unwrap();
+    g.build_graph(vec![node("A")], vec![edge("A", "B", "up")], vec![])
+        .unwrap();
     assert!(g.is_node_resolved("A".to_owned()));
     assert!(!g.is_node_resolved("B".to_owned()));
 }
@@ -115,12 +107,8 @@ fn test_get_node_missing_returns_none() {
 #[wasm_bindgen_test]
 fn test_get_node_unresolved_has_correct_flag() {
     let mut g = NoteGraph::new();
-    g.build_graph(
-        vec![node("A")],
-        vec![edge("A", "B", "up")],
-        vec![],
-    )
-    .unwrap();
+    g.build_graph(vec![node("A")], vec![edge("A", "B", "up")], vec![])
+        .unwrap();
     let b = g.get_node("B".to_owned()).unwrap();
     assert_eq!(b.path, "B");
     assert!(!b.resolved);
@@ -258,7 +246,12 @@ fn test_get_filtered_outgoing_edges_none_returns_all() {
         vec![],
     )
     .unwrap();
-    assert_eq!(g.get_filtered_outgoing_edges("A".to_owned(), None).edges.len(), 2);
+    assert_eq!(
+        g.get_filtered_outgoing_edges("A".to_owned(), None)
+            .edges
+            .len(),
+        2
+    );
 }
 
 #[wasm_bindgen_test]

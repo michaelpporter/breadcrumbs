@@ -222,7 +222,8 @@ fn test_traversal_separate_edges_restricts_subtree() {
     let g = mixed_edge_graph();
     let sep = g.rec_traverse(opts("A", 10, None, true)).unwrap();
 
-    // Only one edge from A (A-up→B); separate_edges restricts B's subtree to "up" only
+    // Only one edge from A (A-up→B); separate_edges restricts B's subtree to "up"
+    // only
     assert_eq!(sep.data.len(), 1);
     assert_eq!(sep.data[0].edge.edge_type(), "up");
     // B has no "up" children

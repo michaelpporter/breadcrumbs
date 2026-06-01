@@ -36,7 +36,13 @@
 		parent_component?: Component | undefined;
 	}
 
-	let { plugin, options, errors, file_path, parent_component = undefined }: Props = $props();
+	let {
+		plugin,
+		options,
+		errors,
+		file_path,
+		parent_component = undefined,
+	}: Props = $props();
 
 	let sort = $derived(
 		create_edge_sorter(options.sort.field, options.sort.order === -1),
@@ -152,7 +158,9 @@
 			);
 
 			if (has_dv_paths) {
-				return (options.title ? "# " + options.title + "\n" : "") + list;
+				return (
+					(options.title ? "# " + options.title + "\n" : "") + list
+				);
 			}
 
 			const source_path =
@@ -188,13 +196,18 @@
 
 	// Strip [[path|alias]] wikilinks to clean display names and build a
 	// reverse Map (display → path) for click navigation.
-	function strip_wikilinks(md: string): { clean: string; path_map: Map<string, string> } {
+	function strip_wikilinks(md: string): {
+		clean: string;
+		path_map: Map<string, string>;
+	} {
 		const path_map = new Map<string, string>();
 		const clean = md.replace(
 			/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g,
 			(_, path: string, alias?: string) => {
 				const display =
-					alias ?? path.split("/").pop()?.replace(/\.md$/, "") ?? path;
+					alias ??
+					path.split("/").pop()?.replace(/\.md$/, "") ??
+					path;
 				if (!path_map.has(display)) path_map.set(display, path);
 				return display;
 			},
@@ -218,7 +231,11 @@
 		if (!path) return;
 		e.stopPropagation();
 		const newLeaf = Keymap.isModEvent(e);
-		void plugin.app.workspace.openLinkText(path, file_path, newLeaf ?? false);
+		void plugin.app.workspace.openLinkText(
+			path,
+			file_path,
+			newLeaf ?? false,
+		);
 	}
 
 	$effect(() => {
@@ -261,7 +278,7 @@
 					text={code}
 					cls="clickable-icon nav-action-button"
 				/>
-				</div>
+			</div>
 			<svg
 				bind:this={svg_el}
 				style="width: 100%; height: 400px; display: block;"

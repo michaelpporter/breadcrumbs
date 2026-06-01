@@ -21,7 +21,9 @@
 			all_labels.includes(label),
 		);
 		const selected_set = new Set(selected);
-		const unselected = all_labels.filter((label) => !selected_set.has(label));
+		const unselected = all_labels.filter(
+			(label) => !selected_set.has(label),
+		);
 
 		return [...selected, ...unselected];
 	}
@@ -42,14 +44,17 @@
 	});
 
 	function emit() {
-		const next = ordered_labels.filter((label) => selected_labels.has(label));
+		const next = ordered_labels.filter((label) =>
+			selected_labels.has(label),
+		);
 		custom_sort_field_labels = next;
 		select_cb(next);
 	}
 
 	function move(from: number, to: number) {
 		if (from === to || from < 0 || to < 0) return;
-		if (from >= ordered_labels.length || to >= ordered_labels.length) return;
+		if (from >= ordered_labels.length || to >= ordered_labels.length)
+			return;
 
 		const next = [...ordered_labels];
 		const [label] = next.splice(from, 1);

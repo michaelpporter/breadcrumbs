@@ -54,7 +54,8 @@ const get_traverse_note_field = (
 	}
 
 	const field =
-		raw || plugin.settings.explicit_edge_sources.traverse_note.default_field;
+		raw ||
+		plugin.settings.explicit_edge_sources.traverse_note.default_field;
 
 	if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
 		return graph_build_fail({

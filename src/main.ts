@@ -1,6 +1,6 @@
-import type {WorkspaceLeaf, Menu, TAbstractFile} from "obsidian";
+import type { WorkspaceLeaf, Menu, TAbstractFile } from "obsidian";
 import type { Debouncer } from "obsidian";
-import {    TFolder } from "obsidian";
+import { TFolder } from "obsidian";
 import { debounce, Events, Notice, Plugin, TFile } from "obsidian";
 import { DEFAULT_SETTINGS } from "src/const/settings";
 import { VIEW_IDS } from "src/const/views";
@@ -128,7 +128,9 @@ export default class BreadcrumbsPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new BreadcrumbsSettingTab(this.app, this));
-		this.registerEvent(this.app.workspace.on('file-menu', this.handleFileMenu.bind(this)));
+		this.registerEvent(
+			this.app.workspace.on("file-menu", this.handleFileMenu.bind(this)),
+		);
 
 		// API
 		// NOTE: I think this should be done quite early
@@ -158,11 +160,11 @@ export default class BreadcrumbsPlugin extends Plugin {
 			// Set the edge_fields & BC-meta-fields to the right Properties type
 			try {
 				for (const field of this.settings.edge_fields) {
-					const current_type = this.getMetdataPropertyType(field.label);
-					if (
-						current_type === "multitext" ||
-						current_type === "text"
-					) continue;
+					const current_type = this.getMetdataPropertyType(
+						field.label,
+					);
+					if (current_type === "multitext" || current_type === "text")
+						continue;
 					await this.app.metadataTypeManager.setType(
 						field.label,
 						"multitext",
@@ -172,7 +174,8 @@ export default class BreadcrumbsPlugin extends Plugin {
 				for (const [field, { property_type }] of Object.entries(
 					METADATA_FIELDS_MAP,
 				)) {
-					if (this.getMetdataPropertyType(field) === property_type) continue;
+					if (this.getMetdataPropertyType(field) === property_type)
+						continue;
 					await this.app.metadataTypeManager.setType(
 						field,
 						property_type,
@@ -349,9 +352,9 @@ export default class BreadcrumbsPlugin extends Plugin {
 		if (!(file instanceof TFolder)) return;
 
 		menu.addItem((item) => {
-		item.setTitle('Freeze implied edges in folder')
-			.setIcon('pin')
-			.onClick(() => freeze_edges_in_folder(this, file));
+			item.setTitle("Freeze implied edges in folder")
+				.setIcon("pin")
+				.onClick(() => freeze_edges_in_folder(this, file));
 		});
 	}
 
@@ -456,7 +459,9 @@ export default class BreadcrumbsPlugin extends Plugin {
 	private getMetdataPropertyType(field: string): string | null {
 		if ("getAssignedWidget" in this.app.metadataTypeManager) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-			return (this.app.metadataTypeManager as any).getAssignedWidget(field) as string;
+			return (this.app.metadataTypeManager as any).getAssignedWidget(
+				field,
+			) as string;
 		} else {
 			return this.app.metadataTypeManager.getAssignedType(field);
 		}

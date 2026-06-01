@@ -38,7 +38,9 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				untrack(() => $state.snapshot(plugin.settings.views.side.matrix)),
+				untrack(() =>
+					$state.snapshot(plugin.settings.views.side.matrix),
+				),
 			);
 		}
 	});
@@ -69,23 +71,32 @@
 	let active_file = $derived($active_file_store);
 
 	let grouped_out_edges = $derived.by(() => {
-		if (active_file &&
+		if (
+			active_file &&
 			// Even tho we ensure the graph is built before the views are registered,
 			// Existing views still try render before the graph is built.
-				plugin.graph.has_node(active_file.path)) {
-				if (settings.lock_view && plugin.graph.has_node(settings.lock_path!)) {
-					log.debug("Using locked path for MatrixView:", settings.lock_path);
-					return plugin.graph.get_filtered_grouped_outgoing_edges(
-					  settings.lock_path!,
-					  edge_field_labels,)
-				}
+			plugin.graph.has_node(active_file.path)
+		) {
+			if (
+				settings.lock_view &&
+				plugin.graph.has_node(settings.lock_path!)
+			) {
+				log.debug(
+					"Using locked path for MatrixView:",
+					settings.lock_path,
+				);
 				return plugin.graph.get_filtered_grouped_outgoing_edges(
-					active_file.path,
+					settings.lock_path!,
 					edge_field_labels,
-				)
-			} else {
-				return null
+				);
 			}
+			return plugin.graph.get_filtered_grouped_outgoing_edges(
+				active_file.path,
+				edge_field_labels,
+			);
+		} else {
+			return null;
+		}
 	});
 
 	let sort = $derived(
@@ -131,8 +142,10 @@
 
 			if (rank_a !== rank_b) return rank_a - rank_b;
 
-			return fields.findIndex((x) => x.label === a.label) -
-				fields.findIndex((x) => x.label === b.label);
+			return (
+				fields.findIndex((x) => x.label === a.label) -
+				fields.findIndex((x) => x.label === b.label)
+			);
 		});
 	});
 </script>

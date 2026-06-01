@@ -26,7 +26,6 @@ import { _add_settings_thread } from "./ThreadSettings";
 import { _add_settings_traverse_note } from "./TraverseNoteSettings";
 import { _add_settings_tree_view } from "./TreeViewSettings";
 
-
 function make_details_el(
 	parent: HTMLElement,
 	o?: { d?: DomElementInfo; s?: DomElementInfo },
@@ -79,7 +78,9 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 						props: { plugin },
 						target: group.listEl,
 					});
-					return () => { void unmount(comp); };
+					return () => {
+						void unmount(comp);
+					};
 				},
 			},
 		];
@@ -174,11 +175,17 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 								render: (setting, group) => {
 									setting.settingEl.detach();
 									const el = group.listEl;
-									new Setting(el).setHeading().setName("General");
+									new Setting(el)
+										.setHeading()
+										.setName("General");
 									_add_settings_page_views(plugin, el);
-									new Setting(el).setHeading().setName("Trail");
+									new Setting(el)
+										.setHeading()
+										.setName("Trail");
 									_add_settings_trail_view(plugin, el);
-									new Setting(el).setHeading().setName("Previous/next");
+									new Setting(el)
+										.setHeading()
+										.setName("Previous/next");
 									_add_settings_prev_next_view(plugin, el);
 								},
 							},
@@ -248,8 +255,11 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 								d.addOptions(opts)
 									.setValue(plugin.settings.debug.level)
 									.onChange(async (value) => {
-										log.set_level(value as (typeof LOG_LEVELS)[number]);
-										plugin.settings.debug.level = value as (typeof LOG_LEVELS)[number];
+										log.set_level(
+											value as (typeof LOG_LEVELS)[number],
+										);
+										plugin.settings.debug.level =
+											value as (typeof LOG_LEVELS)[number];
 										await plugin.saveSettings();
 									});
 							});
@@ -291,7 +301,9 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			containerEl.addClass("BC-settings-tab");
 
 			const fallback = containerEl.createDiv({ cls: "p-4" });
-			new Setting(fallback).setHeading().setName("Breadcrumbs settings failed to load");
+			new Setting(fallback)
+				.setHeading()
+				.setName("Breadcrumbs settings failed to load");
 			fallback.createEl("p", {
 				text: String(
 					(error as Error)?.stack ??

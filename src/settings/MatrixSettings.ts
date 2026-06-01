@@ -48,7 +48,8 @@ export const _add_settings_matrix = (
 			custom_sort_field_labels:
 				plugin.settings.views.side.matrix.custom_sort_field_labels,
 			select_cb: async (value: string[]) => {
-				plugin.settings.views.side.matrix.custom_sort_field_labels = value;
+				plugin.settings.views.side.matrix.custom_sort_field_labels =
+					value;
 
 				plugin.refreshViews();
 				await plugin.saveSettings();
@@ -118,12 +119,9 @@ export const _add_settings_matrix = (
 		input: {
 			value: plugin.settings.views.side.matrix.lock_path,
 			cb: async (value) => {
-				if (!value)
-					plugin.settings.views.side.matrix.lock_path =
-						value;
+				if (!value) plugin.settings.views.side.matrix.lock_path = value;
 				else {
-					plugin.settings.views.side.matrix.lock_path =
-						value;
+					plugin.settings.views.side.matrix.lock_path = value;
 					await Promise.all([
 						plugin.rebuildGraph(),
 						plugin.saveSettings(),
@@ -132,7 +130,6 @@ export const _add_settings_matrix = (
 			},
 		},
 	});
-
 
 	_add_settings_show_node_options(plugin, containerEl, {
 		get: () => plugin.settings.views.side.matrix.show_node_options,

@@ -70,7 +70,9 @@ export class CodeblockMDRC extends MarkdownRenderChild {
 		if (!parsed) {
 			log.warn(
 				"fatal codeblock errors\n" +
-				errors.map((e) => `  [${e.code}] ${e.path}: ${e.message}`).join("\n"),
+					errors
+						.map((e) => `  [${e.code}] ${e.path}: ${e.message}`)
+						.join("\n"),
 			);
 
 			mount(CodeblockErrors, {

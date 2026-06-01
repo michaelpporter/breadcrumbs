@@ -84,7 +84,9 @@ const get_tag_note_info = (
 				message: `tag-note-sibling-field is not a string: '${raw_sibling_field}'`,
 			});
 		} else if (
-			!plugin.settings.edge_fields.find((f) => f.label === raw_sibling_field)
+			!plugin.settings.edge_fields.find(
+				(f) => f.label === raw_sibling_field,
+			)
 		) {
 			return graph_build_fail({
 				path,
@@ -130,24 +132,26 @@ export const _add_explicit_edges_tag_note: ExplicitEdgeBuilder = (
 		({ file: tag_note_file, cache: tag_note_cache }) => {
 			if (!tag_note_cache) return;
 
-			const process_tag = ( tag: string) => {
+			const process_tag = (tag: string) => {
 				// Ensure consistent tag formatting, since some have the # and some don't
 				const formatted_tag = ensure_starts_with(tag, "#");
 				// Quite happy with this trick :)
 				// Try get the existing_paths, and mutate it if it exists
 				// Push returns the new length (guarenteed to be atleast 1 - truthy)
 				// So it will only be false if the key doesn't exist
-				if (!tag_paths_map.get(formatted_tag)?.push(tag_note_file.path)) {
+				if (
+					!tag_paths_map.get(formatted_tag)?.push(tag_note_file.path)
+				) {
 					tag_paths_map.set(formatted_tag, [tag_note_file.path]);
 				}
-			}
+			};
 
 			// Check if the tag_note itself has any tags for other tags notes
 			// We must iterate over both the frontmatter and body tags independently
 			parse_frontmatter_tags(tag_note_cache?.frontmatter).forEach(
 				process_tag,
 			);
-			tag_note_cache?.tags?.map((item) => item.tag)?.forEach(process_tag)
+			tag_note_cache?.tags?.map((item) => item.tag)?.forEach(process_tag);
 
 			const tag_note_info = get_tag_note_info(
 				plugin,

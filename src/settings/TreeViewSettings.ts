@@ -161,12 +161,9 @@ export const _add_settings_tree_view = (
 		input: {
 			value: plugin.settings.views.side.tree.lock_path,
 			cb: async (value) => {
-				if (!value)
-					plugin.settings.views.side.tree.lock_path =
-						value;
+				if (!value) plugin.settings.views.side.tree.lock_path = value;
 				else {
-					plugin.settings.views.side.tree.lock_path =
-						value;
+					plugin.settings.views.side.tree.lock_path = value;
 					await Promise.all([
 						plugin.rebuildGraph(),
 						plugin.saveSettings(),

@@ -24,17 +24,19 @@ export const _add_settings_freeze_implied_edges = (
 			},
 		},
 	});
-	
+
 	mount(FieldGroupLabelsSettingItem, {
 		target: contentEl,
 		props: {
 			name: "Included field groups",
-			description:
-				"Field groups to include when freezing edges.",
+			description: "Field groups to include when freezing edges.",
 			edge_field_groups: plugin.settings.edge_field_groups,
-			field_group_labels: plugin.settings.commands.freeze_implied_edges.default_options.included_fields,
+			field_group_labels:
+				plugin.settings.commands.freeze_implied_edges.default_options
+					.included_fields,
 			select_cb: async (value: string[]) => {
-				plugin.settings.commands.freeze_implied_edges.default_options.included_fields = value;
+				plugin.settings.commands.freeze_implied_edges.default_options.included_fields =
+					value;
 
 				await plugin.saveSettings();
 			},
@@ -45,9 +47,11 @@ export const _add_settings_freeze_implied_edges = (
 		name: "Use alias",
 		desc: "Freeze implied edges using the first alias of the target node.",
 		toggle: {
-			value: settings.commands.freeze_implied_edges.default_options.use_alias,
+			value: settings.commands.freeze_implied_edges.default_options
+				.use_alias,
 			cb: async (checked) => {
-				settings.commands.freeze_implied_edges.default_options.use_alias = checked;
+				settings.commands.freeze_implied_edges.default_options.use_alias =
+					checked;
 
 				await plugin.saveSettings();
 			},

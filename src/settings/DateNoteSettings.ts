@@ -37,8 +37,12 @@ function add_period_settings(
 		toggle: {
 			value: cfg().enabled,
 			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.date_note[kind].enabled = value;
-				await Promise.all([plugin.rebuildGraph(), plugin.saveSettings()]);
+				plugin.settings.explicit_edge_sources.date_note[kind].enabled =
+					value;
+				await Promise.all([
+					plugin.rebuildGraph(),
+					plugin.saveSettings(),
+				]);
 			},
 		},
 	});
@@ -62,8 +66,13 @@ function add_period_settings(
 				if (!value) {
 					new Notice("Date format cannot be empty");
 				} else {
-					plugin.settings.explicit_edge_sources.date_note[kind].date_format = value;
-					await Promise.all([plugin.rebuildGraph(), plugin.saveSettings()]);
+					plugin.settings.explicit_edge_sources.date_note[
+						kind
+					].date_format = value;
+					await Promise.all([
+						plugin.rebuildGraph(),
+						plugin.saveSettings(),
+					]);
 				}
 			},
 		},
@@ -76,8 +85,12 @@ function add_period_settings(
 			value: cfg().folder,
 			placeholder: "",
 			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.date_note[kind].folder = value;
-				await Promise.all([plugin.rebuildGraph(), plugin.saveSettings()]);
+				plugin.settings.explicit_edge_sources.date_note[kind].folder =
+					value;
+				await Promise.all([
+					plugin.rebuildGraph(),
+					plugin.saveSettings(),
+				]);
 			},
 		},
 	});
@@ -91,8 +104,13 @@ function add_period_settings(
 			value: cfg().next_field,
 			options: edge_field_options,
 			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.date_note[kind].next_field = value;
-				await Promise.all([plugin.rebuildGraph(), plugin.saveSettings()]);
+				plugin.settings.explicit_edge_sources.date_note[
+					kind
+				].next_field = value;
+				await Promise.all([
+					plugin.rebuildGraph(),
+					plugin.saveSettings(),
+				]);
 			},
 		},
 	});
@@ -104,8 +122,12 @@ function add_period_settings(
 			value: cfg().up_field,
 			options: edge_field_options,
 			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.date_note[kind].up_field = value;
-				await Promise.all([plugin.rebuildGraph(), plugin.saveSettings()]);
+				plugin.settings.explicit_edge_sources.date_note[kind].up_field =
+					value;
+				await Promise.all([
+					plugin.rebuildGraph(),
+					plugin.saveSettings(),
+				]);
 			},
 		},
 	});
@@ -117,9 +139,7 @@ export const _add_settings_date_note = (
 ) => {
 	new Setting(containerEl)
 		.setName("Quick setup")
-		.setDesc(
-			"Enable date notes with period hierarchy and transitive rules",
-		)
+		.setDesc("Enable date notes with period hierarchy and transitive rules")
 		.addButton((btn) =>
 			btn
 				.setButtonText("Set up...")
@@ -146,10 +166,12 @@ export const _add_settings_date_note = (
 		name: "Default field",
 		desc: "Field used to join date notes together. Breadcrumbs takes the current note's date, adds one day, and joins the two notes with this field.",
 		select: {
-			value: plugin.settings.explicit_edge_sources.date_note.default_field,
+			value: plugin.settings.explicit_edge_sources.date_note
+				.default_field,
 			options: plugin.settings.edge_fields.map((f) => f.label),
 			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.date_note.default_field = value;
+				plugin.settings.explicit_edge_sources.date_note.default_field =
+					value;
 				await Promise.all([
 					plugin.rebuildGraph(),
 					plugin.saveSettings(),
@@ -174,7 +196,8 @@ export const _add_settings_date_note = (
 			cb: async (value) => {
 				if (!value) new Notice("Date format cannot be empty");
 				else {
-					plugin.settings.explicit_edge_sources.date_note.date_format = value;
+					plugin.settings.explicit_edge_sources.date_note.date_format =
+						value;
 					await Promise.all([
 						plugin.rebuildGraph(),
 						plugin.saveSettings(),
@@ -188,9 +211,11 @@ export const _add_settings_date_note = (
 		name: "Stretch to existing",
 		desc: "If there is a gap from one day to another, should the next note be the unresolved one in one day or should it 'stretch' to the next resolved (existing) note?",
 		toggle: {
-			value: plugin.settings.explicit_edge_sources.date_note.stretch_to_existing,
+			value: plugin.settings.explicit_edge_sources.date_note
+				.stretch_to_existing,
 			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.date_note.stretch_to_existing = value;
+				plugin.settings.explicit_edge_sources.date_note.stretch_to_existing =
+					value;
 				await Promise.all([
 					plugin.rebuildGraph(),
 					plugin.saveSettings(),

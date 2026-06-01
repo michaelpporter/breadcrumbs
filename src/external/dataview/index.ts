@@ -1,6 +1,6 @@
 import type { App } from "obsidian";
-import type {DataviewApi} from "obsidian-dataview";
-import { getAPI, isPluginEnabled  } from "obsidian-dataview";
+import type { DataviewApi } from "obsidian-dataview";
+import { getAPI, isPluginEnabled } from "obsidian-dataview";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 

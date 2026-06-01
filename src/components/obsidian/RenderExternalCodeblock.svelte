@@ -14,7 +14,13 @@
 		parent_component?: Component | undefined;
 	}
 
-	let { code, type, plugin, source_path = undefined, parent_component = undefined }: Props = $props();
+	let {
+		code,
+		type,
+		plugin,
+		source_path = undefined,
+		parent_component = undefined,
+	}: Props = $props();
 </script>
 
 <RenderMarkdown

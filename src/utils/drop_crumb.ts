@@ -11,7 +11,11 @@ import {
 import type { EdgeStruct } from "wasm/pkg/breadcrumbs_graph_wasm";
 import { Paths } from "./paths";
 
-function linkify_edge(plugin: BreadcrumbsPlugin, struct: EdgeStruct, use_alias: boolean ) {
+function linkify_edge(
+	plugin: BreadcrumbsPlugin,
+	struct: EdgeStruct,
+	use_alias: boolean,
+) {
 	const target_path = struct.target_path(plugin.graph);
 
 	// target_id is a full path
@@ -24,7 +28,9 @@ function linkify_edge(plugin: BreadcrumbsPlugin, struct: EdgeStruct, use_alias: 
 			target_file,
 			struct.source_path(plugin.graph),
 			undefined,
-			use_alias ? struct.target_data(plugin.graph).aliases?.at(0) : undefined,
+			use_alias
+				? struct.target_data(plugin.graph).aliases?.at(0)
+				: undefined,
 		);
 	}
 }
@@ -33,13 +39,25 @@ export async function drop_crumbs(
 	plugin: BreadcrumbsPlugin,
 	destination_file: TFile,
 	crumbs: EdgeStruct[],
-	options: { destination: CrumbDestination | "none" , included_fields?: string[], use_alias?: boolean },
+	options: {
+		destination: CrumbDestination | "none";
+		included_fields?: string[];
+		use_alias?: boolean;
+	},
 ) {
 	if (!crumbs.length) return;
-	const included_fields: string[] = options.included_fields?.flatMap(key => plugin.settings.edge_field_groups.find(f => f.label === key)?.fields ?? []) ?? [];
+	const included_fields: string[] =
+		options.included_fields?.flatMap(
+			(key) =>
+				plugin.settings.edge_field_groups.find((f) => f.label === key)
+					?.fields ?? [],
+		) ?? [];
 	const links_by_field = group_projection(
 		group_by(crumbs, (e) => e.edge_type),
-		(edges) => edges.map((e) => linkify_edge(plugin, e, options.use_alias ?? false)),
+		(edges) =>
+			edges.map((e) =>
+				linkify_edge(plugin, e, options.use_alias ?? false),
+			),
 	);
 
 	switch (options.destination) {
@@ -52,7 +70,8 @@ export async function drop_crumbs(
 
 			Object.entries(links_by_field).forEach(([field, links]) => {
 				if (!links?.length) return;
-				if (included_fields.length && !included_fields.includes(field)) return;
+				if (included_fields.length && !included_fields.includes(field))
+					return;
 
 				const existing = frontmatter[field];
 				if (existing) {
@@ -98,9 +117,16 @@ export async function drop_crumbs(
 
 				Object.entries(links_by_field).forEach(([field, links]) => {
 					if (!links?.length) return;
-					if (included_fields.length && !included_fields.includes(field)) return;
+					if (
+						included_fields.length &&
+						!included_fields.includes(field)
+					)
+						return;
 
-					const escaped = field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+					const escaped = field.replace(
+						/[.*+?^${}()|[\]\\]/g,
+						"\\$&",
+					);
 					const regex = new RegExp(`^(${escaped}:: )(.+)$`, "m");
 					const match = result.match(regex);
 
@@ -109,8 +135,14 @@ export async function drop_crumbs(
 							.split(",")
 							.map((s) => s.trim())
 							.filter(Boolean);
-						const merged = remove_duplicates([...existing, ...links]);
-						result = result.replace(regex, `${match[1]}${merged.join(", ")}`);
+						const merged = remove_duplicates([
+							...existing,
+							...links,
+						]);
+						result = result.replace(
+							regex,
+							`${match[1]}${merged.join(", ")}`,
+						);
 					} else {
 						to_append.push(`${field}:: ${links.join(", ")}`);
 					}

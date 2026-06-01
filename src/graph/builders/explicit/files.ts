@@ -1,5 +1,5 @@
-import type {App, CachedMetadata} from "obsidian";
-import { TFile   } from "obsidian";
+import type { App, CachedMetadata } from "obsidian";
+import { TFile } from "obsidian";
 import type { IDataview } from "src/external/dataview/interfaces";
 
 interface TFileWithCache {

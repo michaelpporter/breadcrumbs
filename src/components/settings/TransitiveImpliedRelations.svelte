@@ -8,7 +8,10 @@
 	} from "lucide-svelte";
 	import { Menu, Notice } from "obsidian";
 	import { ICON_SIZE } from "src/const";
-	import type { BreadcrumbsSettings, EdgeField } from "src/interfaces/settings";
+	import type {
+		BreadcrumbsSettings,
+		EdgeField,
+	} from "src/interfaces/settings";
 	import { log } from "src/logger";
 	import type BreadcrumbsPlugin from "src/main";
 	import { reactive_settings } from "src/stores/reactive_settings.svelte";
@@ -42,7 +45,9 @@
 	);
 	let opens = $state<boolean[]>([]);
 
-	const tick_opens_sync = effect_counter("TransitiveImpliedRelations.opens_sync");
+	const tick_opens_sync = effect_counter(
+		"TransitiveImpliedRelations.opens_sync",
+	);
 	$effect.pre(() => {
 		tick_opens_sync();
 		if (opens.length !== transitives.length) {
@@ -162,9 +167,7 @@
 
 		remove_transitive: (i: number) => {
 			settings.implied_relations.transitive =
-				settings.implied_relations.transitive.filter(
-					(_, j) => j !== i,
-				);
+				settings.implied_relations.transitive.filter((_, j) => j !== i);
 			opens = opens.filter((_, j) => j !== i);
 
 			autosave();

@@ -19,5 +19,4 @@ export const _add_settings_page_views = (
 			},
 		},
 	});
-
 };
