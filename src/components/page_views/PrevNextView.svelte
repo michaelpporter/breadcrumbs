@@ -75,7 +75,11 @@
 		const rows: PeriodRow[] = [];
 		const { period_rows } = plugin.settings.views.page.prev_next;
 		const period_cfg = plugin.settings.explicit_edge_sources.date_note;
-		const basename = file_path.split("/").pop()?.replace(/\.[^.]+$/, "") ?? "";
+		const basename =
+			file_path
+				.split("/")
+				.pop()
+				?.replace(/\.[^.]+$/, "") ?? "";
 
 		for (const kind of PERIOD_KINDS) {
 			if (!period_rows[kind]) continue;
@@ -94,8 +98,15 @@
 					.get_edges();
 				for (const edge of up_edges) {
 					const target = edge.target_path(plugin.graph);
-					const target_basename = target.split("/").pop()?.replace(/\.[^.]+$/, "") ?? "";
-					if (DateTime.fromFormat(target_basename, cfg.date_format).isValid) {
+					const target_basename =
+						target
+							.split("/")
+							.pop()
+							?.replace(/\.[^.]+$/, "") ?? "";
+					if (
+						DateTime.fromFormat(target_basename, cfg.date_format)
+							.isValid
+					) {
 						period_path = target;
 						break;
 					}
@@ -105,15 +116,17 @@
 			if (!period_path) continue;
 			if (!plugin.graph.has_node(period_path)) continue;
 
-			const prev_field = implied_pair_close_field(plugin.settings, cfg.next_field) ?? null;
+			const prev_field =
+				implied_pair_close_field(plugin.settings, cfg.next_field) ??
+				null;
 
 			const next_edges = plugin.graph
 				.get_filtered_outgoing_edges(period_path, [cfg.next_field])
 				.get_edges();
 			const prev_edges = prev_field
 				? plugin.graph
-					.get_filtered_outgoing_edges(period_path, [prev_field])
-					.get_edges()
+						.get_filtered_outgoing_edges(period_path, [prev_field])
+						.get_edges()
 				: [];
 
 			rows.push({
@@ -137,7 +150,9 @@
 				style="border-radius: var(--radius-m) 0 0 var(--radius-m)"
 			>
 				{#each grouped_out_edges?.prev ?? [] as edge}
-					<div class="BC-next-prev-item flex gap-3 py-1 pl-2 pr-1 text-left">
+					<div
+						class="BC-next-prev-item flex gap-3 py-1 pl-2 pr-1 text-left"
+					>
 						<span class="BC-field px-2">{edge.edge_type}</span>
 
 						<EdgeLink
@@ -155,7 +170,9 @@
 				style="border-radius:  0 var(--radius-m) var(--radius-m) 0"
 			>
 				{#each grouped_out_edges?.next ?? [] as edge}
-					<div class="BC-next-prev-item flex gap-3 py-1 pl-1 pr-2 text-right">
+					<div
+						class="BC-next-prev-item flex gap-3 py-1 pl-1 pr-2 text-right"
+					>
 						<EdgeLink
 							cls="grow"
 							{edge}
@@ -179,7 +196,15 @@
 					{#if row.prev_path}
 						<EdgeLink
 							cls=""
-							edge={plugin.graph.get_filtered_outgoing_edges(row.period_path, [implied_pair_close_field(plugin.settings, plugin.settings.explicit_edge_sources.date_note[row.kind].next_field) ?? ""]).get_edges()[0]}
+							edge={plugin.graph
+								.get_filtered_outgoing_edges(row.period_path, [
+									implied_pair_close_field(
+										plugin.settings,
+										plugin.settings.explicit_edge_sources
+											.date_note[row.kind].next_field,
+									) ?? "",
+								])
+								.get_edges()[0]}
 							{plugin}
 							{node_stringify_options}
 						/>
@@ -187,14 +212,22 @@
 				</div>
 
 				<span class="BC-period-current mx-2 font-medium">
-					{row.period_path.split("/").pop()?.replace(/\.[^.]+$/, "") ?? ""}
+					{row.period_path
+						.split("/")
+						.pop()
+						?.replace(/\.[^.]+$/, "") ?? ""}
 				</span>
 
 				<div class="flex-1 text-right">
 					{#if row.next_path}
 						<EdgeLink
 							cls=""
-							edge={plugin.graph.get_filtered_outgoing_edges(row.period_path, [plugin.settings.explicit_edge_sources.date_note[row.kind].next_field]).get_edges()[0]}
+							edge={plugin.graph
+								.get_filtered_outgoing_edges(row.period_path, [
+									plugin.settings.explicit_edge_sources
+										.date_note[row.kind].next_field,
+								])
+								.get_edges()[0]}
 							{plugin}
 							{node_stringify_options}
 						/>
@@ -206,7 +239,6 @@
 </div>
 
 <style>
-
 	.BC-prev-next-view > div {
 		border: 1px solid var(--background-modifier-border);
 	}

@@ -76,7 +76,8 @@ export const _add_settings_prev_next_view = (
 			toggle: {
 				value: plugin.settings.views.page.prev_next.period_rows[kind],
 				cb: async (value) => {
-					plugin.settings.views.page.prev_next.period_rows[kind] = value;
+					plugin.settings.views.page.prev_next.period_rows[kind] =
+						value;
 					plugin.refreshViews();
 					await plugin.saveSettings();
 				},

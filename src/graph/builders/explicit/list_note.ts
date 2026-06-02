@@ -258,7 +258,8 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = (
 						new GCEdgeData(
 							list_note_page.file.path,
 							source_path,
-							source_override_field.data?.field ?? list_note_info.data.field,
+							source_override_field.data?.field ??
+								list_note_info.data.field,
 							"list_note",
 						),
 					);
@@ -322,7 +323,8 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = (
 						new GCEdgeData(
 							source_path,
 							target_path,
-							target_override_field.data?.field ?? list_note_info.data.field,
+							target_override_field.data?.field ??
+								list_note_info.data.field,
 							"list_note",
 						),
 					);
@@ -357,9 +359,9 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = (
 				return;
 			}
 
-			const list_note_page = dataview_api.page?.(
-				list_note_file.path,
-			) as IDataview.Page | undefined;
+			const list_note_page = dataview_api.page?.(list_note_file.path) as
+				| IDataview.Page
+				| undefined;
 			if (!list_note_page) return;
 
 			process_list_note_page(list_note_page);

@@ -25,7 +25,7 @@
 		field = fields.find((field) => field.label === e.currentTarget.value);
 
 		if (field) {
-			onselect?.(field)
+			onselect?.(field);
 		}
 
 		if (undefine_on_change) field = undefined;

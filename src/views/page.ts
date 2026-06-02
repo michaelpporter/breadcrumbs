@@ -64,7 +64,9 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			existing.file_path === file_path
 		) {
 			const page_views_el =
-				markdown_view.containerEl.querySelector<HTMLElement>(".BC-page-views");
+				markdown_view.containerEl.querySelector<HTMLElement>(
+					".BC-page-views",
+				);
 			if (page_views_el?.isConnected) return;
 		}
 
@@ -75,7 +77,9 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 
 		// Ensure the container exists _on the current page_, leaving other pages' containers alone
 		const page_views_el =
-			markdown_view.containerEl.querySelector<HTMLElement>(".BC-page-views") ??
+			markdown_view.containerEl.querySelector<HTMLElement>(
+				".BC-page-views",
+			) ??
 			markdown_view.containerEl.createDiv({
 				cls: "BC-page-views w-full mx-auto",
 			});
@@ -121,15 +125,15 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			page_views_el.style.removeProperty("padding-left");
 
 			// Source mode may have left these on .cm-scroller in older versions.
-			const preview_scroller = markdown_view.containerEl.querySelector(
-				".cm-scroller",
-			);
+			const preview_scroller =
+				markdown_view.containerEl.querySelector(".cm-scroller");
 			preview_scroller?.classList.remove("flex-col");
-			preview_scroller?.classList.remove("BC-cm-scroller-inline-page-views");
-		} else {
-			const cm_scroller = markdown_view.containerEl.querySelector(
-				".cm-scroller",
+			preview_scroller?.classList.remove(
+				"BC-cm-scroller-inline-page-views",
 			);
+		} else {
+			const cm_scroller =
+				markdown_view.containerEl.querySelector(".cm-scroller");
 			if (!cm_scroller) {
 				log.info("redraw_page_views > No cm-scroller (mode=source)");
 				return;
@@ -147,7 +151,9 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 					markdown_view.containerEl.querySelector(
 						".markdown-source-view.mod-cm6",
 					) ??
-					markdown_view.containerEl.querySelector(".markdown-source-view");
+					markdown_view.containerEl.querySelector(
+						".markdown-source-view",
+					);
 				const cm_editor =
 					markdown_view.containerEl.querySelector(".cm-editor");
 
@@ -160,7 +166,9 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 				} else {
 					const host = cm_scroller.parentElement;
 					if (!host) {
-						log.info("redraw_page_views > No parent of cm-scroller");
+						log.info(
+							"redraw_page_views > No parent of cm-scroller",
+						);
 						return;
 					}
 					host.insertBefore(page_views_el, cm_scroller);
@@ -170,10 +178,7 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 				// Insert as the first child so BC-page-views occupies row 1 (flex: 0 0 100%),
 				// leaving gutters and content to lay out normally on row 2.
 				cm_scroller.classList.add("BC-cm-scroller-inline-page-views");
-				cm_scroller.insertBefore(
-					page_views_el,
-					cm_scroller.firstChild,
-				);
+				cm_scroller.insertBefore(page_views_el, cm_scroller.firstChild);
 
 				// Inner wrapper holds the visible content; outer stays full-row so flex
 				// always wraps it. Width follows Obsidian's readable-line-length via CSS.
@@ -189,6 +194,11 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			target: mount_target,
 			props: { plugin, file_path },
 		});
-		mounted_page_views.set(markdown_view, { view: mounted, mode, sticky, file_path });
+		mounted_page_views.set(markdown_view, {
+			view: mounted,
+			mode,
+			sticky,
+			file_path,
+		});
 	});
 }

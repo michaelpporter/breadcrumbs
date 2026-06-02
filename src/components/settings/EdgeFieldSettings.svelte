@@ -26,7 +26,6 @@
 		groups: "",
 	});
 
-
 	const autosave = () => {
 		settings.is_dirty = true;
 		plugin.saveSettingsDebounced();
@@ -301,7 +300,10 @@
 							.setTitle(group.label)
 							.setIcon("plus")
 							.onClick(() =>
-								actions.groups.add_field(group, edge_field.label),
+								actions.groups.add_field(
+									group,
+									edge_field.label,
+								),
 							),
 					),
 				);
@@ -429,14 +431,16 @@
 					<button
 						disabled={field_i === 0}
 						title="Move up"
-						onclick={() => actions.fields.reorder(field_i, field_i - 1)}
+						onclick={() =>
+							actions.fields.reorder(field_i, field_i - 1)}
 					>
 						<ArrowUp size={ICON_SIZE} />
 					</button>
 					<button
 						disabled={field_i === settings.edge_fields.length - 1}
 						title="Move down"
-						onclick={() => actions.fields.reorder(field_i, field_i + 1)}
+						onclick={() =>
+							actions.fields.reorder(field_i, field_i + 1)}
 					>
 						<ArrowDown size={ICON_SIZE} />
 					</button>
@@ -445,7 +449,10 @@
 						title="Mermaid arrow shape for this field"
 						value={field.mermaid_arrow ?? ""}
 						onchange={(e) =>
-							actions.fields.set_arrow(field, e.currentTarget.value)}
+							actions.fields.set_arrow(
+								field,
+								e.currentTarget.value,
+							)}
 					>
 						<option value="">Default arrow</option>
 						{#each MERMAID_ARROW_TYPES as arrow}
@@ -457,7 +464,8 @@
 						<Tag
 							tag={group_label}
 							title="Jump to group. Right click to remove."
-							onclick={() => actions.groups.scroll_to(group_label)}
+							onclick={() =>
+								actions.groups.scroll_to(group_label)}
 							oncontextmenu={context_menus.field_group(
 								field,
 								group_label,
@@ -476,7 +484,10 @@
 			{/key}
 		{/each}
 
-		<button class="mt-2 flex items-center gap-1" onclick={actions.fields.add}>
+		<button
+			class="mt-2 flex items-center gap-1"
+			onclick={actions.fields.add}
+		>
 			<PlusIcon size={ICON_SIZE} />
 			New Edge Field
 		</button>
@@ -564,7 +575,9 @@
 
 					<EdgeFieldSelector
 						placeholder="Add Field"
-						fields={settings.edge_fields.filter((f) => !group.fields.includes(f.label))}
+						fields={settings.edge_fields.filter(
+							(f) => !group.fields.includes(f.label),
+						)}
 						onselect={(f) =>
 							actions.groups.add_field(group, f.label)}
 					/>

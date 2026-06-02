@@ -128,12 +128,17 @@
 	});
 
 	let entry_paths = $derived.by(() => {
-		if (!active_file || !plugin.graph.has_node(active_file.path)) return undefined;
+		if (!active_file || !plugin.graph.has_node(active_file.path))
+			return undefined;
 		if (settings.lock_view && plugin.graph.has_node(settings.lock_path!)) {
 			log.debug("Using locked path for TreeView:", settings.lock_path);
 			return [settings.lock_path!];
 		} else if (settings.find_root && find_root_field_labels.length > 0) {
-			const roots = walk_to_roots(plugin.graph, active_file.path, find_root_field_labels);
+			const roots = walk_to_roots(
+				plugin.graph,
+				active_file.path,
+				find_root_field_labels,
+			);
 			log.debug("find_root: walked up to roots", roots);
 			return roots;
 		}
@@ -303,7 +308,9 @@
 
 				<span
 					class="font-mono text-sm"
-					aria-label={tree?.hit_depth_limit ? "Some nodes have been truncated" : ""}
+					aria-label={tree?.hit_depth_limit
+						? "Some nodes have been truncated"
+						: ""}
 				>
 					{depth}{tree?.hit_depth_limit ? "+" : ""}
 				</span>
@@ -342,14 +349,20 @@
 			{#if sorted_tree.tree && !sorted_tree.tree.is_empty() && visible_indices?.size !== 0}
 				{#if entry_node_data && entry_path}
 					<details class="tree-item" bind:open={root_open}>
-						<summary class="tree-item-self is-clickable flex items-center">
-							<div class="tree-item-icon collapse-icon mod-collapsible">
+						<summary
+							class="tree-item-self is-clickable flex items-center"
+						>
+							<div
+								class="tree-item-icon collapse-icon mod-collapsible"
+							>
 								<ChevronOpener open={root_open} />
 							</div>
 							<div class="tree-item-inner">
 								<ObsidianLink
 									{plugin}
-									display={node_stringify_options.stringify_node(entry_node_data)}
+									display={node_stringify_options.stringify_node(
+										entry_node_data,
+									)}
 									path={entry_path}
 									resolved={true}
 									cls="tree-item-inner-text"
@@ -365,7 +378,9 @@
 									show_attributes={settings.show_attributes}
 									data={sorted_tree.tree}
 									items={sorted_tree.tree.entry_nodes}
-									open_signal={visible_indices ? true : !settings.collapse}
+									open_signal={visible_indices
+										? true
+										: !settings.collapse}
 								/>
 							</div>
 						{/if}
@@ -378,7 +393,9 @@
 						show_attributes={settings.show_attributes}
 						data={sorted_tree.tree}
 						items={sorted_tree.tree.entry_nodes}
-						open_signal={visible_indices ? true : !settings.collapse}
+						open_signal={visible_indices
+							? true
+							: !settings.collapse}
 					/>
 				{/if}
 			{:else}

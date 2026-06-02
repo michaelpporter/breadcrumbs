@@ -28,21 +28,36 @@ interface PeriodNote {
 	date: DateTime<true>;
 }
 
-function collect_period_notes(cfg: PeriodNoteConfig, all_files: AllFiles): PeriodNote[] {
+function collect_period_notes(
+	cfg: PeriodNoteConfig,
+	all_files: AllFiles,
+): PeriodNote[] {
 	const notes: PeriodNote[] = [];
 
 	all_files.obsidian?.forEach(({ file }) => {
 		if (cfg.folder && file.parent?.path !== cfg.folder) return;
 		const date = DateTime.fromFormat(file.basename, cfg.date_format);
 		if (!date.isValid) return;
-		notes.push({ date, path: file.path, basename: file.basename, ext: file.extension, folder: file.parent?.path ?? "" });
+		notes.push({
+			date,
+			path: file.path,
+			basename: file.basename,
+			ext: file.extension,
+			folder: file.parent?.path ?? "",
+		});
 	});
 
 	all_files.dataview?.forEach(({ file }) => {
 		if (cfg.folder && file.folder !== cfg.folder) return;
 		const date = DateTime.fromFormat(file.name, cfg.date_format);
 		if (!date.isValid) return;
-		notes.push({ date, path: file.path, basename: file.name, ext: file.ext, folder: file.folder });
+		notes.push({
+			date,
+			path: file.path,
+			basename: file.name,
+			ext: file.ext,
+			folder: file.folder,
+		});
 	});
 
 	const seen = new Set<string>();
@@ -96,7 +111,14 @@ function add_period_edges(
 		if (!notes) continue;
 		const period_cfg = cfg[kind];
 		for (let i = 0; i < notes.length - 1; i++) {
-			results.edges.push(new GCEdgeData(notes[i].path, notes[i + 1].path, period_cfg.next_field, "date_note"));
+			results.edges.push(
+				new GCEdgeData(
+					notes[i].path,
+					notes[i + 1].path,
+					period_cfg.next_field,
+					"date_note",
+				),
+			);
 		}
 	}
 
@@ -106,12 +128,24 @@ function add_period_edges(
 		all_files.obsidian?.forEach(({ file }) => {
 			const date = DateTime.fromFormat(file.basename, cfg.date_format);
 			if (!date.isValid) return;
-			daily_notes.push({ date, path: file.path, basename: file.basename, ext: file.extension, folder: file.parent?.path ?? "" });
+			daily_notes.push({
+				date,
+				path: file.path,
+				basename: file.basename,
+				ext: file.extension,
+				folder: file.parent?.path ?? "",
+			});
 		});
 		all_files.dataview?.forEach(({ file }) => {
 			const date = DateTime.fromFormat(file.name, cfg.date_format);
 			if (!date.isValid) return;
-			daily_notes.push({ date, path: file.path, basename: file.name, ext: file.ext, folder: file.folder });
+			daily_notes.push({
+				date,
+				path: file.path,
+				basename: file.name,
+				ext: file.ext,
+				folder: file.folder,
+			});
 		});
 
 		// When week starts Sunday, a Sunday should map to the *next* ISO week
@@ -125,11 +159,23 @@ function add_period_edges(
 				const notes = period_notes[kind];
 				if (!notes) continue;
 				const period_cfg = cfg[kind];
-				const lookup_date = kind === "week" ? week_date(daily.date) : daily.date;
-				const target_basename = lookup_date.toFormat(period_cfg.date_format);
-				const target = notes.find((n) => n.basename === target_basename);
+				const lookup_date =
+					kind === "week" ? week_date(daily.date) : daily.date;
+				const target_basename = lookup_date.toFormat(
+					period_cfg.date_format,
+				);
+				const target = notes.find(
+					(n) => n.basename === target_basename,
+				);
 				if (target) {
-					results.edges.push(new GCEdgeData(daily.path, target.path, period_cfg.up_field, "date_note"));
+					results.edges.push(
+						new GCEdgeData(
+							daily.path,
+							target.path,
+							period_cfg.up_field,
+							"date_note",
+						),
+					);
 				}
 			}
 		}
@@ -147,10 +193,21 @@ function add_period_edges(
 			const coarser_cfg = cfg[coarser];
 
 			for (const note of finer_notes) {
-				const target_basename = note.date.toFormat(coarser_cfg.date_format);
-				const target = coarser_notes.find((n) => n.basename === target_basename);
+				const target_basename = note.date.toFormat(
+					coarser_cfg.date_format,
+				);
+				const target = coarser_notes.find(
+					(n) => n.basename === target_basename,
+				);
 				if (target) {
-					results.edges.push(new GCEdgeData(note.path, target.path, finer_cfg.up_field, "date_note"));
+					results.edges.push(
+						new GCEdgeData(
+							note.path,
+							target.path,
+							finer_cfg.up_field,
+							"date_note",
+						),
+					);
 				}
 			}
 		}
@@ -279,7 +336,11 @@ export const _add_explicit_edges_date_note: ExplicitEdgeBuilder = (
 				? (next_date_note_basename ?? basename_plus_one_day)
 				: basename_plus_one_day;
 			log.debug(`tomorrow_folder: ${tomorrow_folder}`);
-			const target_folder = (date_note_settings.stretch_to_existing || target_basename === next_date_note_basename) ? (next_date_note_folder ?? tomorrow_folder) : tomorrow_folder;
+			const target_folder =
+				date_note_settings.stretch_to_existing ||
+				target_basename === next_date_note_basename
+					? (next_date_note_folder ?? tomorrow_folder)
+					: tomorrow_folder;
 			const target_id = Paths.build(
 				target_folder,
 				target_basename,

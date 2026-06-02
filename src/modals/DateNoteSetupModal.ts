@@ -83,13 +83,11 @@ export class DateNoteSetupModal extends Modal {
 		new Setting(contentEl).setHeading().setName("Period notes");
 
 		for (const kind of PERIODS) {
-			new Setting(contentEl)
-				.setName(PERIOD_LABEL[kind])
-				.addToggle((t) =>
-					t.setValue(this.periods[kind]).onChange((v) => {
-						this.periods[kind] = v;
-					}),
-				);
+			new Setting(contentEl).setName(PERIOD_LABEL[kind]).addToggle((t) =>
+				t.setValue(this.periods[kind]).onChange((v) => {
+					this.periods[kind] = v;
+				}),
+			);
 		}
 
 		new Setting(contentEl).setHeading().setName("Field names");
@@ -148,7 +146,8 @@ export class DateNoteSetupModal extends Modal {
 	}
 
 	async apply() {
-		const { plugin, periods, period_specific, daily_enabled, week_start } = this;
+		const { plugin, periods, period_specific, daily_enabled, week_start } =
+			this;
 		const s = plugin.settings;
 
 		const ensure_field = (label: string) => {
@@ -158,7 +157,9 @@ export class DateNoteSetupModal extends Modal {
 		};
 
 		const ensure_in_group = (group_label: string, field: string) => {
-			const group = s.edge_field_groups.find((g) => g.label === group_label);
+			const group = s.edge_field_groups.find(
+				(g) => g.label === group_label,
+			);
 			if (group && !group.fields.includes(field)) {
 				group.fields.push(field);
 			}
@@ -196,8 +197,9 @@ export class DateNoteSetupModal extends Modal {
 
 		for (const kind of enabled_periods) {
 			s.explicit_edge_sources.date_note[kind].enabled = true;
-			s.explicit_edge_sources.date_note[kind].next_field =
-				period_specific ? `next_${kind}` : "next";
+			s.explicit_edge_sources.date_note[kind].next_field = period_specific
+				? `next_${kind}`
+				: "next";
 			s.explicit_edge_sources.date_note[kind].up_field = "up";
 		}
 
@@ -218,8 +220,20 @@ export class DateNoteSetupModal extends Modal {
 			);
 			if (!exists) {
 				s.implied_relations.transitive.push(
-					{ name: "", rounds: 1, chain: [{ field: next_f }], close_field: prev_f, close_reversed: true },
-					{ name: "", rounds: 1, chain: [{ field: prev_f }], close_field: next_f, close_reversed: true },
+					{
+						name: "",
+						rounds: 1,
+						chain: [{ field: next_f }],
+						close_field: prev_f,
+						close_reversed: true,
+					},
+					{
+						name: "",
+						rounds: 1,
+						chain: [{ field: prev_f }],
+						close_field: next_f,
+						close_reversed: true,
+					},
 				);
 			}
 		};

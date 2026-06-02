@@ -33,7 +33,9 @@
 		if (last_plugin !== plugin) {
 			last_plugin = plugin;
 			settings = json_clone(
-				untrack(() => $state.snapshot(plugin.settings.views.page.trail)),
+				untrack(() =>
+					$state.snapshot(plugin.settings.views.page.trail),
+				),
 			);
 		}
 	});

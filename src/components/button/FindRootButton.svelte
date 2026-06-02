@@ -12,7 +12,9 @@
 
 <button
 	class={cls}
-	aria-label={find_root ? "Show Tree From Root" : "Show Tree From Active Note"}
+	aria-label={find_root
+		? "Show Tree From Root"
+		: "Show Tree From Active Note"}
 	onclick={() => (find_root = !find_root)}
 >
 	{#if find_root}

@@ -18,6 +18,8 @@ export function mock_file(
 		frontmatter?: Record<string, unknown>;
 		/** Body-level tags (cache.tags) — each becomes { tag, position } */
 		tags?: string[];
+		/** Obsidian-resolved frontmatter links (typed_link builder) */
+		frontmatterLinks?: { key: string; link: string }[];
 	} = {},
 ) {
 	const slash_path = path.replace(/\\/g, "/");
@@ -36,13 +38,14 @@ export function mock_file(
 	}) as TFile & { parent: { path: string } };
 
 	const cache =
-		opts.frontmatter || opts.tags
+		opts.frontmatter || opts.tags || opts.frontmatterLinks
 			? {
 					frontmatter: opts.frontmatter ?? {},
 					tags: opts.tags?.map((tag) => ({
 						tag,
 						position: { start: { line: 0, col: 0, offset: 0 }, end: { line: 0, col: 0, offset: 0 } },
 					})),
+					frontmatterLinks: opts.frontmatterLinks,
 				}
 			: null;
 
@@ -65,10 +68,13 @@ export function make_all_files(
  * @param settings_override — merged on top of DEFAULT_SETTINGS.
  * @param known_paths — paths for which vault.getFileByPath returns a truthy
  *   object (i.e. the file "exists" in the vault). All other paths return null.
+ * @param resolve_link — optional override for metadataCache.getFirstLinkpathDest.
+ *   Return a TFile to simulate a resolved link, null for unresolved.
  */
 export function make_plugin(
 	settings_override: Partial<BreadcrumbsSettings> = {},
 	known_paths: string[] = [],
+	resolve_link?: (link: string, source_path: string) => TFile | null,
 ): BreadcrumbsPlugin {
 	const settings = {
 		...DEFAULT_SETTINGS,
@@ -89,7 +95,10 @@ export function make_plugin(
 				getAbstractFileByPath: () => null,
 			},
 			metadataCache: {
-				getFirstLinkpathDest: () => null,
+				getFirstLinkpathDest: resolve_link ?? (() => null),
+			},
+			fileManager: {
+				getNewFileParent: () => ({ path: "" }),
 			},
 		},
 	} as unknown as BreadcrumbsPlugin;

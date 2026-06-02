@@ -99,36 +99,36 @@ export const _add_explicit_edges_dataview_note: ExplicitEdgeBuilder = (
 			}
 
 			const { field, query } = dataview_note_info.data;
-		// eslint-disable-next-line no-useless-assignment
-		let pages: IDataview.Page[] = [];
-		try {
-			pages = dataview_pages_to_plain_array(
-				dataview_api.pages(query, dataview_note_file.path),
-			) as IDataview.Page[];
-		} catch (error) {
-			log.warn(
-				"dataview-note > DV API error:",
-				error instanceof Error ? error.message : error,
-			);
+			// eslint-disable-next-line no-useless-assignment
+			let pages: IDataview.Page[] = [];
+			try {
+				pages = dataview_pages_to_plain_array(
+					dataview_api.pages(query, dataview_note_file.path),
+				) as IDataview.Page[];
+			} catch (error) {
+				log.warn(
+					"dataview-note > DV API error:",
+					error instanceof Error ? error.message : error,
+				);
 
-			return results.errors.push({
-				code: "invalid_field_value",
+				return results.errors.push({
+					code: "invalid_field_value",
 					path: dataview_note_file.path,
-				message: `dataview-note-query is not a valid dataview query: '${query}'`,
-			});
-		}
+					message: `dataview-note-query is not a valid dataview query: '${query}'`,
+				});
+			}
 
-		pages.forEach((page) => {
-			// NOTE: I _believe_ we don't need to even safe_add_node, since dv will only return resolved notes
-			results.edges.push(
-				new GCEdgeData(
+			pages.forEach((page) => {
+				// NOTE: I _believe_ we don't need to even safe_add_node, since dv will only return resolved notes
+				results.edges.push(
+					new GCEdgeData(
 						dataview_note_file.path,
-					page.file.path,
-					field,
-					"dataview_note",
-				),
-			);
-		});
+						page.file.path,
+						field,
+						"dataview_note",
+					),
+				);
+			});
 		},
 	);
 

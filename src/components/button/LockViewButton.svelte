@@ -11,7 +11,12 @@
 		active_path?: string | null;
 	}
 
-	let { cls = "", lock_view = $bindable(), lock_path = $bindable(), active_path }: Props = $props();
+	let {
+		cls = "",
+		lock_view = $bindable(),
+		lock_path = $bindable(),
+		active_path,
+	}: Props = $props();
 
 	const tick_lock = effect_counter("LockViewButton");
 	$effect(() => {
@@ -24,7 +29,7 @@
 
 <button
 	class={cls}
-	aria-label={lock_view ? "Locked View" : "Dynamic View" }
+	aria-label={lock_view ? "Locked View" : "Dynamic View"}
 	onclick={() => (lock_view = !lock_view)}
 >
 	{#if lock_view}

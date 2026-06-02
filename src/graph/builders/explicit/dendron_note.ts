@@ -11,7 +11,11 @@ import { Paths } from "src/utils/paths";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 
-function dendron_edge_key(source: string, target: string, field: string): string {
+function dendron_edge_key(
+	source: string,
+	target: string,
+	field: string,
+): string {
 	return `${source}\0${target}\0${field}\0dendron_note`;
 }
 
@@ -111,7 +115,9 @@ function handle_dendron_note(
 	const { field } = dendron_note_info.data;
 
 	// target_path is now a full path, so we can check for it directly, instead of getFirstLinkpathDest
-	const target_file = plugin.app.vault.getFileByPath(normalizePath(target_id));
+	const target_file = plugin.app.vault.getFileByPath(
+		normalizePath(target_id),
+	);
 
 	if (!target_file) {
 		results.nodes.push(new GCNodeData(target_id, [], false, false, false));
@@ -135,7 +141,13 @@ function handle_dendron_note(
 
 	const return_field = implied_pair_close_field(plugin.settings, field);
 	if (return_field) {
-		push_dendron_edge(results, edge_sig, target_id, source_id, return_field);
+		push_dendron_edge(
+			results,
+			edge_sig,
+			target_id,
+			source_id,
+			return_field,
+		);
 	}
 }
 
@@ -183,7 +195,9 @@ function add_dendron_hub_parent_down_edges(
 				if (child.path === parent.path) continue;
 				const child_parts = Paths.basename(child.path).split(delimiter);
 				if (child_parts.length < 2) continue;
-				const child_parent_stem = child_parts.slice(0, -1).join(delimiter);
+				const child_parent_stem = child_parts
+					.slice(0, -1)
+					.join(delimiter);
 				if (child_parent_stem !== stem) continue;
 
 				push_dendron_edge(
@@ -205,7 +219,8 @@ function add_dendron_sibling_edges(
 	paths: DendronPathMeta[],
 ) {
 	const sibling_field =
-		plugin.settings.explicit_edge_sources.dendron_note.default_sibling_field;
+		plugin.settings.explicit_edge_sources.dendron_note
+			.default_sibling_field;
 	if (!sibling_field) return;
 
 	const { delimiter } = plugin.settings.explicit_edge_sources.dendron_note;
@@ -228,7 +243,11 @@ function add_dendron_sibling_edges(
 		if (siblings.length < 2) continue;
 		for (let i = 0; i < siblings.length; i++) {
 			for (let j = i + 1; j < siblings.length; j++) {
-				const k = dendron_edge_key(siblings[i], siblings[j], sibling_field);
+				const k = dendron_edge_key(
+					siblings[i],
+					siblings[j],
+					sibling_field,
+				);
 				if (edge_sig.has(k)) continue;
 				edge_sig.add(k);
 				results.edges.push(
@@ -288,13 +307,7 @@ export const _add_explicit_edges_dendron_note: ExplicitEdgeBuilder = (
 			path: page.file.path,
 			metadata: page,
 		});
-		handle_dendron_note(
-			plugin,
-			results,
-			page.file.path,
-			page,
-			edge_sig,
-		);
+		handle_dendron_note(plugin, results, page.file.path, page, edge_sig);
 	});
 
 	add_dendron_hub_parent_down_edges(plugin, results, edge_sig, paths);

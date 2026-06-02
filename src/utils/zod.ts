@@ -33,9 +33,7 @@ function dynamic_enum_schema(
 ) {
 	return z.string().superRefine((received, ctx) => {
 		if (options.includes(received)) return;
-		ctx.addIssue(
-			invalid_enum_msg(field ?? "value", options, received),
-		);
+		ctx.addIssue(invalid_enum_msg(field ?? "value", options, received));
 	});
 }
 
