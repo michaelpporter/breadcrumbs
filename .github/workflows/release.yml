@@ -58,7 +58,14 @@ jobs:
                     fi
                   fi
 
+                  if [[ -z "$prerelease_flag" ]]; then
+                    cp manifest.json manifest-beta.json
+                    extra_files="manifest-beta.json"
+                  else
+                    extra_files=""
+                  fi
+
                   gh release create "$tag" \
                     --title="$tag" \
                     $prerelease_flag \
-                    main.js manifest.json styles.css
+                    main.js manifest.json styles.css $extra_files
