@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
-### [4.13.9-beta.1](https://github.com/michaelpotter/breadcrumbs/compare/4.13.8...4.13.9-beta.1) (2026-06-01)
+### [4.13.9](https://github.com/michaelpotter/breadcrumbs/compare/4.13.8...4.13.9) (2026-06-02)
 
 ### Chores
 
