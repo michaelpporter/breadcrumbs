@@ -4,14 +4,6 @@ Breadcrumbs is an Obsidian plugin that lets you add _typed links_ to your notes,
 
 As of May 2026, Breadcrumbs is maintained by [michaelpporter](https://github.com/michaelpporter). The plugin was originally created by [SkepticMystic](https://github.com/SkepticMystic), whose foundational work made this all possible. Development continues at [github.com/michaelpporter/breadcrumbs](https://github.com/michaelpporter/breadcrumbs).
 
-> **Note:** The default branch has been renamed from `master` to `main`. Update any existing forks or local clones:
-> ```bash
-> git branch -m master main
-> git fetch origin
-> git branch -u origin/main main
-> git remote set-head origin -a
-> ```
-
 ## Obsidian 1.13
 
 Breadcrumbs 4.13.0 is fully compatible with Obsidian 1.13. The settings tab uses the new declarative settings API — all sections appear in global settings search and support page-based navigation. The existing display() fallback remains for older Obsidian versions (minAppVersion stays 1.12.3).
@@ -24,16 +16,17 @@ Want to see Breadcrumbs in action before configuring your own vault? The [Breadc
 
 Breadcrumbs has its own docs site!✨ All detailed documentation lives there: https://breadcrumbs-docs.michaelpporter.com
 
-## Media
+## Contributing
 
-Media related to Breacrumbs. Thanks to everyone for sharing!
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, build commands, and how to submit a pull request.
 
-### Written
+## Donations
 
--   @Rhoadey: [How a Hierarchy Note sharpened my thinking in 20 minutes](https://medium.com/obsidian-observer/how-a-hierarchy-note-sharpened-my-thinking-in-20-minutes-f1c65945f41e?sk=64f4d1f889ff8a99009a060a24778a7f)
--   [Obsidian Hub - Breadcrumbs Quickstart Guide](https://publish.obsidian.md/hub/04+-+Guides%2C+Workflows%2C+%26+Courses/Guides/Breadcrumbs+Quickstart+Guide)
--   [Obsidian Hub - Breadcrumbs for Comparative Law](https://publish.obsidian.md/hub/03+-+Showcases+%26+Templates/Plugin+Showcases/Breadcrumbs+for+Comparative+Law)
--   [Obsidian Hub - How to get the most out of Breadcrumbs](https://publish.obsidian.md/hub/04+-+Guides%2C+Workflows%2C+%26+Courses/Guides/How+to+get+the+most+out+of+the+Breadcrumbs+plugin)
+If you find Breadcrumbs useful, consider sponsoring continued development:
+
+-   [GitHub Sponsors — michaelpporter](https://github.com/sponsors/michaelpporter)
+
+Original creator SkepticMystic also accepts donations via [Ko-fi](https://ko-fi.com/skepticmystic) — their foundational work is what made this plugin possible.
 
 ## Security & Privacy
 
@@ -70,18 +63,6 @@ All of the above are generated automatically by wasm-bindgen and are not written
 
 <!-- NOTE: This heading is linked to in the manifest.fundingUrl. Be sure to change that if updating the heading label -->
 
-## Donations
-
-If you find Breadcrumbs useful, consider sponsoring continued development:
-
--   [GitHub Sponsors — michaelpporter](https://github.com/sponsors/michaelpporter)
-
-Original creator SkepticMystic also accepts donations via [Ko-fi](https://ko-fi.com/skepticmystic) — their foundational work is what made this plugin possible.
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, build commands, and how to submit a pull request.
-
 ### Release process
 
 #### Beta
@@ -97,6 +78,13 @@ Or, do steps 3-5 in one go with `bun run release:beta`
 ## History
 
 Older media kept for posterity. Many predate v4 and may not match current behavior, but the effort of the authors is appreciated.
+
+### Written
+
+-   @Rhoadey: [How a Hierarchy Note sharpened my thinking in 20 minutes](https://medium.com/obsidian-observer/how-a-hierarchy-note-sharpened-my-thinking-in-20-minutes-f1c65945f41e?sk=64f4d1f889ff8a99009a060a24778a7f)
+-   [Obsidian Hub - Breadcrumbs Quickstart Guide](https://publish.obsidian.md/hub/04+-+Guides%2C+Workflows%2C+%26+Courses/Guides/Breadcrumbs+Quickstart+Guide)
+-   [Obsidian Hub - Breadcrumbs for Comparative Law](https://publish.obsidian.md/hub/03+-+Showcases+%26+Templates/Plugin+Showcases/Breadcrumbs+for+Comparative+Law)
+-   [Obsidian Hub - How to get the most out of Breadcrumbs](https://publish.obsidian.md/hub/04+-+Guides%2C+Workflows%2C+%26+Courses/Guides/How+to+get+the+most+out+of+the+Breadcrumbs+plugin)
 
 ### Videos
 
