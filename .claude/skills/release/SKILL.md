@@ -112,9 +112,11 @@ Use the existing CHANGELOG entries as style reference. Write descriptive bullets
 ### 10. Commit
 
 ```
-git add package.json manifest.json CHANGELOG.md wasm/pkg/
+git add package.json manifest.json CHANGELOG.md bun.lock wasm/pkg/
 git commit -m "release: <version>"
 ```
+
+`bun.lock` is safe to include unconditionally — `git add` on an unchanged file is a no-op.
 
 ### 11. Tag
 
