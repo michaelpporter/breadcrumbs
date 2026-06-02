@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.11](https://github.com/michaelpotter/breadcrumbs/compare/4.13.10...4.13.11) (2026-06-02)
+
+### Chores
+
+* **Dependency updates** — bumped `@types/obsidian-typings` alias from `obsidian-typings@^3.16.6` to `^6.13.0`, matching the runtime dep. Added `package-lock.json` for npm audit compatibility. Reduced npm audit findings from 12 to 3 (remaining 3 are SSR-only Svelte vulns inside `obsidian-calendar-ui`, unfixable without an upstream `obsidian-dataview` fix).
+
 ### [4.13.10](https://github.com/michaelpotter/breadcrumbs/compare/4.13.9...4.13.10) (2026-06-02)
 
 ### Bug Fixes

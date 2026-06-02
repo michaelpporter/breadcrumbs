@@ -1,6 +1,6 @@
 {
 	"name": "breadcrumbs",
-	"version": "4.13.10",
+	"version": "4.13.11",
 	"description": "Add typed-links to your Obsidian notes",
 	"main": "main.js",
 	"scripts": {
@@ -43,7 +43,7 @@
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/luxon": "^3.7.1",
 		"@types/node": "^25.9.1",
-		"@types/obsidian-typings": "npm:obsidian-typings@^3.16.6",
+		"@types/obsidian-typings": "npm:obsidian-typings@^6.13.0",
 		"@vitest/coverage-v8": "4.1.8",
 		"@vitest/ui": "4.1.8",
 		"esbuild": "^0.28.0",
