@@ -89,6 +89,8 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 		],
 	},
 
+	self_is_sibling: ["same"],
+
 	explicit_edge_sources: {
 		typed_link: {},
 		list_note: {

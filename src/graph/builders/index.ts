@@ -1,14 +1,11 @@
 import { parseFrontMatterAliases } from "obsidian";
 import { EXPLICIT_EDGE_SOURCES } from "src/const/graph";
 import { META_ALIAS } from "src/const/metadata_fields";
-import { dataview_plugin } from "src/external/dataview/index";
-import type { IDataview } from "src/external/dataview/interfaces";
-import { dataview_pages_to_plain_array } from "src/external/dataview/pages_to_array";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { Timer } from "src/utils/timer";
-import type { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import {
+	GCEdgeData,
 	GCNodeData,
 	TransitiveGraphRule,
 } from "wasm/pkg/breadcrumbs_graph_wasm";
@@ -81,16 +78,6 @@ export const rebuild_graph = async (plugin: BreadcrumbsPlugin) => {
 	// Get once, send to all builders
 	const all_files = get_all_files(plugin.app);
 
-	// Populate Dataview pages when available so typed_link can read inline fields.
-	// The Obsidian list remains authoritative for node discovery; Dataview is only
-	// used as supplementary field data (inline fields aren't in frontmatterLinks).
-	const dv_api = dataview_plugin.get_api(plugin.app);
-	if (dv_api) {
-		all_files.dataview = dataview_pages_to_plain_array(
-			dv_api.pages(),
-		) as IDataview.Page[];
-	}
-
 	// Add initial nodes
 	const nodes = get_initial_nodes(all_files);
 
@@ -110,6 +97,29 @@ export const rebuild_graph = async (plugin: BreadcrumbsPlugin) => {
 	for (const { results } of explicit_edge_results) {
 		nodes.push(...results.nodes);
 		edges.push(...results.edges);
+	}
+
+	// Self-is-sibling: for each configured field, inject a self-loop implied
+	// edge for every node that already has an outgoing explicit edge of that type.
+	const self_sibling_fields = new Set(plugin.settings.self_is_sibling);
+	if (self_sibling_fields.size > 0) {
+		// Collect every node that participates in a same-type edge (source OR
+		// target). Targets gain outgoing same edges via the default reversed
+		// transitive rule, so they too should appear in their own sibling list.
+		const participants = new Map<string, Set<string>>();
+		for (const edge of edges) {
+			if (self_sibling_fields.has(edge.edge_type)) {
+				if (!participants.has(edge.edge_type))
+					participants.set(edge.edge_type, new Set());
+				participants.get(edge.edge_type)!.add(edge.source);
+				participants.get(edge.edge_type)!.add(edge.target);
+			}
+		}
+		for (const [field, node_set] of participants) {
+			for (const node of node_set) {
+				edges.push(new GCEdgeData(node, node, field, "implied"));
+			}
+		}
 	}
 
 	log.debug(timer.elapsedMessage("Collecting edges and nodes"));

@@ -69,6 +69,10 @@ export interface BreadcrumbsSettings {
 		}[];
 	};
 
+	/** Field labels for which a self-loop implied edge is added to every note
+	 *  that has at least one explicit outgoing edge of that type. */
+	self_is_sibling: string[];
+
 	// NOTE: Anytime a new default_field prop is added, be sure to update it on rename in EdgeFieldSettings.svelte
 	explicit_edge_sources: {
 		// Just a regular `up: [[link]]` or `down:: [[link]]` in the content/frontmatter of a note

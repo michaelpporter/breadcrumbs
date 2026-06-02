@@ -1,8 +1,6 @@
 import { parseYaml } from "obsidian";
-import { dataview_plugin } from "src/external/dataview";
-import type { IDataview } from "src/external/dataview/interfaces";
-import { dataview_pages_to_plain_array } from "src/external/dataview/pages_to_array";
 import type { BreadcrumbsError } from "src/interfaces/graph";
+import { dataview_from_query } from "./dataview_from";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { remove_duplicates_by } from "src/utils/arrays";
@@ -113,19 +111,16 @@ function postprocess_options(
 
 	if (parsed["dataview-from"]) {
 		try {
-			const pages = dataview_pages_to_plain_array(
-				dataview_plugin
-					.get_api(plugin.app)
-					?.pages(parsed["dataview-from"], source_path),
-			) as IDataview.Page[];
-
-			parsed["dataview-from-paths"] = pages.map((page) => page.file.path);
+			parsed["dataview-from-paths"] = dataview_from_query(
+				parsed["dataview-from"],
+				plugin.app,
+				source_path,
+			);
 		} catch (_) {
 			errors.push({
 				path: "dataview-from",
 				code: "invalid_field_value",
-				message: `Input \`${parsed["dataview-from"]}\` is not a valid Dataview query.
-You can use \`app.plugins.plugins.dataview.api.pages("<query>")\` to test your query in the console (press \`Ctrl + Shift + I\` to open the console).`,
+				message: `Input \`${parsed["dataview-from"]}\` is not a valid query. Supported: \`#tag\`, \`"folder"\`, \`[[link]]\`, and \`AND\`/\`OR\`/\`NOT\` combinations.`,
 			});
 		}
 	}

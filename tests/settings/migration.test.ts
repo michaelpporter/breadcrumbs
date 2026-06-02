@@ -138,6 +138,7 @@ describe("migration", () => {
 					},
 				],
 			},
+			self_is_sibling: ["same"],
 
 			explicit_edge_sources: {
 				list_note: {
@@ -781,6 +782,7 @@ describe("migration", () => {
 					},
 				],
 			},
+			self_is_sibling: ["same"],
 		} satisfies BreadcrumbsSettings);
 	});
 });

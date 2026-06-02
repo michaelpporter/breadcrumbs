@@ -1,15 +1,23 @@
 import type { App } from "obsidian";
-import type { DataviewApi } from "obsidian-dataview";
-import { getAPI, isPluginEnabled } from "obsidian-dataview";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 
+interface DataviewApi {
+	index: { initialized: boolean };
+	page: (path: string) => unknown;
+	pages: (query?: string, path?: string) => unknown;
+}
+
 function get_api(app: App): DataviewApi | undefined {
-	return getAPI(app);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return (app as any).plugins?.plugins?.["dataview"]?.api as
+		| DataviewApi
+		| undefined;
 }
 
 function is_enabled(app: App): boolean {
-	return isPluginEnabled(app);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return Boolean((app as any).plugins?.plugins?.["dataview"]);
 }
 
 /** `FullIndex.initialized` is set when the vault walk finishes (0.5.x). */
@@ -42,7 +50,7 @@ function await_if_enabled(plugin: BreadcrumbsPlugin) {
 	});
 }
 
-export type { DataviewApi } from "obsidian-dataview";
+export type { DataviewApi };
 
 export const dataview_plugin = {
 	get_api,

@@ -17,9 +17,7 @@
 		TraversalOptions,
 		TraversalPostprocessOptions,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
-	import { dataview_plugin } from "src/external/dataview";
-	import { dataview_pages_to_plain_array } from "src/external/dataview/pages_to_array";
-	import type { IDataview } from "src/external/dataview/interfaces";
+	import { dataview_from_query } from "src/codeblocks/dataview_from";
 	import { log } from "src/logger";
 	import { Links } from "src/utils/links";
 	import { Transformer } from "markmap-lib";
@@ -68,20 +66,19 @@
 		const source_path =
 			options["start-note"] || file_path || active_file?.path || "";
 
-		// Re-query Dataview on every update so we pick up a fresh index
-		// (the paths pre-computed in postprocess_options may be stale if DV
-		// wasn't ready when the MDRC first loaded).
+		// Re-query on every update so we pick up fresh vault state
+		// (the paths pre-computed in postprocess_options may be stale if the
+		// graph wasn't ready when the MDRC first loaded).
 		let live_dv_paths: string[] | undefined;
 		if (options["dataview-from"]) {
 			try {
-				const pages = dataview_pages_to_plain_array(
-					dataview_plugin
-						.get_api(plugin.app)
-						?.pages(options["dataview-from"], file_path),
-				) as IDataview.Page[];
-				live_dv_paths = pages.map((p) => p.file.path);
+				live_dv_paths = dataview_from_query(
+					options["dataview-from"],
+					plugin.app,
+					file_path,
+				);
 			} catch (_) {
-				// DV not available; fall through to source_path traversal
+				// Fall through to source_path traversal
 			}
 		}
 

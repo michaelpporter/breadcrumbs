@@ -1,6 +1,6 @@
 {
 	"name": "breadcrumbs",
-	"version": "4.13.11",
+	"version": "4.14.0",
 	"description": "Add typed-links to your Obsidian notes",
 	"main": "main.js",
 	"scripts": {
@@ -55,7 +55,6 @@
 		"eslint-plugin-svelte": "^3.19.0",
 		"npm-run-all2": "^9.0.1",
 		"obsidian": "1.13.0",
-		"obsidian-dataview": "^0.5.68",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.8.0",

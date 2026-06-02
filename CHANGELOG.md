@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.14.0](https://github.com/michaelpotter/breadcrumbs/compare/4.13.11...4.14.0) (2026-06-02)
+
+### Features
+
+* **`self_is_sibling` implied relation** — new setting in Edge Fields → Self group. Fields listed there automatically generate an implied self-loop edge for every note that participates in an edge of that type (either as source or target). Defaults to `["same"]`, restoring the classic Breadcrumbs behaviour where a note appears in its own sibling list. Configurable via the tag-chip selector in the Edge Fields settings page.
+
+### Bug Fixes
+
+* **`folder_note` builder** — `BC-folder-note-field` now creates edges to `.canvas` and `.base` files, not just `.md` files. Extension filter now matches the same set used when collecting vault nodes.
+* **`list_note` builder** — no longer requires Dataview. Rebuilt using Obsidian's native `metadataCache.listItems` + `metadataCache.links` + `vault.cachedRead`; field overrides and neighbour-field edges preserved.
+* **`typed_link` builder** — added a native second pass for body inline fields (`field:: [[value]]` syntax). Previously required Dataview; now resolved from `cache.links` + line content, covering self-references and inline-only fields.
+* **`dataview-from:` codeblock option** — no longer requires Dataview. Replaced with a native FROM-clause parser supporting `#tag`, `"folder"`, `[[link]]`, and `AND`/`OR`/`NOT` combinations (`src/codeblocks/dataview_from.ts`).
+* **Markmap codeblock** — live re-query on each update now uses the native FROM parser instead of calling the Dataview API directly; restores markmap rendering when Dataview is not installed.
+
+### Chores
+
+* **Removed `obsidian-dataview` dev dependency** — plugin no longer imports from the `obsidian-dataview` package. Dataview API is accessed at runtime via `app.plugins.plugins["dataview"]?.api` (optional; `dataview_note` builder still uses it when installed). Eliminates all npm audit findings (was 12 vulns via transitive svelte 3.x in `obsidian-calendar-ui`).
+
 ### [4.13.11](https://github.com/michaelpotter/breadcrumbs/compare/4.13.10...4.13.11) (2026-06-02)
 
 ### Chores
