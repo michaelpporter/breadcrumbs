@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
-### [4.14.0](https://github.com/michaelpotter/breadcrumbs/compare/4.13.11...4.14.0) (2026-06-02)
+### [4.14.0](https://github.com/michaelpporter/breadcrumbs/compare/4.13.11...4.14.0) (2026-06-02)
 
 ### Features
 
@@ -22,19 +22,19 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **Removed `obsidian-dataview` dev dependency** — plugin no longer imports from the `obsidian-dataview` package. Dataview API is accessed at runtime via `app.plugins.plugins["dataview"]?.api` (optional; `dataview_note` builder still uses it when installed). Eliminates all npm audit findings (was 12 vulns via transitive svelte 3.x in `obsidian-calendar-ui`).
 
-### [4.13.11](https://github.com/michaelpotter/breadcrumbs/compare/4.13.10...4.13.11) (2026-06-02)
+### [4.13.11](https://github.com/michaelpporter/breadcrumbs/compare/4.13.10...4.13.11) (2026-06-02)
 
 ### Chores
 
 * **Dependency updates** — bumped `@types/obsidian-typings` alias from `obsidian-typings@^3.16.6` to `^6.13.0`, matching the runtime dep. Added `package-lock.json` for npm audit compatibility. Reduced npm audit findings from 12 to 3 (remaining 3 are SSR-only Svelte vulns inside `obsidian-calendar-ui`, unfixable without an upstream `obsidian-dataview` fix).
 
-### [4.13.10](https://github.com/michaelpotter/breadcrumbs/compare/4.13.9...4.13.10) (2026-06-02)
+### [4.13.10](https://github.com/michaelpporter/breadcrumbs/compare/4.13.9...4.13.10) (2026-06-02)
 
 ### Bug Fixes
 
 * **`folder_note` builder** — `BC-folder-note-field` now creates edges to `.canvas` and `.base` files inside a folder, not just `.md` files. The extension filter is now driven by the same `NON_MD_EXTENSIONS` set used when collecting vault files for the graph.
 
-### [4.13.9](https://github.com/michaelpotter/breadcrumbs/compare/4.13.8...4.13.9) (2026-06-02)
+### [4.13.9](https://github.com/michaelpporter/breadcrumbs/compare/4.13.8...4.13.9) (2026-06-02)
 
 ### Chores
 
@@ -44,26 +44,26 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **`typed_link` builder** — added 18 test cases covering the Obsidian `frontmatterLinks` branch (unresolved links, resolved links, list-type keys, multiple edges) and the Dataview branch (Link objects, markdown link strings, invalid values, dedup logic). Extended test helpers with `frontmatterLinks` support in `mock_file` and `resolve_link`/`fileManager` in `make_plugin`.
 
-### [4.13.8](https://github.com/michaelpotter/breadcrumbs/compare/4.13.7...4.13.8) (2026-06-01)
+### [4.13.8](https://github.com/michaelpporter/breadcrumbs/compare/4.13.7...4.13.8) (2026-06-01)
 
 ### Features
 
 * **Date Notes quick setup** — a "Set up…" button at the top of the Date Notes settings section opens a modal for one-click hierarchy configuration. Choose which period levels to enable (week / month / quarter / year), opt in to period-specific edge fields (`next_week` / `prev_week`, `next_month` / `prev_month`, etc. — created automatically and added to the `nexts` / `prevs` field groups), and pick the week start day. On confirm, the modal enables the selected periods, bumps the `up` / `down` transitive-rule rounds to 3 for full daily → week → month → quarter → year chaining, and adds `next ↔ prev` reversal rules for each period-specific field. Modal choices are remembered across opens.
 * **`week_start` setting** — new "Week starts on" option (Monday / Sunday) in Date Notes settings and in the quick-setup modal. When set to Sunday, daily notes that fall on a Sunday are shifted forward one day before the ISO week lookup, so they map to the _following_ week's note — matching US-style week file numbering. Available in both the quick-setup modal and the main Date Notes settings panel.
 
-### [4.13.7](https://github.com/michaelpotter/breadcrumbs/compare/4.13.6...4.13.7) (2026-05-31)
+### [4.13.7](https://github.com/michaelpporter/breadcrumbs/compare/4.13.6...4.13.7) (2026-05-31)
 
 ### Chores
 
 * **ESLint** — integrated `eslint-plugin-obsidianmd` recommended config. Fixed plugin registration conflict (`@typescript-eslint` was being registered twice — once by obsidianmd's config and once by our own); now both `import` and `@typescript-eslint` plugins are stripped from obsidianmd's spread before our own registrations. Resolved all resulting warnings: `Array<T>` → `T[]` in `traverse_note.ts`, removed unused `Result` import in `result.ts`, dropped unnecessary `as any` cast in `SettingsTab`, and suppressed `no-deprecated` on the intentional `this.display()` fallback call that supports Obsidian < 1.13.
 
-### [4.13.6](https://github.com/michaelpotter/breadcrumbs/compare/4.13.5...4.13.6) (2026-05-31)
+### [4.13.6](https://github.com/michaelpporter/breadcrumbs/compare/4.13.5...4.13.6) (2026-05-31)
 
 ### Bug Fixes
 
-* **Pretty Properties cover image click conflict** — the `.BC-page-views` container now sets `pointer-events: none` on itself and restores `pointer-events: auto` on its children, so the empty wrapper never intercepts clicks on underlying plugin elements (e.g. the Pretty Properties cover image). When both Trail and Prev/Next views are disabled, the container is no longer inserted into the DOM at all. TrailView also no longer renders a bare `<div>` wrapper when it has no paths to display, eliminating invisible empty nodes that could contribute to the interference (closes [#704](https://github.com/michaelpotter/breadcrumbs/issues/704)).
+* **Pretty Properties cover image click conflict** — the `.BC-page-views` container now sets `pointer-events: none` on itself and restores `pointer-events: auto` on its children, so the empty wrapper never intercepts clicks on underlying plugin elements (e.g. the Pretty Properties cover image). When both Trail and Prev/Next views are disabled, the container is no longer inserted into the DOM at all. TrailView also no longer renders a bare `<div>` wrapper when it has no paths to display, eliminating invisible empty nodes that could contribute to the interference (closes [#704](https://github.com/michaelpporter/breadcrumbs/issues/704)).
 
-### [4.13.5](https://github.com/michaelpotter/breadcrumbs/compare/4.13.4...4.13.5) (2026-05-31)
+### [4.13.5](https://github.com/michaelpporter/breadcrumbs/compare/4.13.4...4.13.5) (2026-05-31)
 
 ### Bug Fixes
 
@@ -77,7 +77,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **"Create list index" command** — the command is now hidden from the command palette when no file is active, instead of opening a modal that immediately closes with a notice.
 * **TrailView controls** — removed redundant `onchange` save calls from the format/selection dropdowns; the existing `$effect` writeback already persists every settings change.
 
-### [4.13.4](https://github.com/michaelpotter/breadcrumbs/compare/4.13.3...4.13.4) (2026-05-31)
+### [4.13.4](https://github.com/michaelpporter/breadcrumbs/compare/4.13.3...4.13.4) (2026-05-31)
 
 ### Bug Fixes
 
