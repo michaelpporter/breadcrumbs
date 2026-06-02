@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Coding Guidelines
+
+### Think Before Coding
+State assumptions explicitly. If multiple interpretations exist, present them — don't pick silently. If something is unclear, stop and ask.
+
+### Simplicity First
+Minimum code that solves the problem. No features beyond what was asked, no abstractions for single-use code, no error handling for impossible scenarios.
+
+### Surgical Changes
+Touch only what you must. Don't refactor adjacent code that isn't broken. Match existing style. Remove imports/variables YOUR changes made unused — don't remove pre-existing dead code unless asked.
+
+### Goal-Driven Execution
+For multi-step tasks, state a brief plan with verifiable checks. Strong success criteria: run tests, type-check, build.
+
+---
+
 ## Commands
 
 All commands use `bun` as the package manager.
