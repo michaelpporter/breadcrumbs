@@ -4,7 +4,7 @@ name: Release Obsidian plugin
 on:
     push:
         tags:
-            - "[0-9]*"
+            - "[1-9]*"
     workflow_dispatch:
 
 jobs:
