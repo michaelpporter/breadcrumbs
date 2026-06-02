@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.13.10](https://github.com/michaelpotter/breadcrumbs/compare/4.13.9...4.13.10) (2026-06-02)
+
+### Bug Fixes
+
+* **`folder_note` builder** — `BC-folder-note-field` now creates edges to `.canvas` and `.base` files inside a folder, not just `.md` files. The extension filter is now driven by the same `NON_MD_EXTENSIONS` set used when collecting vault files for the graph.
+
 ### [4.13.9](https://github.com/michaelpotter/breadcrumbs/compare/4.13.8...4.13.9) (2026-06-02)
 
 ### Chores

@@ -7,7 +7,7 @@ interface TFileWithCache {
 	cache: CachedMetadata | null;
 }
 
-const NON_MD_EXTENSIONS = ["canvas", "base"] as const;
+export const NON_MD_EXTENSIONS = ["canvas", "base"] as const;
 
 /**
  * Collect markdown, canvas, and base files from the vault for graph rebuild.

@@ -1,5 +1,6 @@
 import { TFile, TFolder } from "obsidian";
 import { META_ALIAS } from "src/const/metadata_fields";
+import { NON_MD_EXTENSIONS } from "./files";
 import type {
 	BreadcrumbsError,
 	EdgeBuilderResults,
@@ -69,6 +70,8 @@ const iterate_folder_files = (
 		}
 	}
 };
+
+const VALID_EXTENSIONS = new Set(["md", ...NON_MD_EXTENSIONS]);
 
 /**
  * **folder_note** — folder containment edge builder.
@@ -143,8 +146,9 @@ export const _add_explicit_edges_folder_note: ExplicitEdgeBuilder = async (
 			plugin,
 			folder_note.folder,
 			(target_path) => {
+				const ext = target_path.split(".").pop() ?? "";
 				if (
-					!target_path.endsWith(".md") ||
+					!VALID_EXTENSIONS.has(ext) ||
 					target_path === folder_note.path
 				) {
 					return;
