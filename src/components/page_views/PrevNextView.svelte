@@ -250,11 +250,5 @@
 		border: 1px solid var(--background-modifier-border);
 		border-radius: var(--radius-m);
 	}
-	:global(.BC-next-prev-item) {
-		padding: 0.25rem 0.25rem !important;
-	}
-	:global(.BC-next-prev-item .BC-field) {
-		padding-left: 0.25rem !important;
-		padding-right: 0.25rem !important;
-	}
+
 </style>

@@ -145,12 +145,14 @@ Outputs to /styles.css, for Obsidian to use.
 	color: var(--text-error);
 }
 
-.BC-field.pr-2 {
-	padding-left: 0.5rem;
+/* Specificity 0 2 0 / 0 3 0 — beats Tailwind utility (0 1 0) without !important */
+.BC-prev-next-view .BC-next-prev-item {
+	padding: 0.25rem 0.25rem;
 }
 
-.BC-field.pl-2 {
-	padding-right: 0.5rem;
+.BC-prev-next-view .BC-next-prev-item .BC-field {
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
 }
 
 .BC-search-input-container {

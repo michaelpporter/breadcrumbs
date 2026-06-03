@@ -35,3 +35,5 @@ meta.txt
 # Personal Claude skills (local paths, not for public contributors)
 .claude/skills/copy-to-demo/
 .claude/skills/update-docs/
+
+.codegraph/*
