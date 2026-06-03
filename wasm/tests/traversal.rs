@@ -230,11 +230,12 @@ fn test_traversal_separate_edges_restricts_subtree() {
     assert_eq!(sep.data[0].children.len(), 0);
 }
 
-// ---- cycle / diamond deduplication ----
+// ---- cycle / diamond / multi-parent ----
 
 #[wasm_bindgen_test]
-fn test_traversal_diamond_visits_each_node_once() {
+fn test_traversal_diamond_shows_node_under_each_parent() {
     // A → B, A → C, B → D, C → D  (diamond)
+    // D has two parents (B and C) so it should appear under both in the tree.
     let mut g = NoteGraph::new();
     g.build_graph(
         vec![node("A"), node("B"), node("C"), node("D")],
@@ -249,8 +250,49 @@ fn test_traversal_diamond_visits_each_node_once() {
     .unwrap();
 
     let result = g.rec_traverse(opts("A", 10, None, false)).unwrap();
-    // B, C, D — D reached from B first; C→D skipped (already visited)
+    // B, C, D (under B), D (under C) — 4 tree positions
+    assert_eq!(result.node_count, 4);
+}
+
+#[wasm_bindgen_test]
+fn test_traversal_multi_parent_shows_child_under_each_parent() {
+    // A → B, A → C, B → C  (C has two parents: A and B)
+    // C should appear as a direct child of A AND as a child of B.
+    let mut g = NoteGraph::new();
+    g.build_graph(
+        vec![node("A"), node("B"), node("C")],
+        vec![
+            edge("A", "B", "up"),
+            edge("A", "C", "up"),
+            edge("B", "C", "up"),
+        ],
+        vec![],
+    )
+    .unwrap();
+
+    let result = g.rec_traverse(opts("A", 10, None, false)).unwrap();
+    // B, C (under A), C (under B) — 3 tree positions
     assert_eq!(result.node_count, 3);
+    // B is a direct child of A
+    assert_eq!(result.data.len(), 2);
+    // B has one child (C)
+    assert_eq!(result.data.iter().find(|d| d.children.len() == 1).is_some(), true);
+}
+
+#[wasm_bindgen_test]
+fn test_traversal_cycle_does_not_loop_infinitely() {
+    // A → B → A  (cycle)
+    let mut g = NoteGraph::new();
+    g.build_graph(
+        vec![node("A"), node("B")],
+        vec![edge("A", "B", "up"), edge("B", "A", "up")],
+        vec![],
+    )
+    .unwrap();
+
+    let result = g.rec_traverse(opts("A", 10, None, false)).unwrap();
+    // B is a child of A; the back-edge B→A is blocked (A is ancestor of B)
+    assert_eq!(result.node_count, 1);
 }
 
 // ---- rec_traverse_and_process (flat) ----
