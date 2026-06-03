@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.14.1](https://github.com/michaelpporter/breadcrumbs/compare/4.14.0...4.14.1) (2026-06-03)
+
+### Bug Fixes
+
+* **Tree View multi-parent** — a note with multiple parents now appears under each parent in the Tree View. Previously, a shared `visited` set across all traversal branches caused the node to appear only once (under whichever parent was processed first). Replaced with a per-branch `ancestors` set so cycle detection blocks only literal ancestors on the current path, not siblings or diamond nodes.
+
 ### [4.14.0](https://github.com/michaelpporter/breadcrumbs/compare/4.13.11...4.14.0) (2026-06-02)
 
 ### Features
