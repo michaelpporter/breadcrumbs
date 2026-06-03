@@ -6,7 +6,10 @@
 	"description": "Add structured hierarchies to your notes.",
 	"author": "MichaelPPorter",
 	"authorUrl": "https://github.com/michaelpporter/breadcrumbs",
-	"fundingUrl": "https://github.com/michaelpporter/breadcrumbs#donations",
+	"fundingUrl": {
+		"GitHub Sponsors": "https://github.com/sponsors/michaelpporter",
+		"Buy Me a Coffee": "https://www.buymeacoffee.com/michaelpporter"
+	},
 	"helpUrl": "https://publish.obsidian.md/breadcrumbs-docs",
 	"isDesktopOnly": false
 }
