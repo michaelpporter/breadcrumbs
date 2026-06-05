@@ -17,8 +17,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | ea8364a | build clean |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | 565fdce | build + eslint clean |
 | 3 | Dedup `validate_edge_field` across 9 explicit builders | done | b9f438c | build + lint + 68 tests green |
-| 4 | Tests for date_note builder (guards 1b + week_start) | done | _pending_ | 9 tests, full suite 221 green |
-| 4b | Tests for list_note, folder_note, dataview_note, traverse_note | todo | | need TFolder/dataview/resolvedLinks mocks |
+| 4 | Tests for date_note builder (guards 1b + week_start) | done | fd88a59 | 9 tests, full suite 221 green |
+| 4b | Tests for list_note, folder_note, dataview_note, traverse_note | done | _pending_ | +21 tests; suite 242 green |
 
 ## Notes per item
 
@@ -93,3 +93,16 @@ present, then applies per-kind overrides. Full suite: 221 green (was 212).
 Remaining builders (4b) need extra mocks not in `helpers.ts` yet: folder_note wants a
 `getAbstractFileByPath` returning a TFolder tree; dataview_note wants a stub Dataview
 api; traverse_note wants `metadataCache.resolvedLinks`.
+
+### 4b — tests for folder/traverse/dataview/list builders
+Extended `helpers.ts`: `make_plugin` gained a 4th `app_extra` arg
+(`getAbstractFileByPath`, `resolvedLinks`, `cachedRead`, `dataview_pages`), and
+`mock_file` gained `listItems` / `links` cache options. Added 4 test files (+21 tests):
+- traverse_note (6): DFS over `resolvedLinks`, cycle protection, field errors.
+- folder_note (5): folder→sibling edges, recurse on/off, invalid field.
+- dataview_note (6): query→page edges, DataArray `{values}` normalization,
+  missing-plugin + invalid-query errors.
+- list_note (4): list-item child edges via `cachedRead` + link resolver, field errors.
+
+Note: `bun run build` type-checks `tests/` too (tsc), so test files must be type-clean;
+the project `lint` script only covers `src/`. Full suite: 242 green (was 221).
