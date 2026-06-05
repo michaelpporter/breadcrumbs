@@ -53,7 +53,7 @@
 		const matrix_snapshot = $state.snapshot(settings);
 		untrack(() => {
 			plugin.settings.views.side.matrix = matrix_snapshot;
-			void plugin.saveSettings();
+			plugin.saveSettingsDebounced();
 		});
 		if (is_initial_mount) {
 			is_initial_mount = false;
