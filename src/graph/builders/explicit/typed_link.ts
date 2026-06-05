@@ -94,7 +94,7 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 					const match = INLINE_FIELD_REGEX.exec(line_text);
 					if (!match) continue;
 
-					const field = match[1]!.trim();
+					const field = match[1].trim();
 					if (!field_labels.has(field)) continue;
 					if (fm_covered.has(`${field}\0${link_cache.link}`)) continue;
 

@@ -167,3 +167,11 @@ Outputs to /styles.css, for Obsidian to use.
 .BC-codeblock-markmap svg foreignObject div {
 	color: var(--text-normal);
 }
+
+.bc-date-note-setup-warning {
+	background: var(--background-modifier-error);
+	color: var(--text-error);
+	padding: 8px 12px;
+	border-radius: 4px;
+	margin-bottom: 12px;
+}

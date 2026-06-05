@@ -6,7 +6,7 @@ type FilePredicate = (file: TFile) => boolean;
 const VALID_EXTENSIONS = new Set(["md", "canvas", "base"]);
 
 function skip_ws(q: string, pos: { i: number }) {
-	while (pos.i < q.length && /\s/.test(q[pos.i]!)) pos.i++;
+	while (pos.i < q.length && /\s/.test(q[pos.i])) pos.i++;
 }
 
 function consume_keyword(
@@ -42,7 +42,7 @@ function parse_atom(
 	// #tag
 	if (q[pos.i] === "#") {
 		const start = pos.i;
-		while (pos.i < q.length && !/[\s)&|]/.test(q[pos.i]!)) pos.i++;
+		while (pos.i < q.length && !/[\s)&|]/.test(q[pos.i])) pos.i++;
 		const tag = q.slice(start, pos.i);
 		return (file) => {
 			const cache = app.metadataCache.getFileCache(file);
@@ -74,7 +74,7 @@ function parse_atom(
 		pos.i += 2;
 		const start = pos.i;
 		while (pos.i < q.length && q.slice(pos.i, pos.i + 2) !== "]]") pos.i++;
-		const link_text = q.slice(start, pos.i).split("|")[0]!.trim();
+		const link_text = q.slice(start, pos.i).split("|")[0].trim();
 		if (q.slice(pos.i, pos.i + 2) === "]]") pos.i += 2;
 		const target = app.metadataCache.getFirstLinkpathDest(
 			link_text,
@@ -89,7 +89,7 @@ function parse_atom(
 	}
 
 	// Unknown atom — skip to next whitespace/operator and return false
-	while (pos.i < q.length && !/[\s)]/.test(q[pos.i]!)) pos.i++;
+	while (pos.i < q.length && !/[\s)]/.test(q[pos.i])) pos.i++;
 	return () => false;
 }
 
