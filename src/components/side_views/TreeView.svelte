@@ -93,7 +93,7 @@
 		const tree_snapshot = $state.snapshot(settings);
 		untrack(() => {
 			plugin.settings.views.side.tree = tree_snapshot;
-			void plugin.saveSettings();
+			plugin.saveSettingsDebounced();
 		});
 	});
 

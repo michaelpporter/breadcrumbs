@@ -58,7 +58,7 @@
 		if (is_initial_mount) {
 			is_initial_mount = false;
 		} else {
-			untrack(() => void plugin.saveSettings());
+			plugin.saveSettingsDebounced();
 		}
 	});
 
