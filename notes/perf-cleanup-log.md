@@ -12,8 +12,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 | # | Item | Status | Commit | Notes |
 |---|------|--------|--------|-------|
 | 1a | Debounce view setting write-backs (TreeView/Matrix/TrailView → `saveSettingsDebounced`) | done | d892ace | build clean, 0 errors |
-| 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | done | _pending_ | build clean |
-| 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | todo | | |
+| 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | done | ab8a84f | build clean |
+| 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | _pending_ | build clean |
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | todo | | |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | todo | | |
 | 3 | Dedup `validate_edge_field` across 9 explicit builders | todo | | bigger diff, hot path |
@@ -39,3 +39,10 @@ No behavior change beyond coalescing rapid disk writes. Verify: `bun run build`.
 `basename → PeriodNote` Map per period kind once (alongside `period_notes`, keeping the
 first occurrence to match prior `.find()` semantics) and replaced both `.find()` calls
 with `.get()`. `period_notes` arrays kept for the sequential-next loop. Identical edges.
+
+### 1c — Debounce opt-in layout-change rebuild
+When `commands.rebuild_graph.trigger.layout_change` is enabled, the `layout-change`
+handler in `src/main.ts` called `void this.rebuildGraph()` directly — a full rebuild on
+every CM6 cursor move/scroll. Swapped to `this.rebuildGraphDebounced()` (existing 1500ms
+`_rebuild_debouncer`), matching the `else` branch. Default for the trigger is `false`,
+so only opt-in users were affected.
