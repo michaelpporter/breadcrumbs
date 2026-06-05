@@ -458,10 +458,12 @@ export default class BreadcrumbsPlugin extends Plugin {
 
 	private getMetdataPropertyType(field: string): string | null {
 		if ("getAssignedWidget" in this.app.metadataTypeManager) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-			return (this.app.metadataTypeManager as any).getAssignedWidget(
-				field,
-			) as string;
+			// `getAssignedWidget` exists on newer Obsidian but isn't in the typings
+			return (
+				this.app.metadataTypeManager as unknown as {
+					getAssignedWidget(field: string): string;
+				}
+			).getAssignedWidget(field);
 		} else {
 			return this.app.metadataTypeManager.getAssignedType(field);
 		}

@@ -14,8 +14,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 1a | Debounce view setting write-backs (TreeView/Matrix/TrailView → `saveSettingsDebounced`) | done | d892ace | build clean, 0 errors |
 | 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | done | ab8a84f | build clean |
 | 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | 70fb9f7 | build clean |
-| 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | _pending_ | build clean |
-| 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | todo | | |
+| 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | ea8364a | build clean |
+| 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | _pending_ | build + eslint clean |
 | 3 | Dedup `validate_edge_field` across 9 explicit builders | todo | | bigger diff, hot path |
 | 4 | Tests for untested builders (date_note, list_note, folder_note, dataview_note, traverse_note) | todo | | date_note test guards 1b |
 
@@ -54,3 +54,12 @@ so only opt-in users were affected.
   `TODO(RUST)` commented method stubs below it (tracked future work).
 - Removed commented-out `EdgeToAdd` type + its doc comment in `src/interfaces/graph.ts`.
 Zero refs confirmed by grep before deleting.
+
+### 2b — Tighten `any` casts
+- `src/external/dataview/index.ts`: replaced the two `(app as any).plugins...` accesses
+  with a single `PluginRegistry` interface and `app as unknown as PluginRegistry`. Also
+  switched bracket `["dataview"]` to dot notation (eslint). Dropped the two
+  `no-explicit-any` eslint-disable comments.
+- `src/main.ts` `getMetdataPropertyType`: replaced `(metadataTypeManager as any)` with a
+  cast to `{ getAssignedWidget(field: string): string }`, dropping the three
+  unsafe-call/any eslint-disable comments. Still guarded by the existing `in` check.
