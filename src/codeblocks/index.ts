@@ -116,7 +116,7 @@ function postprocess_options(
 				plugin.app,
 				source_path,
 			);
-		} catch (_) {
+		} catch {
 			errors.push({
 				path: "dataview-from",
 				code: "invalid_field_value",

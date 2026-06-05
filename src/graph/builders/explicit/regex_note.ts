@@ -42,7 +42,7 @@ function get_regex_note_info(
 		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		regex = new RegExp(regex_str, (flags || "") as string);
 		log.debug(`get_regex_note_info > regex:`, regex);
-	} catch (_) {
+	} catch {
 		return graph_build_fail({
 			path,
 			code: "invalid_field_value",

@@ -16,10 +16,11 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | 70fb9f7 | build clean |
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | ea8364a | build clean |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | 565fdce | build + eslint clean |
-| 2c | Remove dead `all_files.dataview` file-source field + branches | done | _pending_ | build + 242 tests green |
+| 2c | Remove dead `all_files.dataview` file-source field + branches | done | 05d5292 | build + 242 tests green |
 | 3 | Dedup `validate_edge_field` across 9 explicit builders | done | b9f438c | build + lint + 68 tests green |
 | 4 | Tests for date_note builder (guards 1b + week_start) | done | fd88a59 | 9 tests, full suite 221 green |
 | 4b | Tests for list_note, folder_note, dataview_note, traverse_note | done | 6af2c6b | +21 tests; suite 242 green |
+| 5 | Obsidian community scorecard lint fixes (pre-existing) | done | _pending_ | build + 242 tests green |
 
 ## Notes per item
 
@@ -121,3 +122,12 @@ Extended `helpers.ts`: `make_plugin` gained a 4th `app_extra` arg
 
 Note: `bun run build` type-checks `tests/` too (tsc), so test files must be type-clean;
 the project `lint` script only covers `src/`. Full suite: 242 green (was 221).
+
+### 5 — Obsidian community scorecard lint fixes
+Addressed the obsidianmd branch review (all pre-existing, not from this pass):
+- Unnecessary non-null assertions removed: `dataview_from.ts` (`q[pos.i]!` ×3, `split("|")[0]!`) and `typed_link.ts:97` (`match[1]!`).
+- Unused catch bindings `catch (_)` → optional `catch {`: `codeblocks/index.ts`, `regex_note.ts`.
+- Static inline styles → CSS class: `DateNoteSetupModal` warning div now styled via the existing `.bc-date-note-setup-warning` class in `src/styles.css` (dropped the `style.cssText` assignment).
+- Blanket `/* eslint-disable */` in `MDRC.ts` scoped to the single rule that fires (`@typescript-eslint/no-duplicate-type-constituents`).
+
+Skipped: `wasm/pkg/*.d.ts` (generated + git-ignored). Left out of scope: `obsidianmd/ui/sentence-case` warnings (its suggestions lowercase the ISO/US acronyms) and two pre-existing `import/order` + one `Array<T>` warning.

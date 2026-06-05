@@ -58,8 +58,6 @@ export class DateNoteSetupModal extends Modal {
 			warning.appendText(
 				"Date notes are already configured. This may overwrite your current settings.",
 			);
-			warning.style.cssText =
-				"background:var(--background-modifier-error);color:var(--text-error);padding:8px 12px;border-radius:4px;margin-bottom:12px;";
 		}
 
 		contentEl.createEl("h2", { text: "Set up Date Notes" });

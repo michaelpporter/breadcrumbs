@@ -10,12 +10,14 @@ import { Timer } from "src/utils/timer";
 import { mount, unmount } from "svelte";
 import { Codeblocks } from ".";
 
-/* eslint-disable */
+/* The three components currently share a mount return type, so the union reads
+   as duplicated; keep it explicit for when they diverge. */
+/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
 type SvelteComponent =
 	| ReturnType<typeof CodeblockTree>
 	| ReturnType<typeof CodeblockMermaid>
 	| ReturnType<typeof CodeblockMarkmap>;
-/* eslint-enable */
+/* eslint-enable @typescript-eslint/no-duplicate-type-constituents */
 
 export class CodeblockMDRC extends MarkdownRenderChild {
 	source: string;
