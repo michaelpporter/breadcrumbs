@@ -82,7 +82,6 @@ export function make_all_files(
 ): AllFiles {
 	return {
 		obsidian: files as unknown as AllFiles["obsidian"],
-		dataview: null,
 	};
 }
 

@@ -291,14 +291,6 @@ export const _add_explicit_edges_dendron_note: ExplicitEdgeBuilder = (
 		);
 	});
 
-	all_files.dataview?.forEach((page) => {
-		paths.push({
-			path: page.file.path,
-			metadata: page,
-		});
-		handle_dendron_note(plugin, results, page.file.path, page, edge_sig);
-	});
-
 	add_dendron_hub_parent_down_edges(plugin, results, edge_sig, paths);
 	add_dendron_sibling_edges(plugin, results, edge_sig, paths);
 

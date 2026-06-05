@@ -173,20 +173,6 @@ export const _add_explicit_edges_johnny_decimal_note: ExplicitEdgeBuilder = (
 		});
 	});
 
-	all_files.dataview?.forEach((page) => {
-		const basename = Paths.basename(page.file.path);
-
-		const decimals = basename.match(regex)?.[1];
-		if (!decimals) return;
-
-		johnny_decimal_notes.push({
-			basename,
-			metadata: page,
-			path: page.file.path,
-			decimals: ensure_not_ends_with(decimals, delimiter),
-		});
-	});
-
 	johnny_decimal_notes.forEach((note) => {
 		handle_johnny_decimal_note(plugin, results, note, johnny_decimal_notes);
 	});

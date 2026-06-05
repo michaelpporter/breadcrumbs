@@ -102,24 +102,7 @@ export const _add_explicit_edges_regex_note: ExplicitEdgeBuilder = (
 		regex_note_files.push({ info: info.data, path: file.path });
 	});
 
-	all_files.dataview?.forEach((page) => {
-		const { file } = page;
-		const info = get_regex_note_info(plugin, page, file.path);
-		if (!info.ok) {
-			if (info.error) results.errors.push(info.error);
-			return;
-		}
-
-		regex_note_files.push({ info: info.data, path: file.path });
-	});
-
-	// Return early before bringing all nodes into memory
-	if (!regex_note_files) return results;
-
-	const nodes =
-		all_files.obsidian?.map((note) => note.file.path) ??
-		all_files.dataview?.map((note) => note.file.path) ??
-		[]; // Won't happen, but makes TS happy
+	const nodes = all_files.obsidian.map((note) => note.file.path);
 
 	regex_note_files.forEach((regex_note) => {
 		nodes

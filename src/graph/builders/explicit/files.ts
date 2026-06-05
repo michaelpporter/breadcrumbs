@@ -1,6 +1,5 @@
 import type { App, CachedMetadata } from "obsidian";
 import { TFile } from "obsidian";
-import type { IDataview } from "src/external/dataview/interfaces";
 
 interface TFileWithCache {
 	file: TFile;
@@ -39,20 +38,14 @@ function collect_vault_files(app: App): TFile[] {
 /**
  * Files passed to graph rebuild.
  *
- * We always use Obsidian’s vault list plus `metadataCache` for each file.
- * Historically, when Dataview was enabled we used `dataview.api.pages().values`
- * instead; that list comes from Dataview’s index and API, which changed across
- * versions (0.4 → 0.5) and can omit markdown notes the graph still needs, so
- * views like the tree could miss edges. Dataview remains used elsewhere (e.g.
- * `dataview-from` in codeblocks) via `dataview_plugin.get_api()`.
- *
- * `dataview` is always `null` here; optional `all_files.dataview?.forEach` in
- * builders remains a no-op. The old dual-source shape is not used for rebuild.
+ * We use Obsidian’s vault list plus `metadataCache` for each file. (Historically a
+ * Dataview-page list was an alternative source, but it could omit markdown notes
+ * the graph needs — so the rebuild always uses the vault list now. Dataview is
+ * still used elsewhere, e.g. `dataview-from` in codeblocks, via
+ * `dataview_plugin.get_api()`.)
  */
 export interface AllFiles {
 	obsidian: TFileWithCache[];
-	/** Not populated during rebuild; optional Dataview page list for legacy branches. */
-	dataview: IDataview.Page[] | null;
 }
 
 export const get_all_files = (app: App): AllFiles => ({
@@ -60,5 +53,4 @@ export const get_all_files = (app: App): AllFiles => ({
 		file,
 		cache: app.metadataCache.getFileCache(file),
 	})),
-	dataview: null,
 });
