@@ -8,6 +8,7 @@ import type BreadcrumbsPlugin from "src/main";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { ensure_starts_with } from "src/utils/strings";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 const parse_frontmatter_tags = (
 	frontmatter: Record<string, unknown> | undefined,
@@ -49,25 +50,15 @@ const get_tag_note_info = (
 	}
 	const tag = ensure_starts_with(raw_tag, "#");
 
-	const field =
+	const field_res = validate_edge_field(
+		plugin,
 		metadata[META_ALIAS["tag-note-field"]] ??
-		plugin.settings.explicit_edge_sources.tag_note.default_field;
-
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `tag-note-field is not a string: '${field}'`,
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `tag-note-field is not a valid BC field: '${field}'`,
-		});
-	}
+			plugin.settings.explicit_edge_sources.tag_note.default_field,
+		path,
+		"tag-note-field",
+	);
+	if (!field_res.ok) return field_res;
+	const field = field_res.data;
 
 	const exact = Boolean(metadata[META_ALIAS["tag-note-exact"]]);
 
@@ -77,24 +68,14 @@ const get_tag_note_info = (
 
 	let sibling_field: string | undefined;
 	if (raw_sibling_field) {
-		if (typeof raw_sibling_field !== "string") {
-			return graph_build_fail({
-				path,
-				code: "invalid_field_value",
-				message: `tag-note-sibling-field is not a string: '${raw_sibling_field}'`,
-			});
-		} else if (
-			!plugin.settings.edge_fields.find(
-				(f) => f.label === raw_sibling_field,
-			)
-		) {
-			return graph_build_fail({
-				path,
-				code: "invalid_edge_field",
-				message: `tag-note-sibling-field is not a valid BC field: '${raw_sibling_field}'`,
-			});
-		}
-		sibling_field = raw_sibling_field;
+		const sibling_res = validate_edge_field(
+			plugin,
+			raw_sibling_field,
+			path,
+			"tag-note-sibling-field",
+		);
+		if (!sibling_res.ok) return sibling_res;
+		sibling_field = sibling_res.data;
 	}
 
 	return succ({ tag, field, exact, sibling_field });

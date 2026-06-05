@@ -8,6 +8,7 @@ import type BreadcrumbsPlugin from "src/main";
 import { resolve_relative_target_path } from "src/utils/obsidian";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 interface NativeListItem {
 	position: { start: { line: number; col: number } };
@@ -72,45 +73,27 @@ const get_list_note_info = (
 		return fail(undefined);
 	}
 
-	const field = metadata[META_ALIAS["list-note-field"]];
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `list-note-field is not a string: '${field}'`,
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `list-note-field is not a valid BC field: '${field}'`,
-		});
-	}
+	const field_res = validate_edge_field(
+		plugin,
+		metadata[META_ALIAS["list-note-field"]],
+		path,
+		"list-note-field",
+	);
+	if (!field_res.ok) return field_res;
+	const field = field_res.data;
 
 	const neighbour_field =
 		metadata[META_ALIAS["list-note-neighbour-field"]] ??
 		plugin.settings.explicit_edge_sources.list_note.default_neighbour_field;
 
 	if (neighbour_field) {
-		if (typeof neighbour_field !== "string") {
-			return graph_build_fail({
-				path,
-				code: "invalid_field_value",
-				message: `list-note-neighbour-field is not a string: '${neighbour_field}'`,
-			});
-		} else if (
-			!plugin.settings.edge_fields.find(
-				(f) => f.label === neighbour_field,
-			)
-		) {
-			return graph_build_fail({
-				path,
-				code: "invalid_edge_field",
-				message: `list-note-neighbour-field is not a valid BC field: '${neighbour_field}'`,
-			});
-		}
+		const neighbour_res = validate_edge_field(
+			plugin,
+			neighbour_field,
+			path,
+			"list-note-neighbour-field",
+		);
+		if (!neighbour_res.ok) return neighbour_res;
 	}
 
 	// list-note-exclude-index ignores out-edges, but _only for list-notes_

@@ -8,8 +8,9 @@ import type {
 import type BreadcrumbsPlugin from "src/main";
 import { implied_pair_close_field } from "src/utils/implied_pair_close_field";
 import { Paths } from "src/utils/paths";
-import { fail, graph_build_fail, succ } from "src/utils/result";
+import { succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 function dendron_edge_key(
 	source: string,
@@ -32,29 +33,17 @@ function get_dendron_note_info(
 	// NOTE: Don't return early here. Dendron notes can be valid without any metadata in them
 	//   We just have to iterate and check each note
 	// if (!metadata) return fail(undefined);
-	const field =
+	const field_res = validate_edge_field(
+		plugin,
 		metadata?.[META_ALIAS["dendron-note-field"]] ??
-		//   Which is why we have a default_field on dendron_note
-		plugin.settings.explicit_edge_sources.dendron_note.default_field;
+			//   Which is why we have a default_field on dendron_note
+			plugin.settings.explicit_edge_sources.dendron_note.default_field,
+		path,
+		"dendron-note-field",
+	);
+	if (!field_res.ok) return field_res;
 
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		// eslint-disable @typescript-eslint/no-base-to-string
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `dendron-note-field is not a string: '${field}'`,
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `dendron-note-field is not a valid field: '${field}'`,
-		});
-	}
-
-	return succ({ field });
+	return succ({ field: field_res.data });
 }
 
 /** Take in the info of a _potential_ dendron note.
