@@ -100,9 +100,18 @@ function add_period_edges(
 	if (results.errors.length > 0) return;
 
 	const period_notes: Partial<Record<PeriodKind, PeriodNote[]>> = {};
+	// basename → first matching note, for O(1) target lookups below
+	const period_index: Partial<Record<PeriodKind, Map<string, PeriodNote>>> =
+		{};
 	for (const kind of PERIOD_KINDS) {
 		if (!cfg[kind].enabled) continue;
-		period_notes[kind] = collect_period_notes(cfg[kind], all_files);
+		const notes = collect_period_notes(cfg[kind], all_files);
+		period_notes[kind] = notes;
+		const index = new Map<string, PeriodNote>();
+		for (const note of notes) {
+			if (!index.has(note.basename)) index.set(note.basename, note);
+		}
+		period_index[kind] = index;
 	}
 
 	// Sequential next edges between period notes of the same kind
@@ -156,17 +165,15 @@ function add_period_edges(
 
 		for (const daily of daily_notes) {
 			for (const kind of PERIOD_KINDS) {
-				const notes = period_notes[kind];
-				if (!notes) continue;
+				const index = period_index[kind];
+				if (!index) continue;
 				const period_cfg = cfg[kind];
 				const lookup_date =
 					kind === "week" ? week_date(daily.date) : daily.date;
 				const target_basename = lookup_date.toFormat(
 					period_cfg.date_format,
 				);
-				const target = notes.find(
-					(n) => n.basename === target_basename,
-				);
+				const target = index.get(target_basename);
 				if (target) {
 					results.edges.push(
 						new GCEdgeData(
@@ -188,17 +195,15 @@ function add_period_edges(
 		const finer_cfg = cfg[finer];
 
 		for (const coarser of CONTAINMENT[finer]) {
-			const coarser_notes = period_notes[coarser];
-			if (!coarser_notes) continue;
+			const coarser_index = period_index[coarser];
+			if (!coarser_index) continue;
 			const coarser_cfg = cfg[coarser];
 
 			for (const note of finer_notes) {
 				const target_basename = note.date.toFormat(
 					coarser_cfg.date_format,
 				);
-				const target = coarser_notes.find(
-					(n) => n.basename === target_basename,
-				);
+				const target = coarser_index.get(target_basename);
 				if (target) {
 					results.edges.push(
 						new GCEdgeData(
