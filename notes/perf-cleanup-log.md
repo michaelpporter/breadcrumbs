@@ -16,8 +16,9 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | 70fb9f7 | build clean |
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | ea8364a | build clean |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | 565fdce | build + eslint clean |
-| 3 | Dedup `validate_edge_field` across 9 explicit builders | done | _pending_ | build + lint + 68 tests green |
-| 4 | Tests for untested builders (date_note, list_note, folder_note, dataview_note, traverse_note) | todo | | date_note test guards 1b |
+| 3 | Dedup `validate_edge_field` across 9 explicit builders | done | b9f438c | build + lint + 68 tests green |
+| 4 | Tests for date_note builder (guards 1b + week_start) | done | _pending_ | 9 tests, full suite 221 green |
+| 4b | Tests for list_note, folder_note, dataview_note, traverse_note | todo | | need TFolder/dataview/resolvedLinks mocks |
 
 ## Notes per item
 
@@ -79,3 +80,16 @@ Behavior notes:
   string at that point, so default was never reached). Identical behavior.
 
 Verify: `bun run build`, `bunx eslint`, `bun run test tests/graph/builders/` (68 green).
+
+### 4 — date_note builder tests
+New `tests/graph/builders/date_note.test.ts` (9 tests). Covers `add_period_edges` (the
+1b refactor): period sequential-next edges, finer→coarser `up` via the basename Map
+(week→month, month→quarter), absent-target skip, and the daily→period path with the
+**week_start** edge case — Sunday 2024-01-07 maps to 2024-W01 under `monday` vs 2024-W02
+under `sunday`. Plus the invalid-`default_field` error and `edge_source` tag. Helper
+deep-clones `DEFAULT_SETTINGS.explicit_edge_sources.date_note` so every period kind is
+present, then applies per-kind overrides. Full suite: 221 green (was 212).
+
+Remaining builders (4b) need extra mocks not in `helpers.ts` yet: folder_note wants a
+`getAbstractFileByPath` returning a TFolder tree; dataview_note wants a stub Dataview
+api; traverse_note wants `metadataCache.resolvedLinks`.
