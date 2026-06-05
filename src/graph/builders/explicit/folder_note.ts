@@ -112,27 +112,6 @@ export const _add_explicit_edges_folder_note: ExplicitEdgeBuilder = async (
 		},
 	);
 
-	all_files.dataview?.forEach((folder_note_page) => {
-		const folder_note_info = get_folder_note_info(
-			plugin,
-			folder_note_page,
-			folder_note_page.file.path,
-		);
-		if (!folder_note_info.ok) {
-			if (folder_note_info.error)
-				results.errors.push(folder_note_info.error);
-			return;
-		}
-
-		folder_notes.push({
-			data: folder_note_info.data,
-			file: {
-				path: folder_note_page.file.path,
-				folder: folder_note_page.file.folder,
-			},
-		});
-	});
-
 	folder_notes.forEach(({ data, file: folder_note }) =>
 		iterate_folder_files(
 			plugin,

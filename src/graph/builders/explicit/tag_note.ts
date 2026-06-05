@@ -157,36 +157,6 @@ export const _add_explicit_edges_tag_note: ExplicitEdgeBuilder = (
 		},
 	);
 
-	all_files.dataview?.forEach((page) => {
-		const tag_note_file = page.file;
-
-		// NOTE: We make sure to use etags, not tags (which are unwound)
-		tag_note_file.etags.values.forEach((tag) => {
-			if (!tag_paths_map.get(tag)?.push(tag_note_file.path)) {
-				tag_paths_map.set(tag, [tag_note_file.path]);
-			}
-		});
-
-		const tag_note_info = get_tag_note_info(
-			plugin,
-			page,
-			tag_note_file.path,
-		);
-		if (!tag_note_info.ok) {
-			if (tag_note_info.error) results.errors.push(tag_note_info.error);
-			return;
-		}
-		const { tag, field, exact, sibling_field } = tag_note_info.data;
-
-		tag_notes.push({
-			tag,
-			exact,
-			field,
-			source_path: tag_note_file.path,
-			sibling_field,
-		});
-	});
-
 	const all_tags = [...tag_paths_map.keys()];
 
 	tag_notes.forEach((tag_note) => {

@@ -16,9 +16,10 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | 70fb9f7 | build clean |
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | ea8364a | build clean |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | 565fdce | build + eslint clean |
+| 2c | Remove dead `all_files.dataview` file-source field + branches | done | _pending_ | build + 242 tests green |
 | 3 | Dedup `validate_edge_field` across 9 explicit builders | done | b9f438c | build + lint + 68 tests green |
 | 4 | Tests for date_note builder (guards 1b + week_start) | done | fd88a59 | 9 tests, full suite 221 green |
-| 4b | Tests for list_note, folder_note, dataview_note, traverse_note | done | _pending_ | +21 tests; suite 242 green |
+| 4b | Tests for list_note, folder_note, dataview_note, traverse_note | done | 6af2c6b | +21 tests; suite 242 green |
 
 ## Notes per item
 
@@ -64,6 +65,20 @@ Zero refs confirmed by grep before deleting.
 - `src/main.ts` `getMetdataPropertyType`: replaced `(metadataTypeManager as any)` with a
   cast to `{ getAssignedWidget(field: string): string }`, dropping the three
   unsafe-call/any eslint-disable comments. Still guarded by the existing `in` check.
+
+### 2c — Remove dead all_files.dataview file-source
+`get_all_files` has hardcoded `dataview: null` since the Dataview-page file source was
+retired, so every `all_files.dataview?.forEach/map` branch in the builders was dead.
+Removed the `dataview` field from the `AllFiles` interface + `get_all_files` (`files.ts`)
+and the matching `null` in the test `make_all_files`, then deleted the 10 dead branches
+across 6 builders (date_note ×3, regex_note ×2, tag_note, dendron_note,
+johnny_decimal_note, folder_note). regex_note's `nodes` fallback simplified to
+`all_files.obsidian.map(...)`. Dropped the now-unused `IDataview` import in `files.ts`.
+
+**Not touched:** the `dataview-from` codeblock feature (separate system in
+`src/codeblocks/dataview_from.ts` + schema) and the live Dataview API used by
+`dataview_note` (which keeps its own `IDataview` import). Purely internal; no vault-
+visible behavior changes. 242 tests still green.
 
 ### 3 — Dedup validate_edge_field
 New helper `src/graph/builders/explicit/validate_field.ts` exports `validate_edge_field`

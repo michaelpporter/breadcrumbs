@@ -47,19 +47,6 @@ function collect_period_notes(
 		});
 	});
 
-	all_files.dataview?.forEach(({ file }) => {
-		if (cfg.folder && file.folder !== cfg.folder) return;
-		const date = DateTime.fromFormat(file.name, cfg.date_format);
-		if (!date.isValid) return;
-		notes.push({
-			date,
-			path: file.path,
-			basename: file.name,
-			ext: file.ext,
-			folder: file.folder,
-		});
-	});
-
 	const seen = new Set<string>();
 	return notes
 		.filter((n) => {
@@ -143,17 +130,6 @@ function add_period_edges(
 				basename: file.basename,
 				ext: file.extension,
 				folder: file.parent?.path ?? "",
-			});
-		});
-		all_files.dataview?.forEach(({ file }) => {
-			const date = DateTime.fromFormat(file.name, cfg.date_format);
-			if (!date.isValid) return;
-			daily_notes.push({
-				date,
-				path: file.path,
-				basename: file.name,
-				ext: file.ext,
-				folder: file.folder,
 			});
 		});
 
@@ -277,22 +253,6 @@ export const _add_explicit_edges_date_note: ExplicitEdgeBuilder = (
 			ext: file.extension,
 			basename: file.basename,
 			folder: file.parent?.path ?? "",
-		});
-	});
-
-	all_files.dataview?.forEach(({ file }) => {
-		const date = DateTime.fromFormat(
-			file.name,
-			date_note_settings.date_format,
-		);
-		if (!date.isValid) return;
-
-		date_notes.push({
-			date,
-			ext: file.ext,
-			path: file.path,
-			folder: file.folder,
-			basename: file.name,
 		});
 	});
 
