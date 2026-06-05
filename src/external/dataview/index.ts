@@ -8,16 +8,21 @@ interface DataviewApi {
 	pages: (query?: string, path?: string) => unknown;
 }
 
+/** Shape of Obsidian's (untyped) community-plugin registry on `app`. */
+interface PluginRegistry {
+	plugins?: {
+		plugins?: Record<string, { api?: DataviewApi } | undefined>;
+	};
+}
+
 function get_api(app: App): DataviewApi | undefined {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return (app as any).plugins?.plugins?.["dataview"]?.api as
-		| DataviewApi
-		| undefined;
+	return (app as unknown as PluginRegistry).plugins?.plugins?.dataview?.api;
 }
 
 function is_enabled(app: App): boolean {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return Boolean((app as any).plugins?.plugins?.["dataview"]);
+	return Boolean(
+		(app as unknown as PluginRegistry).plugins?.plugins?.dataview,
+	);
 }
 
 /** `FullIndex.initialized` is set when the vault walk finishes (0.5.x). */
