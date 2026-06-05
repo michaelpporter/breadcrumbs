@@ -3,7 +3,6 @@ import {
 	build_list_index,
 	LIST_INDEX_DEFAULT_OPTIONS,
 } from "src/commands/list_index";
-// import { Traverse } from "src/graph/traverse";
 import { active_file_store } from "src/stores/active_file";
 import { get } from "svelte/store";
 import type { EdgeList } from "wasm/pkg/breadcrumbs_graph_wasm";
