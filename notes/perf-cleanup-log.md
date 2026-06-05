@@ -11,8 +11,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 
 | # | Item | Status | Commit | Notes |
 |---|------|--------|--------|-------|
-| 1a | Debounce view setting write-backs (TreeView/Matrix/TrailView → `saveSettingsDebounced`) | done | 53a1f89 | build clean, 0 errors |
-| 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | todo | | |
+| 1a | Debounce view setting write-backs (TreeView/Matrix/TrailView → `saveSettingsDebounced`) | done | d892ace | build clean, 0 errors |
+| 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | done | _pending_ | build clean |
 | 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | todo | | |
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | todo | | |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | todo | | |
@@ -31,3 +31,11 @@ debouncer, `main.ts:51`) in the writeback `$effect` of:
   wrapper — the debouncer reads nothing reactive)
 
 No behavior change beyond coalescing rapid disk writes. Verify: `bun run build`.
+
+### 1b — Index date_note period lookups
+`add_period_edges` in `src/graph/builders/explicit/date_note.ts` did
+`notes.find(n => n.basename === target_basename)` inside two nested loops
+(daily→period and finer→coarser), i.e. O(n·m) string scans per rebuild. Built a
+`basename → PeriodNote` Map per period kind once (alongside `period_notes`, keeping the
+first occurrence to match prior `.find()` semantics) and replaced both `.find()` calls
+with `.get()`. `period_notes` arrays kept for the sequential-next loop. Identical edges.
