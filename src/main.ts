@@ -215,7 +215,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 						this.settings.commands.rebuild_graph.trigger
 							.layout_change
 					) {
-						void this.rebuildGraph();
+						this.rebuildGraphDebounced();
 					} else {
 						this._redraw_page_views_debouncer();
 					}
