@@ -1,18 +1,27 @@
 import { DEFAULT_SETTINGS } from "src/const/settings";
 import { _add_explicit_edges_date_note } from "src/graph/builders/explicit/date_note";
-import type { BreadcrumbsSettings } from "src/interfaces/settings";
+import type {
+	BreadcrumbsSettings,
+	PeriodNoteConfig,
+} from "src/interfaces/settings";
 import { describe, test } from "vitest";
 import { make_all_files, make_plugin, mock_file } from "./helpers";
 
 type DateNoteSettings =
 	BreadcrumbsSettings["explicit_edge_sources"]["date_note"];
 
+type PeriodKind = "week" | "month" | "quarter" | "year";
+
+type DateNoteOverrides = Partial<
+	Omit<DateNoteSettings, PeriodKind>
+> & Partial<Record<PeriodKind, Partial<PeriodNoteConfig>>>;
+
 /**
  * Build a plugin stub with a fully-populated date_note config. We deep-clone the
  * default so every period kind is present, then apply `overrides` on top.
  */
 function date_note_plugin(
-	overrides: Partial<DateNoteSettings> = {},
+	overrides: DateNoteOverrides = {},
 	known_paths: string[] = [],
 ) {
 	const date_note = structuredClone(
