@@ -29,13 +29,6 @@ export interface BreadcrumbsError {
 	path: string;
 }
 
-/** The values passed into safe_add_edge */
-// export type EdgeToAdd = {
-// 	source_id: string;
-// 	target_id: string;
-// 	attr: BCEdgeAttributes;
-// };
-
 /**
  * What an explicit edge builder must return.
  *

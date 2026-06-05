@@ -13,8 +13,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 |---|------|--------|--------|-------|
 | 1a | Debounce view setting write-backs (TreeView/Matrix/TrailView → `saveSettingsDebounced`) | done | d892ace | build clean, 0 errors |
 | 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | done | ab8a84f | build clean |
-| 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | _pending_ | build clean |
-| 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | todo | | |
+| 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | 70fb9f7 | build clean |
+| 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | _pending_ | build clean |
 | 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | todo | | |
 | 3 | Dedup `validate_edge_field` across 9 explicit builders | todo | | bigger diff, hot path |
 | 4 | Tests for untested builders (date_note, list_note, folder_note, dataview_note, traverse_note) | todo | | date_note test guards 1b |
@@ -46,3 +46,11 @@ handler in `src/main.ts` called `void this.rebuildGraph()` directly — a full r
 every CM6 cursor move/scroll. Swapped to `this.rebuildGraphDebounced()` (existing 1500ms
 `_rebuild_debouncer`), matching the `else` branch. Default for the trigger is `false`,
 so only opt-in users were affected.
+
+### 2a — Remove dead code
+- Deleted `src/utils/markmap.ts` (only `export const Markmap = {}`, never imported — the
+  `Markmap` used in CodeblockMarkmap.svelte comes from the `markmap-view` package).
+- Removed commented-out `// import { Traverse }` in `src/api/index.ts`. Left the
+  `TODO(RUST)` commented method stubs below it (tracked future work).
+- Removed commented-out `EdgeToAdd` type + its doc comment in `src/interfaces/graph.ts`.
+Zero refs confirmed by grep before deleting.
