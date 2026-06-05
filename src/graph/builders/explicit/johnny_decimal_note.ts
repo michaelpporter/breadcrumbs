@@ -7,9 +7,10 @@ import type {
 import type BreadcrumbsPlugin from "src/main";
 import { implied_pair_close_field } from "src/utils/implied_pair_close_field";
 import { Paths } from "src/utils/paths";
-import { fail, graph_build_fail, succ } from "src/utils/result";
+import { succ } from "src/utils/result";
 import { ensure_not_ends_with } from "src/utils/strings";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 const get_johnny_decimal_note_info = (
 	plugin: BreadcrumbsPlugin,
@@ -20,28 +21,18 @@ const get_johnny_decimal_note_info = (
 	//   We just have to iterate and check each note
 	// if (!metadata) return fail(undefined);
 
-	const field =
+	const field_res = validate_edge_field(
+		plugin,
 		metadata?.[META_ALIAS["johnny-decimal-note-field"]] ??
-		//   Which is why we have a default_field on johnny_decimal_note
-		plugin.settings.explicit_edge_sources.johnny_decimal_note.default_field;
+			//   Which is why we have a default_field on johnny_decimal_note
+			plugin.settings.explicit_edge_sources.johnny_decimal_note
+				.default_field,
+		path,
+		"johnny-decimal-note-field",
+	);
+	if (!field_res.ok) return field_res;
 
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `johnny-decimal-note-field is not a string: '${field}'`,
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `johnny-decimal-note-field is not a valid BC field: '${field}'`,
-		});
-	}
-
-	return succ({ field });
+	return succ({ field: field_res.data });
 };
 
 /** Take in the info of a johnny_decimal note.

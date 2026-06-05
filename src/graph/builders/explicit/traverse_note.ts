@@ -3,8 +3,9 @@ import type {
 	EdgeBuilderResults,
 	ExplicitEdgeBuilder,
 } from "src/interfaces/graph";
-import { fail, graph_build_fail, succ } from "src/utils/result";
+import { fail, succ } from "src/utils/result";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 /**
  * Walk the Obsidian vault link graph from a starting note using iterative DFS.
@@ -42,30 +43,15 @@ const get_traverse_note_field = (
 ) => {
 	if (!metadata) return fail(undefined);
 
-	const raw = metadata[META_ALIAS["traverse-note-field"]];
-	if (!raw) return fail(undefined);
+	const field_res = validate_edge_field(
+		plugin,
+		metadata[META_ALIAS["traverse-note-field"]],
+		path,
+		"traverse-note-field",
+	);
+	if (!field_res.ok) return field_res;
 
-	if (typeof raw !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `traverse-note-field is not a string: '${raw}'`,
-		});
-	}
-
-	const field =
-		raw ||
-		plugin.settings.explicit_edge_sources.traverse_note.default_field;
-
-	if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `traverse-note-field is not a valid BC field: '${field}'`,
-		});
-	}
-
-	return succ(field);
+	return succ(field_res.data);
 };
 
 /**

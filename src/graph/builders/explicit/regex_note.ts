@@ -7,6 +7,7 @@ import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 function get_regex_note_info(
 	plugin: BreadcrumbsPlugin,
@@ -49,28 +50,17 @@ function get_regex_note_info(
 		});
 	}
 
-	const field =
+	const field_res = validate_edge_field(
+		plugin,
 		metadata[META_ALIAS["regex-note-field"]] ??
-		plugin.settings.explicit_edge_sources.regex_note.default_field;
-
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `${META_ALIAS["regex-note-field"]} is not a string: '${field}'`,
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `${META_ALIAS["regex-note-field"]} is not a valid field: '${field}'`,
-		});
-	}
+			plugin.settings.explicit_edge_sources.regex_note.default_field,
+		path,
+		META_ALIAS["regex-note-field"],
+	);
+	if (!field_res.ok) return field_res;
 
 	return succ({
-		field,
+		field: field_res.data,
 		regex,
 	});
 }

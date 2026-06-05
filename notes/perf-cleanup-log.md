@@ -15,8 +15,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 1b | Index date_note period lookups (Map instead of `.find()`, O(n·m)→O(n)) | done | ab8a84f | build clean |
 | 1c | Debounce opt-in layout-change rebuild (`main.ts:218` → `rebuildGraphDebounced`) | done | 70fb9f7 | build clean |
 | 2a | Remove dead code (`utils/markmap.ts`, commented Traverse import, EdgeToAdd type) | done | ea8364a | build clean |
-| 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | _pending_ | build + eslint clean |
-| 3 | Dedup `validate_edge_field` across 9 explicit builders | todo | | bigger diff, hot path |
+| 2b | Tighten `any` casts (dataview plugin access, metadataTypeManager) | done | 565fdce | build + eslint clean |
+| 3 | Dedup `validate_edge_field` across 9 explicit builders | done | _pending_ | build + lint + 68 tests green |
 | 4 | Tests for untested builders (date_note, list_note, folder_note, dataview_note, traverse_note) | todo | | date_note test guards 1b |
 
 ## Notes per item
@@ -63,3 +63,19 @@ Zero refs confirmed by grep before deleting.
 - `src/main.ts` `getMetdataPropertyType`: replaced `(metadataTypeManager as any)` with a
   cast to `{ getAssignedWidget(field: string): string }`, dropping the three
   unsafe-call/any eslint-disable comments. Still guarded by the existing `in` check.
+
+### 3 — Dedup validate_edge_field
+New helper `src/graph/builders/explicit/validate_field.ts` exports `validate_edge_field`
+(falsy→`fail(undefined)`, non-string→`invalid_field_value`, not-registered→
+`invalid_edge_field`, else `succ(string)`). Replaced the copy-pasted 3-branch blocks in
+9 sites across 7 builders: folder, dendron, johnny_decimal, tag (field + sibling),
+list (field + neighbour), regex (field), traverse. Removed now-unused `fail`/
+`graph_build_fail` imports where the block was their only use.
+
+Behavior notes:
+- Error **message** wording was unified to `<field> is not a valid field` (was a mix of
+  "valid field" / "valid BC field"). Codes unchanged; tests assert only on `.code`.
+- traverse_note: dropped a dead `raw || default_field` fallback (raw is already a truthy
+  string at that point, so default was never reached). Identical behavior.
+
+Verify: `bun run build`, `bunx eslint`, `bun run test tests/graph/builders/` (68 green).

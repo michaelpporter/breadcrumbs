@@ -8,8 +8,9 @@ import type {
 } from "src/interfaces/graph";
 import type { Result } from "src/interfaces/result";
 import type BreadcrumbsPlugin from "src/main";
-import { fail, graph_build_fail, succ } from "src/utils/result";
+import { fail, succ } from "src/utils/result";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { validate_edge_field } from "./validate_field";
 
 interface FolderNoteData {
 	field: string;
@@ -23,27 +24,18 @@ const get_folder_note_info = (
 ): Result<FolderNoteData, BreadcrumbsError | undefined> => {
 	if (!metadata) return fail(undefined);
 
-	const field = metadata[META_ALIAS["folder-note-field"]];
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: `folder-note-field is not a string: '${field}'`,
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `folder-note-field is not a valid field: '${field}'`,
-		});
-	}
+	const field_res = validate_edge_field(
+		plugin,
+		metadata[META_ALIAS["folder-note-field"]],
+		path,
+		"folder-note-field",
+	);
+	if (!field_res.ok) return field_res;
 
 	const recurse = Boolean(metadata[META_ALIAS["folder-note-recurse"]]);
 
 	return succ({
-		field,
+		field: field_res.data,
 		recurse,
 	});
 };
