@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-function-type, @typescript-eslint/no-misused-new */
 export function create_graph(): NoteGraph;
 export function create_edge_sorter(field: string, reverse: boolean): EdgeSorter;
 export function sort_traversal_data(graph: NoteGraph, traversal_data: TraversalData[], sorter: EdgeSorter): TraversalData[];

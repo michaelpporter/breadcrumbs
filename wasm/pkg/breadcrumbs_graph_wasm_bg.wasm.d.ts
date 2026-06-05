@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-function-type, @typescript-eslint/no-misused-new */
 export const memory: WebAssembly.Memory;
 export const create_graph: () => number;
 export const __wbg_get_path_edges: (a: number) => [number, number];

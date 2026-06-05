@@ -142,3 +142,13 @@ are tracked (committed so builds don't require a Rust toolchain) and regenerated
 `postwasm:build`/`dev`/`profile`, which previously duplicated the `.gitignore` printf)
 strips the `eslint-disable` line via `perl -i`. Applied to the committed files too. The
 `/* tslint:disable */` line is left (tslint is dead; not flagged).
+
+### 5c — scope the generated .d.ts eslint-disable (revise 5b)
+Stripping the disable (5b) exposed the generated bindings to the scorecard's full
+ruleset, which then flagged `no-explicit-any`, `no-unsafe-function-type`, and
+`no-misused-new` on the wasm-bindgen output. Reverted that approach: instead of removing
+the suppression, scope it. Moved the post-wasm logic into `scripts/wasm-postbuild.mjs`
+(`wasm:postbuild` now runs it), which writes `wasm/pkg/.gitignore` and rewrites the
+generated `.d.ts` header to a disable scoped to exactly those three rules — satisfying
+the "specify rule names" meta-rule while keeping generated code unlinted. Idempotent;
+handles wasm-pack's fresh blanket `/* eslint-disable */` and re-runs alike.
