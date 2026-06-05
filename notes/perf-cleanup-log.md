@@ -21,7 +21,8 @@ Full plan rationale lives in the approved plan file (Claude plan
 | 4 | Tests for date_note builder (guards 1b + week_start) | done | fd88a59 | 9 tests, full suite 221 green |
 | 4b | Tests for list_note, folder_note, dataview_note, traverse_note | done | 6af2c6b | +21 tests; suite 242 green |
 | 5 | Obsidian community scorecard lint fixes (pre-existing) | done | 2ec09d2 | build + 242 tests green |
-| 5b | Strip wasm-bindgen `eslint-disable` from generated `wasm/pkg/*.d.ts` | done | 7e6b043 | build clean |
+| 5b | Strip wasm-bindgen `eslint-disable` from generated `wasm/pkg/*.d.ts` | superseded by 5c | 7e6b043 | over-stripped — exposed full ruleset |
+| 5c | Scope generated `.d.ts` eslint-disable via `scripts/wasm-postbuild.mjs` | done | fd554e1 | build clean |
 
 ## Notes per item
 
