@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.14.2](https://github.com/michaelpporter/breadcrumbs/compare/4.14.1...4.14.2) (2026-06-05)
+
+Internal maintenance release — no user-facing behavior changes.
+
+### Performance
+
+* Debounce side/page view setting writes (Tree View, Matrix, Trail View) so rapid control changes coalesce into a single save instead of hitting disk on every change.
+* Index date-note period lookups with a basename map, replacing nested linear scans (O(n·m) → O(n)) during graph rebuilds.
+* Debounce the opt-in "rebuild graph on layout change" trigger so it no longer rebuilds on every editor cursor move or scroll.
+
+### Refactors
+
+* Extract a shared `validate_edge_field` helper used across all explicit edge builders.
+* Replace untyped `any` casts on Obsidian/Dataview internals with typed shapes.
+* Remove dead code, including the unused Dataview file-source path. No effect on the `dataview-from` codeblock feature.
+
+### Tests
+
+* Add unit tests for the date, list, folder, dataview, and traverse note builders.
+
+### Chores
+
+* Address Obsidian community plugin scorecard lint findings, including scoping the lint-suppression header in the generated WASM type declarations.
+* Update funding links (GitHub Sponsors, Buy Me a Coffee).
+
 ### [4.14.1](https://github.com/michaelpporter/breadcrumbs/compare/4.14.0...4.14.1) (2026-06-03)
 
 ### Bug Fixes
