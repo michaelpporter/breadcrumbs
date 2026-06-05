@@ -5,11 +5,11 @@
 	"minAppVersion": "1.12.3",
 	"description": "Add structured hierarchies to your notes.",
 	"author": "MichaelPPorter",
-	"authorUrl": "https://github.com/michaelpporter/breadcrumbs",
+	"authorUrl": "https://github.com/michaelpporter",
 	"fundingUrl": {
 		"GitHub Sponsors": "https://github.com/sponsors/michaelpporter",
 		"Buy Me a Coffee": "https://www.buymeacoffee.com/michaelpporter"
 	},
-	"helpUrl": "https://publish.obsidian.md/breadcrumbs-docs",
+	"helpUrl": "https://breadcrumbs-docs.michaelpporter.com",
 	"isDesktopOnly": false
 }
