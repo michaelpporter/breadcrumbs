@@ -1,5 +1,4 @@
 /* tslint:disable */
-/* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const create_graph: () => number;
 export const __wbg_get_path_edges: (a: number) => [number, number];
