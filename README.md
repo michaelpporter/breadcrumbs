@@ -1,12 +1,10 @@
 Breadcrumbs is an Obsidian plugin that lets you add _typed links_ to your notes, then view/traverse them in various ways. Internally, Breadcrumbs uses a graph to represent this structure (much like the regular Obsidian graph, except now, links have _types_ to them). You tell Breadcrumbs about the structure of your notes, then it lets you visualise and navigate the graph.
 
-## New Maintainer
-
-As of May 2026, Breadcrumbs is maintained by [michaelpporter](https://github.com/michaelpporter). The plugin was originally created by [SkepticMystic](https://github.com/SkepticMystic), whose foundational work made this all possible. Development continues at [github.com/michaelpporter/breadcrumbs](https://github.com/michaelpporter/breadcrumbs).
-
 ## Obsidian 1.13
 
-Breadcrumbs 4.13.0 is fully compatible with Obsidian 1.13. The settings tab uses the new declarative settings API — all sections appear in global settings search and support page-based navigation. The existing display() fallback remains for older Obsidian versions (minAppVersion stays 1.12.3).
+As of 4.15.0, Breadcrumbs requires Obsidian 1.13 or later (`minAppVersion` 1.13.0). The settings tab uses the new declarative settings API, so every section appears in global settings search and supports page-based navigation. The legacy imperative `display()` fallback has been removed.
+
+Still on Obsidian 1.12? Use Breadcrumbs 4.14.2 — the last release supporting 1.12. Fixes for the 1.12 line are maintained on the [`1.12-compat`](https://github.com/michaelpporter/breadcrumbs/tree/1.12-compat) branch.
 
 ## Demo Vault
 
@@ -85,6 +83,8 @@ All of the above are generated automatically by wasm-bindgen and are not written
 Or, do steps 3-5 in one go with `bun run release:beta`
 
 ## History
+
+As of May 2026, Breadcrumbs is maintained by [michaelpporter](https://github.com/michaelpporter). The plugin was originally created by [SkepticMystic](https://github.com/SkepticMystic), whose foundational work made this all possible. Development continues at [github.com/michaelpporter/breadcrumbs](https://github.com/michaelpporter/breadcrumbs).
 
 Older media kept for posterity. Many predate v4 and may not match current behavior, but the effort of the authors is appreciated.
 

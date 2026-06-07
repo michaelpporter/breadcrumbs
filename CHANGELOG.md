@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.15.0](https://github.com/michaelpporter/breadcrumbs/compare/4.14.2...4.15.0) (2026-06-07)
+
+**Breaking:** Breadcrumbs now requires Obsidian 1.13.0 or later. If you're still on Obsidian 1.12, stay on 4.14.2 — the 1.12 line is maintained on the `1.12-compat` branch.
+
+### ⚠ BREAKING CHANGES
+
+* Require Obsidian 1.13.0. The imperative `display()` settings fallback for older app versions has been removed; the settings tab now renders entirely through the declarative `getSettingDefinitions()` API, so every section appears in global settings search and supports page-based navigation.
+
+### Features
+
+* Settings tab now shows a "waypoints" icon next to its name in the settings list and global search.
+* Reordered settings sections — Views lead with Page (the in-note views) before the sidebar views; Edge sources are grouped as content-based (tag, list), then filename-derived (dendron, johnny.decimal, date, regex), then query-based (traverse).
+* Added a short description under every settings entry so each section's purpose is clear at a glance.
+
+### Documentation
+
+* Expanded the Security & Privacy section: documented the bundled-dependency `fetch()` matches (KaTeX lexer method, markmap's CDN asset loader), the exported WASM linear memory, and the single wasm-bindgen `new Function()` (no `eval`).
+
+### Build
+
+* Stopped attaching `manifest-beta.json` to GitHub releases — Obsidian only downloads `main.js`/`manifest.json`/`styles.css`, and BRAT reads `manifest-beta.json` from the repo root.
+
 ### [4.14.2](https://github.com/michaelpporter/breadcrumbs/compare/4.14.1...4.14.2) (2026-06-05)
 
 Internal maintenance release — no user-facing behavior changes.
