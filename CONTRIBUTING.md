@@ -6,7 +6,7 @@ Thanks for your interest in contributing! This guide covers setup, development w
 
 - [Bun](https://bun.sh/) (package manager)
 - [Rust + wasm-pack](https://rustwasm.github.io/wasm-pack/installer/) (only if changing graph engine code in `wasm/`)
-- Node.js 18+ (built with 24.15)
+- Node.js 24+ (built with 24.15)
 
 ## Setup
 
@@ -82,9 +82,8 @@ For large changes, open an issue first to discuss the approach.
 
 ## Release Process (maintainers)
 
-See the `release` skill in CLAUDE.md, or run:
+Stable releases are cut with the `release` skill (Claude Code). Beta releases can be pushed directly:
 
 ```bash
 bun run release:beta    # bump + tag + push beta
-bun run release         # bump + tag + push stable
 ```
