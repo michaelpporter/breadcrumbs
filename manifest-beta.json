@@ -2,7 +2,7 @@
 	"id": "breadcrumbs",
 	"name": "Breadcrumbs",
 	"version": "4.14.2",
-	"minAppVersion": "1.12.3",
+	"minAppVersion": "1.13.0",
 	"description": "Add structured hierarchies to your notes.",
 	"author": "MichaelPPorter",
 	"authorUrl": "https://github.com/michaelpporter",
