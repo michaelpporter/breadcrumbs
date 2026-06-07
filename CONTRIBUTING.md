@@ -5,7 +5,7 @@ Thanks for your interest in contributing! This guide covers setup, development w
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (package manager)
-- [Rust + wasm-pack](https://rustwasm.github.io/wasm-pack/installer/) (only if changing graph engine code in `wasm/`)
+- [Rust + wasm-pack](https://rustwasm.github.io/wasm-pack/installer/) (only if changing graph engine code in `wasm/`) — toolchain is pinned to **Rust 1.92.0** via `wasm/rust-toolchain.toml`, and CI uses **wasm-pack 0.15.0**. `rustup` auto-selects the pinned version in `wasm/`; build with `wasm-pack 0.15.0` so the committed `wasm/pkg/` matches (CI fails if it drifts).
 - Node.js 24+ (built with 24.15)
 
 ## Setup
