@@ -58,6 +58,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: BreadcrumbsPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+		this.icon = "waypoints";
 	}
 
 	getSettingDefinitions(): SettingDefinitionItem[] {
@@ -102,6 +103,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			{
 				type: "page",
 				name: "Edge fields",
+				desc: "Define the named relationships edges can use, like up and down",
 				items: svelte_items(EdgeFieldSettings),
 			},
 			{
@@ -111,6 +113,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Transitive",
+						desc: "Derive new edges from chains of existing ones (e.g. the up of an up is an up)",
 						items: svelte_items(TransitiveImpliedRelations),
 					},
 				],
@@ -122,36 +125,43 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Tag notes",
+						desc: "Treat notes that share a tag as children of a parent note",
 						items: imp_items(_add_settings_tag_note),
 					},
 					{
 						type: "page",
 						name: "List notes",
+						desc: "Turn markdown list items in a note into child edges",
 						items: imp_items(_add_settings_list_note),
 					},
 					{
 						type: "page",
-						name: "Date notes",
-						items: imp_items(_add_settings_date_note),
-					},
-					{
-						type: "page",
-						name: "Regex notes",
-						items: imp_items(_add_settings_regex_note),
-					},
-					{
-						type: "page",
 						name: "Dendron notes",
+						desc: "Build hierarchy from dot-separated note names (e.g. parent.child)",
 						items: imp_items(_add_settings_dendron_note),
 					},
 					{
 						type: "page",
 						name: "Johnny.Decimal notes",
+						desc: "Build hierarchy from numeric name prefixes (e.g. 01.02 title)",
 						items: imp_items(_add_settings_johnny_decimal_note),
 					},
 					{
 						type: "page",
+						name: "Date notes",
+						desc: "Link sequential daily and periodic notes by date",
+						items: imp_items(_add_settings_date_note),
+					},
+					{
+						type: "page",
+						name: "Regex notes",
+						desc: "Build edges from a regex match on note names",
+						items: imp_items(_add_settings_regex_note),
+					},
+					{
+						type: "page",
 						name: "Traverse notes",
+						desc: "Build edges by following links outward from a note",
 						items: imp_items(_add_settings_traverse_note),
 					},
 				],
@@ -162,12 +172,8 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				items: [
 					{
 						type: "page",
-						name: "Matrix",
-						items: imp_items(_add_settings_matrix),
-					},
-					{
-						type: "page",
 						name: "Page",
+						desc: "Trail and previous/next bars shown inside the note",
 						items: [
 							{
 								name: "",
@@ -193,12 +199,20 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						name: "Matrix",
+						desc: "Side panel grouping a note's edges by field",
+						items: imp_items(_add_settings_matrix),
+					},
+					{
+						type: "page",
 						name: "Tree",
+						desc: "Side panel showing a recursive tree from the active note",
 						items: imp_items(_add_settings_tree_view),
 					},
 					{
 						type: "page",
 						name: "Codeblocks",
+						desc: "Defaults for breadcrumbs codeblocks rendered in notes",
 						items: imp_items(_add_settings_codeblocks),
 					},
 				],
@@ -210,21 +224,25 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Rebuild graph",
+						desc: "When and how the graph is rebuilt",
 						items: imp_items(_add_settings_rebuild_graph),
 					},
 					{
 						type: "page",
 						name: "List index",
+						desc: "Generate a nested list of the hierarchy from a note",
 						items: imp_items(_add_settings_list_index),
 					},
 					{
 						type: "page",
 						name: "Freeze implied edges",
+						desc: "Write implied edges into notes as explicit links",
 						items: imp_items(_add_settings_freeze_implied_edges),
 					},
 					{
 						type: "page",
 						name: "Thread",
+						desc: "Create a new note along an edge field",
 						items: imp_items(_add_settings_thread),
 					},
 				],
@@ -236,6 +254,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					{
 						type: "page",
 						name: "Edge field suggestor",
+						desc: "Suggest edge fields as you type in the editor",
 						items: imp_items(_add_settings_edge_field_suggestor),
 					},
 				],
@@ -369,22 +388,6 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			),
 		);
 
-		perf_sync("section:date_note", () =>
-			_add_settings_date_note(
-				plugin,
-				make_details_el(containerEl, { s: { text: "> Date Notes" } })
-					.children,
-			),
-		);
-
-		perf_sync("section:regex_note", () =>
-			_add_settings_regex_note(
-				plugin,
-				make_details_el(containerEl, { s: { text: "> Regex Notes" } })
-					.children,
-			),
-		);
-
 		perf_sync("section:dendron_note", () =>
 			_add_settings_dendron_note(
 				plugin,
@@ -403,6 +406,22 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 			),
 		);
 
+		perf_sync("section:date_note", () =>
+			_add_settings_date_note(
+				plugin,
+				make_details_el(containerEl, { s: { text: "> Date Notes" } })
+					.children,
+			),
+		);
+
+		perf_sync("section:regex_note", () =>
+			_add_settings_regex_note(
+				plugin,
+				make_details_el(containerEl, { s: { text: "> Regex Notes" } })
+					.children,
+			),
+		);
+
 		perf_sync("section:traverse_note", () =>
 			_add_settings_traverse_note(
 				plugin,
@@ -415,14 +434,6 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 		// Views
 		containerEl.createEl("hr");
 		new Setting(containerEl).setHeading().setName("Views");
-
-		perf_sync("section:matrix", () =>
-			_add_settings_matrix(
-				plugin,
-				make_details_el(containerEl, { s: { text: "> Matrix" } })
-					.children,
-			),
-		);
 
 		/// Page
 		const page_details = make_details_el(containerEl, {
@@ -442,6 +453,14 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 		new Setting(page_details).setHeading().setName("Previous/next");
 		perf_sync("section:prev_next_view", () =>
 			_add_settings_prev_next_view(plugin, page_details),
+		);
+
+		perf_sync("section:matrix", () =>
+			_add_settings_matrix(
+				plugin,
+				make_details_el(containerEl, { s: { text: "> Matrix" } })
+					.children,
+			),
 		);
 
 		perf_sync("section:tree_view", () =>
