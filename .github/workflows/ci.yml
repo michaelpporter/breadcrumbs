@@ -41,5 +41,14 @@ jobs:
             - name: TypeScript tests
               run: bun run test || exit 1
 
+            - name: Check wasm/pkg is up to date
+              run: |
+                  bun run wasm:build
+                  if ! git diff --quiet -- wasm/pkg; then
+                      echo "::error::wasm/pkg is out of date with wasm/src. Run 'bun run wasm:build' and commit the regenerated wasm/pkg/."
+                      git diff --stat -- wasm/pkg
+                      exit 1
+                  fi
+
             - name: Build
               run: bun run build || exit 1
