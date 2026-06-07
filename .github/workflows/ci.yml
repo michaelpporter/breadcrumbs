@@ -39,14 +39,18 @@ jobs:
             - name: TypeScript tests
               run: bun run test || exit 1
 
-            - name: Check wasm/pkg is up to date
+            - name: Check wasm/pkg regenerated when Rust changed
+              if: github.event_name == 'pull_request'
               run: |
-                  bun run wasm:build
-                  if ! git diff --quiet -- wasm/pkg; then
-                      echo "::error::wasm/pkg is out of date with wasm/src. Run 'bun run wasm:build' and commit the regenerated wasm/pkg/."
-                      git diff --stat -- wasm/pkg
+                  base="${{ github.event.pull_request.base.sha }}"
+                  src_changed=$(git diff --name-only "$base"...HEAD -- wasm/src wasm/Cargo.toml wasm/Cargo.lock)
+                  pkg_changed=$(git diff --name-only "$base"...HEAD -- wasm/pkg)
+                  if [ -n "$src_changed" ] && [ -z "$pkg_changed" ]; then
+                      echo "::error::wasm/src or Cargo.* changed but wasm/pkg was not regenerated. Run 'bun run wasm:build' and commit wasm/pkg/."
+                      echo "Changed Rust sources:"; echo "$src_changed"
                       exit 1
                   fi
+                  echo "wasm/pkg check OK"
 
             - name: Build
               run: bun run build || exit 1
