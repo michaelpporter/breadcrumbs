@@ -14,7 +14,7 @@
 		"build": "bun run clean && bun run build:css && bun run build:esbuild",
 		"version:prod": "bun run version-bump.mjs && git add manifest.json versions.json package.json",
 		"version:beta": "bun run version-bump-beta.mjs && git add manifest-beta.json versions.json package.json",
-		"release:beta": "bun run version:beta && git commit -m 'release:beta' && git push origin master:master && git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags",
+		"release:beta": "bun run version:beta && git commit -m 'release:beta' && git push origin main:main && git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags",
 		"test": "vitest --config vite.config.mjs",
 		"coverage:ui": "vitest run --config vite.config.mjs --coverage --coverage.include 'src/**' --coverage.reporter html && vite preview --outDir ./coverage --open",
 		"fmt": "bun run wasm:fmt && bun run prettier --write ./src",
