@@ -44,6 +44,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, build commands, 
 If you find Breadcrumbs useful, consider sponsoring continued development:
 
 -   [GitHub Sponsors — michaelpporter](https://github.com/sponsors/michaelpporter)
+-   [Buy Me a Coffee — michaelpporter](https://www.buymeacoffee.com/michaelpporter)
 
 Original creator SkepticMystic also accepts donations via [Ko-fi](https://ko-fi.com/skepticmystic) — their foundational work is what made this plugin possible.
 
