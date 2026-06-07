@@ -1,4 +1,25 @@
-Breadcrumbs is an Obsidian plugin that lets you add _typed links_ to your notes, then view/traverse them in various ways. Internally, Breadcrumbs uses a graph to represent this structure (much like the regular Obsidian graph, except now, links have _types_ to them). You tell Breadcrumbs about the structure of your notes, then it lets you visualise and navigate the graph.
+# Breadcrumbs
+
+**Give your Obsidian vault a structure you can see and navigate.**
+
+Breadcrumbs lets you add _typed links_ to your notes — `up`/`down`, `next`/`prev`, or any relationship you define — and builds them into a directed graph. Where Obsidian's own graph only shows _that_ two notes link, Breadcrumbs shows _how_ they relate: which note is the parent, which comes next, which belongs to which. You describe the shape of your vault once, then Breadcrumbs lets you visualise and walk it.
+
+## What you can do
+
+- **See where you are.** A breadcrumb **trail** at the top of each note shows its ancestors and the path back to the top.
+- **Browse the hierarchy.** The **Tree** side view expands the full structure beneath the current note; the **Matrix** view groups every incoming and outgoing relationship by type.
+- **Move through your notes.** **Previous / Next** buttons turn a chain of notes into a readable sequence.
+- **Embed diagrams.** Drop a ` ```breadcrumbs ``` ` codeblock into any note to render its neighbourhood as a tree, a **Mermaid** diagram, or an interactive **Markmap** mind-map.
+
+## Ways to define relationships
+
+You're not limited to one convention — Breadcrumbs reads structure from whatever you already use:
+
+- **Frontmatter properties** (typed links), **tags**, and **Markdown lists**
+- **Naming schemes** — Dendron (`parent.child`), Johnny.Decimal (`01.02 Title`), dates, and custom regex
+- **Folders** (folder notes) and **Dataview** queries
+
+On top of the relationships you declare, Breadcrumbs derives **implied relations** automatically — e.g. if A is `up` from B, then B is `down` from A — and lets you define your own transitive rules.
 
 ## Obsidian 1.13
 
@@ -28,38 +49,7 @@ Original creator SkepticMystic also accepts donations via [Ko-fi](https://ko-fi.
 
 ## Security & Privacy
 
-Breadcrumbs is fully open source. This section discloses every network request, binary module, and non-obvious code pattern in the compiled plugin.
-
-### Network Requests
-
-**Mermaid diagrams** — when you open a `breadcrumbs` codeblock rendered as Mermaid and click the **"View Image on mermaid.ink"** button, your browser opens `https://mermaid.ink/img/<encoded-diagram>` in a new tab. This is the only outbound network request the plugin can make. It is user-initiated (button click), not automatic. The diagram text is base64-encoded with `btoa()` and appended to the URL; no data is sent to any Breadcrumbs server.
-
-No other network requests are made by this plugin. A static scan of the compiled `main.js` will report `fetch(` matches inside bundled dependencies; none are reachable network calls:
-
-- **KaTeX** (math rendering, pulled in transitively) defines a lexer method `Parser.fetch()` that returns the next parse token. The name collides with the Web `fetch` API but performs no networking — this accounts for the large majority of the matches.
-- **markmap-view / markmap-lib** (used to render `breadcrumbs` codeblocks with `type: markmap`) bundle a CDN asset loader that *can* `fetch` KaTeX/plugin files from `cdn.jsdelivr.net` (fallback `unpkg.com`). Breadcrumbs does not use that path: it injects markmap's stylesheet inline via `loadCSS([{ type: "style", data: globalCSS }])` and never requests remote assets, so the fetch branch is never reached.
-
-### WebAssembly Module
-
-The compiled bundle includes one inline WebAssembly binary, [`wasm/pkg/breadcrumbs_graph_wasm_bg.wasm`](./wasm/pkg/breadcrumbs_graph_wasm_bg.wasm). This is the **Breadcrumbs graph engine**, written in Rust and compiled with [`wasm-pack`](https://rustwasm.github.io/wasm-pack/). The full Rust source is in [`wasm/src/`](./wasm/src/) and can be audited directly.
-
-The binary is **not native machine code** — it is portable WebAssembly that runs in the same sandbox as the plugin's JavaScript, with no filesystem, network, or system-call access beyond what JS explicitly passes across the boundary. It is **never fetched from a remote URL**: `esbuild`'s `binary` loader embeds the bytes into `main.js` at build time, and `src/main.ts` initializes the engine with the inline bytes via `init({ module_or_path: wasmbin })`.
-
-To verify the binary matches the source, rebuild it from the Rust sources with `bun run wasm:build` and compare — the `.wasm` is reproducible from [`wasm/src/`](./wasm/src/).
-
-### wasm-bindgen Generated Code Patterns
-
-`wasm-pack` generates JavaScript glue code in `wasm/pkg/breadcrumbs_graph_wasm.js`. Static scanners may flag three patterns in this generated file:
-
-| Pattern | Origin | Purpose |
-|---|---|---|
-| `fetch()` | wasm-bindgen shim | Fallback for loading WASM by URL. **Never called** — the plugin passes the inline binary directly to `init({ module_or_path: wasmbin })`. |
-| `new Function(...)` | wasm-bindgen shim (`__wbg_newnoargs`) | Part of wasm-bindgen's standard generated runtime. It is invoked only with a fixed string compiled into the WASM binary, never with user input, and the plugin's own Rust code never calls it. The plugin does use the `js_sys::Function` **type** (`update_callback`, `node_label_fn`, `iterate_nodes`), but only to *receive and call back* JavaScript functions passed in from the plugin — it never constructs functions from strings. The bundle contains **no `eval()`**. |
-| exported `memory` / `wasm.memory` access | wasm-bindgen shim | The module exports its linear memory and the JS glue reads/writes it to pass strings and arrays between Rust and JavaScript. Required by wasm-bindgen for any non-scalar data transfer across the boundary. |
-
-All of the above are generated automatically by wasm-bindgen and are not written by the plugin authors.
-
-**On the exported linear memory specifically:** static scanners flag that the WASM module exports its `memory`. This is unavoidable and standard for every wasm-bindgen module — JavaScript cannot pass a string, `Vec`, or array to Rust (or read one back) without direct access to the module's linear memory, so wasm-bindgen exports it and the generated glue (`getUint8ArrayMemory0`, `getDataViewMemory0`, etc.) copies bytes in and out. It is not a privilege escalation: the JavaScript host instantiates the module and already fully controls it, and the WASM sandbox has no filesystem, network, or system-call access of its own. Exporting memory only lets the two halves of the same plugin exchange data.
+Breadcrumbs is fully open source and makes no automatic network requests. To report a vulnerability, see the [Security Policy](./SECURITY.md). For a full audit of network requests, the bundled WebAssembly engine, and non-obvious code patterns, see [DISCLOSURES.md](./DISCLOSURES.md).
 
 ## Credits
 
@@ -69,18 +59,6 @@ All of the above are generated automatically by wasm-bindgen and are not written
 -   [michaelpporter](https://github.com/michaelpporter): Current maintainer.
 
 <!-- NOTE: This heading is linked to in the manifest.fundingUrl. Be sure to change that if updating the heading label -->
-
-### Release process
-
-#### Beta
-
-1. Push all previous changes to the actual project
-2. Bump version in `package.json`
-3. `bun run version:beta` to update `manifest-beta.json` and `versions.json` accordingly
-4. `git tag -a x.x.x-beta -m 'x.x.x-beta'` to tag the build
-5. `git push origin x.x.x-beta` to push the release and trigger the action
-
-Or, do steps 3-5 in one go with `bun run release:beta`
 
 ## History
 
