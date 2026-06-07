@@ -83,7 +83,16 @@ Stop on failure.
 
 Update `version` in both files to the new version string:
 - `package.json`
-- `manifest.json`
+- `manifest.json` (or `manifest-beta.json` for a beta)
+
+Then update `versions.json` with the new `"<version>": "<minAppVersion>"` entry (minAppVersion comes from the manifest). The repo's bump scripts do this **and re-sort `versions.json` by semver** — prefer running them over hand-editing:
+
+```
+bun run version:prod    # stable: updates manifest.json, versions.json (sorted)
+bun run version:beta    # beta:   updates manifest-beta.json, versions.json (sorted)
+```
+
+If you do edit `versions.json` by hand, insert the entry in semver order — don't append at the end (the file is kept sorted, prereleases before their release).
 
 ### 9. Update CHANGELOG.md
 
@@ -112,7 +121,7 @@ Use the existing CHANGELOG entries as style reference. Write descriptive bullets
 ### 10. Commit
 
 ```
-git add package.json manifest.json CHANGELOG.md bun.lock wasm/pkg/
+git add package.json manifest.json versions.json CHANGELOG.md bun.lock wasm/pkg/
 git commit -m "release: <version>"
 ```
 
@@ -127,7 +136,7 @@ git tag <version>
 ### 12. Push
 
 ```
-git push origin master --tags
+git push origin main --tags
 ```
 
 ### 13. Confirm
