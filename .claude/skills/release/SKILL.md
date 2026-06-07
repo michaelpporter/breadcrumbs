@@ -96,27 +96,35 @@ If you do edit `versions.json` by hand, insert the entry in semver order — don
 
 ### 9. Update CHANGELOG.md
 
+The changelog follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). The top of the file has a `## [Unreleased]` section; releases accumulate as `## [<version>] - <YYYY-MM-DD>` between `## [Unreleased]` and the legacy `## 4.X` umbrella (older entries below the umbrella are an archive — never reformat them).
 
-Insert a new section at the top of the `## 4.X` block (or a new top-level `## X.Y` block for major bumps):
-
-```
-### [<version>](...compare/<prev>...<version>) (<YYYY-MM-DD>)
-```
-
-Collect changes from git log since last tag:
+Collect changes since the last tag:
 ```
 git log $(git describe --tags --abbrev=0)..HEAD --oneline
 ```
 
-Group commits into CHANGELOG sections using conventional-commit prefixes:
-- `feat:` / `feat(…):` → **Features**
-- `fix:` / `fix(…):` → **Bug Fixes**
-- `perf:` → **Performance**
-- `chore:` / `ci:` / `build:` → **Chores** / **Build** / **CI**
-- `docs:` → **Documentation**
-- `refactor:` → **Refactors**
+**a. Convert the Unreleased section into the release:**
+- Rename `## [Unreleased]` to `## [<version>] - <YYYY-MM-DD>`.
+- Insert a fresh empty `## [Unreleased]` above it.
+- The heading carries **no** inline compare link — links live in the bottom reference section (step c).
 
-Use the existing CHANGELOG entries as style reference. Write descriptive bullets, not raw commit subjects.
+**b. Group changes under `###` subsections**, in this order, omitting any that are empty:
+- **Added** — new features (`feat:` introducing something new)
+- **Changed** — changes to existing behavior (`feat:` modifying behavior, `refactor:`)
+- **Deprecated** — soon-to-be-removed features
+- **Removed** — removed features
+- **Fixed** — bug fixes (`fix:`)
+- **Security** — vulnerability fixes (`security:`)
+- **Performance** — perf work (`perf:`) — custom type, KAC 1.1.0 allows it
+- **Build** — build/CI/tooling (`build:`, `ci:`) — custom type, when user-relevant
+
+`docs:`, `chore:`, and `test:` commits are usually omitted — the changelog is for humans, not a commit dump. Include them only if user-facing. Write descriptive bullets, not raw commit subjects; use existing entries as a style reference.
+
+**c. Update the bottom reference links:**
+- Add a line for the new version:
+  `[<version>]: https://github.com/michaelpporter/breadcrumbs/compare/<prev>...<version>`
+- Repoint Unreleased:
+  `[Unreleased]: https://github.com/michaelpporter/breadcrumbs/compare/<version>...HEAD`
 
 ### 10. Commit
 
