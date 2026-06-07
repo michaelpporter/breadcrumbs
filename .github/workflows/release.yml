@@ -58,11 +58,9 @@ jobs:
                     fi
                   fi
 
-                  if [[ -z "$prerelease_flag" ]]; then
-                    cp manifest.json manifest-beta.json
-                  fi
-
+                  # Obsidian only downloads main.js, manifest.json, styles.css.
+                  # manifest-beta.json lives in the repo root for BRAT and is not a release asset.
                   gh release create "$tag" \
                     --title="$tag" \
                     $prerelease_flag \
-                    main.js manifest.json manifest-beta.json styles.css
+                    main.js manifest.json styles.css
