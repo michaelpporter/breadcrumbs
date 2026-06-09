@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.X
+
+### [4.15.1](https://github.com/michaelpporter/breadcrumbs/compare/4.15.0...4.15.1) (2026-06-09)
+
+### Fixed
+
+* Detect Dataview inline fields wrapped in parentheses or brackets — `(down:: [[Note]])` and `[down:: [[Note]]]` now build edges, matching how Dataview itself parses these forms ([#710](https://github.com/michaelpporter/breadcrumbs/issues/710)).
+
 ### Build
 
 - Bump JS dev dependencies (svelte-check 4.6, svelte 5.56.3, typescript-eslint 8.60.1, @types/node 25.9.2).
 - Add `svelte.config.mjs` so `svelte-check` 4.6 reads the Svelte config directly instead of probing `vite.config.mjs` (which has no `@sveltejs/vite-plugin-svelte`, since this project builds via `esbuild-svelte`).
-
-## 4.X
 
 ### [4.15.0](https://github.com/michaelpporter/breadcrumbs/compare/4.14.2...4.15.0) (2026-06-07)
 

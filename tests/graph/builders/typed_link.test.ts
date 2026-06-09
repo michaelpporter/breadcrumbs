@@ -1,6 +1,6 @@
 import { _add_explicit_edges_typed_link } from "src/graph/builders/explicit/typed_link";
 import { TFile } from "obsidian";
-import { describe, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { make_all_files, make_plugin, mock_file } from "./helpers";
 
 function mock_tfile(path: string): TFile {
@@ -108,6 +108,47 @@ describe("typed_link builder — Obsidian branch", () => {
 		t.expect(r.edges).toHaveLength(2);
 		t.expect(sources).toContain("a.md");
 		t.expect(sources).toContain("b.md");
+	});
+});
+
+// ---- Body inline-field branch ----
+
+/** Build a plugin whose cachedRead returns `body` for any file. */
+function inline_plugin(body: string) {
+	return make_plugin(
+		{ edge_fields: ["up", "down", "same"].map((l) => ({ label: l })) },
+		[],
+		undefined,
+		{ cachedRead: async () => body },
+	);
+}
+
+describe("typed_link builder — body inline fields", () => {
+	test.each([
+		["plain", "down:: [[Convolutions]]"],
+		["list marker", "- down:: [[Convolutions]]"],
+		["space before ::", "down :: [[Convolutions]]"],
+		["paren wrapper", "- (down:: [[Convolutions]])"],
+		["paren wrapper, no space", "- (down::[[Convolutions]])"],
+		["bracket wrapper", "- [down:: [[Convolutions]]]"],
+	])("detects inline field — %s", async (_label, line) => {
+		const files = [mock_file("a.md", { links: [{ line: 0, link: "Convolutions" }] })];
+		const r = await _add_explicit_edges_typed_link(
+			inline_plugin(line),
+			make_all_files(files),
+		);
+		expect(r.edges, `no edge for: ${line}`).toHaveLength(1);
+		expect(r.edges[0]!.edge_type, line).toBe("down");
+		expect(r.edges[0]!.target).toBe("Convolutions.md");
+	});
+
+	test("field not in edge_fields → no edge", async (t) => {
+		const files = [mock_file("a.md", { links: [{ line: 0, link: "X" }] })];
+		const r = await _add_explicit_edges_typed_link(
+			inline_plugin("(unknown:: [[X]])"),
+			make_all_files(files),
+		);
+		t.expect(r.edges).toHaveLength(0);
 	});
 });
 
