@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.15.2](https://github.com/michaelpporter/breadcrumbs/compare/4.15.1...4.15.2) (2026-06-11)
+
+### Fixed
+
+* Settings sub-pages (Edge fields, Tag notes, and every other section) rendered blank — title only, no controls — on Obsidian 1.13.1. Each sub-page now renders through the documented `SettingPage` page factory instead of the previous workaround ([#713](https://github.com/michaelpporter/breadcrumbs/issues/713)).
+
 ### [4.15.1](https://github.com/michaelpporter/breadcrumbs/compare/4.15.0...4.15.1) (2026-06-09)
 
 ### Fixed
@@ -2550,4 +2556,4 @@ Internal maintenance release — no user-facing behavior changes.
 * TrailGrid overlap ([627c64d](https://github.com/SkepticMystic/breadcrumbs/commit/627c64d856a2cf9d152c6205eaa660faabcbd8e7))
 * trailOrTable ([ceb61cd](https://github.com/SkepticMystic/breadcrumbs/commit/ceb61cd4fdc4b7789ac52369d66541d109b4d878))
 
-[Unreleased]: https://github.com/michaelpporter/breadcrumbs/compare/4.15.0...HEAD
+[Unreleased]: https://github.com/michaelpporter/breadcrumbs/compare/4.15.2...HEAD
