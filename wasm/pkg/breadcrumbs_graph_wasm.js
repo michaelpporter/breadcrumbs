@@ -168,66 +168,11 @@ function debugString(val) {
     // TODO we could test for more things here, like `Set`s and `Map`s.
     return className;
 }
-/**
- * @returns {NoteGraph}
- */
-export function create_graph() {
-    const ret = wasm.create_graph();
-    return NoteGraph.__wrap(ret);
-}
-
-function getArrayJsValueFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    const mem = getDataViewMemory0();
-    const result = [];
-    for (let i = ptr; i < ptr + 4 * len; i += 4) {
-        result.push(wasm.__wbindgen_export_2.get(mem.getUint32(i, true)));
-    }
-    wasm.__externref_drop_slice(ptr, len);
-    return result;
-}
-
-function passArrayJsValueToWasm0(array, malloc) {
-    const ptr = malloc(array.length * 4, 4) >>> 0;
-    for (let i = 0; i < array.length; i++) {
-        const add = addToExternrefTable0(array[i]);
-        getDataViewMemory0().setUint32(ptr + 4 * i, add, true);
-    }
-    WASM_VECTOR_LEN = array.length;
-    return ptr;
-}
-
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-}
 
 function takeFromExternrefTable0(idx) {
     const value = wasm.__wbindgen_export_2.get(idx);
     wasm.__externref_table_dealloc(idx);
     return value;
-}
-
-let cachedUint32ArrayMemory0 = null;
-
-function getUint32ArrayMemory0() {
-    if (cachedUint32ArrayMemory0 === null || cachedUint32ArrayMemory0.byteLength === 0) {
-        cachedUint32ArrayMemory0 = new Uint32Array(wasm.memory.buffer);
-    }
-    return cachedUint32ArrayMemory0;
-}
-
-function getArrayU32FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getUint32ArrayMemory0().subarray(ptr / 4, ptr / 4 + len);
-}
-
-function passArray32ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 4, 4) >>> 0;
-    getUint32ArrayMemory0().set(arg, ptr / 4);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
 }
 /**
  * @param {string} field
@@ -244,6 +189,32 @@ export function create_edge_sorter(field, reverse) {
     return EdgeSorter.__wrap(ret[0]);
 }
 
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
+}
+
+function passArrayJsValueToWasm0(array, malloc) {
+    const ptr = malloc(array.length * 4, 4) >>> 0;
+    for (let i = 0; i < array.length; i++) {
+        const add = addToExternrefTable0(array[i]);
+        getDataViewMemory0().setUint32(ptr + 4 * i, add, true);
+    }
+    WASM_VECTOR_LEN = array.length;
+    return ptr;
+}
+
+function getArrayJsValueFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    const mem = getDataViewMemory0();
+    const result = [];
+    for (let i = ptr; i < ptr + 4 * len; i += 4) {
+        result.push(wasm.__wbindgen_export_2.get(mem.getUint32(i, true)));
+    }
+    wasm.__externref_drop_slice(ptr, len);
+    return result;
+}
 /**
  * @param {NoteGraph} graph
  * @param {TraversalData[]} traversal_data
@@ -282,6 +253,34 @@ export function sort_edges(graph, edges, sorter) {
     var v2 = getArrayJsValueFromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
     return v2;
+}
+
+let cachedUint32ArrayMemory0 = null;
+
+function getUint32ArrayMemory0() {
+    if (cachedUint32ArrayMemory0 === null || cachedUint32ArrayMemory0.byteLength === 0) {
+        cachedUint32ArrayMemory0 = new Uint32Array(wasm.memory.buffer);
+    }
+    return cachedUint32ArrayMemory0;
+}
+
+function getArrayU32FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint32ArrayMemory0().subarray(ptr / 4, ptr / 4 + len);
+}
+
+function passArray32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4, 4) >>> 0;
+    getUint32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+/**
+ * @returns {NoteGraph}
+ */
+export function create_graph() {
+    const ret = wasm.create_graph();
+    return NoteGraph.__wrap(ret);
 }
 
 const AddEdgeGraphUpdateFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -1918,6 +1917,39 @@ export class NoteGraph {
         wasm.__wbg_notegraph_free(ptr, 0);
     }
     /**
+     * Runs a recursive traversal of the graph.
+     * @param {TraversalOptions} options
+     * @returns {TraversalResult}
+     */
+    rec_traverse(options) {
+        _assertClass(options, TraversalOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.notegraph_rec_traverse(this.__wbg_ptr, ptr0);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return TraversalResult.__wrap(ret[0]);
+    }
+    /**
+     * Runs a recursive traversal of the graph and post-processes the result.
+     * The post-processed result is more efficient to work with from
+     * JavaScript.
+     * @param {TraversalOptions} options
+     * @param {TraversalPostprocessOptions} postprocess_options
+     * @returns {FlatTraversalResult}
+     */
+    rec_traverse_and_process(options, postprocess_options) {
+        _assertClass(options, TraversalOptions);
+        var ptr0 = options.__destroy_into_raw();
+        _assertClass(postprocess_options, TraversalPostprocessOptions);
+        var ptr1 = postprocess_options.__destroy_into_raw();
+        const ret = wasm.notegraph_rec_traverse_and_process(this.__wbg_ptr, ptr0, ptr1);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return FlatTraversalResult.__wrap(ret[0]);
+    }
+    /**
      * @param {TraversalOptions} traversal_options
      * @param {MermaidGraphOptions} diagram_options
      * @returns {MermaidGraphData}
@@ -2101,39 +2133,6 @@ export class NoteGraph {
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.notegraph_has_node(this.__wbg_ptr, ptr0, len0);
         return ret !== 0;
-    }
-    /**
-     * Runs a recursive traversal of the graph.
-     * @param {TraversalOptions} options
-     * @returns {TraversalResult}
-     */
-    rec_traverse(options) {
-        _assertClass(options, TraversalOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.notegraph_rec_traverse(this.__wbg_ptr, ptr0);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return TraversalResult.__wrap(ret[0]);
-    }
-    /**
-     * Runs a recursive traversal of the graph and post-processes the result.
-     * The post-processed result is more efficient to work with from
-     * JavaScript.
-     * @param {TraversalOptions} options
-     * @param {TraversalPostprocessOptions} postprocess_options
-     * @returns {FlatTraversalResult}
-     */
-    rec_traverse_and_process(options, postprocess_options) {
-        _assertClass(options, TraversalOptions);
-        var ptr0 = options.__destroy_into_raw();
-        _assertClass(postprocess_options, TraversalPostprocessOptions);
-        var ptr1 = postprocess_options.__destroy_into_raw();
-        const ret = wasm.notegraph_rec_traverse_and_process(this.__wbg_ptr, ptr0, ptr1);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return FlatTraversalResult.__wrap(ret[0]);
     }
 }
 
