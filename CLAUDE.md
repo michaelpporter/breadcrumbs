@@ -82,7 +82,7 @@ The graph is a singleton on `plugin.graph`. It is rebuilt from scratch on `rebui
 
 ### Edge Building Pipeline
 
-`rebuild_graph()` runs **9 explicit edge builders** in parallel, each returning `{ nodes, edges, errors }`:
+`rebuild_graph()` runs **10 explicit edge builders** in parallel, each returning `{ nodes, edges, errors }`:
 
 | Builder | Source |
 |---|---|
@@ -95,6 +95,7 @@ The graph is a singleton on `plugin.graph`. It is rebuilt from scratch on `rebui
 | `date_note` | Sequential date-based notes |
 | `folder_note` | Folder → note containment |
 | `regex_note` | Regex matches on basenames |
+| `traverse_note` | DFS walk of vault links from a root note |
 
 Builder implementations live in `src/graph/builders/explicit/` (one file per builder + `index.ts` exporting the `add_explicit_edges` record). The coordinator is `src/graph/builders/index.ts`.
 
