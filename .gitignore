@@ -37,3 +37,6 @@ meta.txt
 .claude/skills/update-docs/
 
 .codegraph/*
+
+# Local triage / scratch notes (not for the repo)
+_notes/
