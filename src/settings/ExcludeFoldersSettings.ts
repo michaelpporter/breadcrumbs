@@ -11,7 +11,7 @@ export const _add_settings_exclude_folders = (
 			"Notes inside these folders are skipped when generating edges. One folder path per line. A note is excluded if its path equals, or is inside, a listed folder.",
 		)
 		.addTextArea((text) => {
-			text.setPlaceholder("templates\narchive/old")
+			text.setPlaceholder("Templates\narchive/old")
 				.setValue(plugin.settings.exclude_folders.join("\n"));
 
 			text.inputEl.rows = 4;

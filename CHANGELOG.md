@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.16.1](https://github.com/michaelpporter/breadcrumbs/compare/4.16.0...4.16.1) (2026-06-13)
+
+### Build
+
+- Code-quality cleanup, no functional change: removed redundant non-null assertions in the list-note section resolver, switched an array type to `T[]` syntax, and capitalized a settings placeholder to satisfy the Obsidian UI lint rule. `src/` now passes ESLint with no `@typescript-eslint` warnings.
+
 ### [4.16.0](https://github.com/michaelpporter/breadcrumbs/compare/4.15.2...4.16.0) (2026-06-13)
 
 ### Features
