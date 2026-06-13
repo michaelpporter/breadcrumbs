@@ -31,12 +31,12 @@ function resolve_section_lines(
 	const matched_i = headings.findIndex((h) => h.heading === section);
 	if (matched_i === -1) return null;
 
-	const matched = headings[matched_i]!;
+	const matched = headings[matched_i];
 
 	let end = Infinity;
 	for (let i = matched_i + 1; i < headings.length; i++) {
-		if (headings[i]!.level <= matched.level) {
-			end = headings[i]!.position.start.line;
+		if (headings[i].level <= matched.level) {
+			end = headings[i].position.start.line;
 			break;
 		}
 	}
