@@ -88,6 +88,38 @@
 					);
 				});
 
+				// Drop transitive rules that reference the removed field —
+				// unlike rename, there's no replacement label to substitute.
+				settings.implied_relations.transitive =
+					settings.implied_relations.transitive.filter(
+						(rule) =>
+							rule.close_field !== edge_field.label &&
+							!rule.chain.some(
+								(attr) => attr.field === edge_field.label,
+							),
+					);
+
+				// Clear any edge source default pointing at the removed field.
+				const sources = settings.explicit_edge_sources;
+				if (sources.tag_note.default_field === edge_field.label)
+					sources.tag_note.default_field = "";
+				if (
+					sources.list_note.default_neighbour_field ===
+					edge_field.label
+				)
+					sources.list_note.default_neighbour_field = "";
+				if (sources.dendron_note.default_field === edge_field.label)
+					sources.dendron_note.default_field = "";
+				if (
+					sources.johnny_decimal_note.default_field ===
+					edge_field.label
+				)
+					sources.johnny_decimal_note.default_field = "";
+				if (sources.date_note.default_field === edge_field.label)
+					sources.date_note.default_field = "";
+				if (sources.regex_note.default_field === edge_field.label)
+					sources.regex_note.default_field = "";
+
 				autosave();
 			},
 
