@@ -186,6 +186,17 @@
 
 				autosave();
 			},
+
+			set_hidden: (edge_field: EdgeField, hidden: boolean) => {
+				const target = settings.edge_fields.find(
+					(f) => f.label === edge_field.label,
+				);
+				if (!target) return;
+
+				target.hide_in_views = hidden || undefined;
+
+				autosave();
+			},
 		},
 
 		groups: {
@@ -459,6 +470,22 @@
 							<option value={arrow}>{arrow}</option>
 						{/each}
 					</select>
+
+					<label
+						class="flex items-center gap-1"
+						title="Hide this field from the Matrix and Tree side views"
+					>
+						<input
+							type="checkbox"
+							checked={field.hide_in_views ?? false}
+							onchange={(e) =>
+								actions.fields.set_hidden(
+									field,
+									e.currentTarget.checked,
+								)}
+						/>
+						Hide in views
+					</label>
 
 					{#each group_labels as group_label}
 						<Tag
