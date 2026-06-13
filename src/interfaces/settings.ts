@@ -20,6 +20,7 @@ export type MermaidArrowType = (typeof MERMAID_ARROW_TYPES)[number];
 export interface EdgeField {
 	label: string;
 	mermaid_arrow?: MermaidArrowType;
+	hide_in_views?: boolean;
 }
 export interface EdgeFieldGroup {
 	label: string;

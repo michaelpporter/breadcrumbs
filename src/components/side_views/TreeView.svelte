@@ -2,7 +2,10 @@
 	import type { BreadcrumbsSettings } from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
 	import { active_file_store } from "src/stores/active_file";
-	import { resolve_field_group_labels } from "src/utils/edge_fields";
+	import {
+		omit_hidden_view_fields,
+		resolve_field_group_labels,
+	} from "src/utils/edge_fields";
 	import NestedEdgeList from "../NestedEdgeList.svelte";
 	import ChevronCollapseButton from "../button/ChevronCollapseButton.svelte";
 	import ChevronOpener from "../button/ChevronOpener.svelte";
@@ -98,9 +101,12 @@
 	});
 
 	let edge_field_labels = $derived(
-		resolve_field_group_labels(
-			plugin.settings.edge_field_groups,
-			settings.field_group_labels,
+		omit_hidden_view_fields(
+			plugin.settings.edge_fields,
+			resolve_field_group_labels(
+				plugin.settings.edge_field_groups,
+				settings.field_group_labels,
+			),
 		),
 	);
 
