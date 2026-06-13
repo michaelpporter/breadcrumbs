@@ -140,6 +140,8 @@ describe("migration", () => {
 			},
 			self_is_sibling: ["same"],
 
+			exclude_folders: [],
+
 			explicit_edge_sources: {
 				list_note: {
 					default_neighbour_field: "",
@@ -783,6 +785,8 @@ describe("migration", () => {
 				],
 			},
 			self_is_sibling: ["same"],
+
+			exclude_folders: [],
 		} satisfies BreadcrumbsSettings);
 	});
 });

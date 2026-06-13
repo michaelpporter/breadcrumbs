@@ -73,6 +73,10 @@ export interface BreadcrumbsSettings {
 	 *  that has at least one explicit outgoing edge of that type. */
 	self_is_sibling: string[];
 
+	/** Vault folder paths whose notes are skipped when generating edges.
+	 *  A note is excluded if its path equals, or is inside, any listed folder. */
+	exclude_folders: string[];
+
 	// NOTE: Anytime a new default_field prop is added, be sure to update it on rename in EdgeFieldSettings.svelte
 	explicit_edge_sources: {
 		// Just a regular `up: [[link]]` or `down:: [[link]]` in the content/frontmatter of a note

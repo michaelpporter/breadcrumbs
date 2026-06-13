@@ -24,6 +24,8 @@ export function mock_file(
 		listItems?: { line: number; col: number; parent: number }[];
 		/** Body wikilinks keyed by line (list_note builder) */
 		links?: { line: number; link: string }[];
+		/** Headings (list_note section scoping): one per line */
+		headings?: { line: number; level: number; heading: string }[];
 	} = {},
 ) {
 	const slash_path = path.replace(/\\/g, "/");
@@ -46,7 +48,8 @@ export function mock_file(
 		opts.tags ||
 		opts.frontmatterLinks ||
 		opts.listItems ||
-		opts.links;
+		opts.links ||
+		opts.headings;
 
 	const cache = has_cache
 		? {
@@ -68,6 +71,14 @@ export function mock_file(
 					position: {
 						start: { line: l.line, col: 0, offset: 0 },
 						end: { line: l.line, col: 0, offset: 0 },
+					},
+				})),
+				headings: opts.headings?.map((h) => ({
+					heading: h.heading,
+					level: h.level,
+					position: {
+						start: { line: h.line, col: 0, offset: 0 },
+						end: { line: h.line, col: 0, offset: 0 },
 					},
 				})),
 			}

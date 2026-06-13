@@ -76,7 +76,10 @@ export const rebuild_graph = async (plugin: BreadcrumbsPlugin) => {
 	const timer2 = new Timer();
 
 	// Get once, send to all builders
-	const all_files = get_all_files(plugin.app);
+	const all_files = get_all_files(
+		plugin.app,
+		plugin.settings.exclude_folders,
+	);
 
 	// Add initial nodes
 	const nodes = get_initial_nodes(all_files);

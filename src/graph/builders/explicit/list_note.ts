@@ -17,13 +17,51 @@ interface NativeListItem {
 	text: string;
 }
 
+/**
+ * Resolve the [start, end) line interval of the section under the heading whose
+ * text equals `section`. The section runs from the heading line to the next
+ * heading of equal-or-higher level (or EOF). Returns `null` if no heading matches.
+ */
+function resolve_section_lines(
+	cache: CachedMetadata,
+	section: string,
+): { start: number; end: number } | null {
+	const headings = cache.headings ?? [];
+
+	const matched_i = headings.findIndex((h) => h.heading === section);
+	if (matched_i === -1) return null;
+
+	const matched = headings[matched_i]!;
+
+	let end = Infinity;
+	for (let i = matched_i + 1; i < headings.length; i++) {
+		if (headings[i]!.level <= matched.level) {
+			end = headings[i]!.position.start.line;
+			break;
+		}
+	}
+
+	return { start: matched.position.start.line, end };
+}
+
 function build_native_list_items(
 	cache: CachedMetadata,
 	content: string,
+	section?: string,
 ): NativeListItem[] {
-	const list_item_caches = cache.listItems ?? [];
+	let list_item_caches = cache.listItems ?? [];
 	const links = cache.links ?? [];
 	const lines = content.split("\n");
+
+	if (section) {
+		const range = resolve_section_lines(cache, section);
+		if (!range) return [];
+
+		list_item_caches = list_item_caches.filter((li) => {
+			const line = li.position.start.line;
+			return line > range.start && line < range.end;
+		});
+	}
 
 	const links_by_line = new Map<number, string[]>();
 	for (const link of links) {
@@ -101,9 +139,14 @@ const get_list_note_info = (
 		metadata[META_ALIAS["list-note-exclude-index"]],
 	);
 
+	// list-note-section restricts the builder to list items under one heading
+	const raw_section = metadata[META_ALIAS["list-note-section"]];
+	const section = typeof raw_section === "string" ? raw_section : undefined;
+
 	return succ({
 		field,
 		exclude_index,
+		section,
 		neighbour_field: (neighbour_field ?? undefined) as string | undefined,
 	});
 };
@@ -140,6 +183,7 @@ const handle_neighbour_list_item = ({
 	list_note_info,
 	flat_items,
 	source_list_item_i,
+	exclude_paths,
 }: {
 	source_id: string;
 	plugin: BreadcrumbsPlugin;
@@ -151,6 +195,7 @@ const handle_neighbour_list_item = ({
 		{ ok: true }
 	>;
 	flat_items: NativeListItem[];
+	exclude_paths: Set<string>;
 }) => {
 	if (!list_note_info.data.neighbour_field) return;
 
@@ -181,6 +226,8 @@ const handle_neighbour_list_item = ({
 	);
 	if (!resolved_neighbour) return;
 	const [target_id, file] = resolved_neighbour;
+
+	if (exclude_paths.has(target_id)) return;
 
 	if (!file) {
 		results.nodes.push(new GCNodeData(target_id, [], false, false, false));
@@ -229,7 +276,30 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = async (
 				}
 
 				const content = await plugin.app.vault.cachedRead(list_note_file);
-				const flat_items = build_native_list_items(list_note_cache, content);
+				const flat_items = build_native_list_items(
+					list_note_cache,
+					content,
+					list_note_info.data.section,
+				);
+
+				// BC-list-note-exclude: targets that should not become children.
+				// Read from frontmatterLinks so wikilinks resolve like typed_link.
+				const exclude_paths = new Set<string>();
+				list_note_cache.frontmatterLinks?.forEach((fl) => {
+					if (
+						fl.key.split(".")[0] !==
+						META_ALIAS["list-note-exclude"]
+					) {
+						return;
+					}
+
+					const resolved = resolve_relative_target_path(
+						plugin.app,
+						fl.link,
+						list_note_file.path,
+					);
+					if (resolved) exclude_paths.add(resolved[0]);
+				});
 
 				flat_items.forEach((source_list_item, source_list_item_i) => {
 					const source_link = source_list_item.outlinks.at(0);
@@ -266,15 +336,17 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = async (
 							return;
 						}
 
-						results.edges.push(
-							new GCEdgeData(
-								list_note_file.path,
-								source_path,
-								source_override_field.data?.field ??
-									list_note_info.data.field,
-								"list_note",
-							),
-						);
+						if (!exclude_paths.has(source_path)) {
+							results.edges.push(
+								new GCEdgeData(
+									list_note_file.path,
+									source_path,
+									source_override_field.data?.field ??
+										list_note_info.data.field,
+									"list_note",
+								),
+							);
+						}
 					}
 
 					if (list_note_info.data.neighbour_field) {
@@ -286,6 +358,7 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = async (
 							list_note_info,
 							source_list_item_i,
 							source_id: source_path,
+							exclude_paths,
 						});
 					}
 
@@ -313,6 +386,8 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = async (
 						);
 						if (!resolved_target) return;
 						const [target_path, target_file] = resolved_target;
+
+						if (exclude_paths.has(target_path)) return;
 
 						if (!target_file) {
 							results.nodes.push(

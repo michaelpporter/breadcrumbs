@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Features
+
+* List Notes can be scoped to a single heading with `BC-list-note-section: "<heading>"` in frontmatter. Only list items under that heading become edges; the section runs to the next equal-or-higher-level heading (or end of file), so nested sub-headings stay inside it. Without the field, the whole note is read as before ([#363](https://github.com/michaelpporter/breadcrumbs/discussions/363)).
+* New **Excluded folders** setting — notes inside the listed folders are skipped when generating edges (one folder path per line). A note is excluded if its path equals, or is inside, a listed folder ([#358](https://github.com/michaelpporter/breadcrumbs/discussions/358)).
+* List Notes can exempt individual links with a `BC-list-note-exclude` frontmatter list of wikilinks. Any listed link stays in the note's list but does not become a child edge — useful for reference/see-also links ([#365](https://github.com/michaelpporter/breadcrumbs/discussions/365)).
+
 ## 4.X
 
 ### [4.15.2](https://github.com/michaelpporter/breadcrumbs/compare/4.15.1...4.15.2) (2026-06-11)

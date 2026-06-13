@@ -9,6 +9,7 @@ import { _add_settings_codeblocks } from "./CodeblockSettings";
 import { _add_settings_date_note } from "./DateNoteSettings";
 import { _add_settings_dendron_note } from "./DendronNoteSettings";
 import { _add_settings_edge_field_suggestor } from "./EdgeFieldSuggestorSettings";
+import { _add_settings_exclude_folders } from "./ExcludeFoldersSettings";
 import { _add_settings_freeze_implied_edges } from "./FreezeImpliedEdgesSettings";
 import { _add_settings_trail_view } from "./GridSettings";
 import { _add_settings_johnny_decimal_note } from "./JohnnyDecimalSettings";
@@ -106,6 +107,15 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				name: "Edge fields",
 				desc: "Define the named relationships edges can use, like up and down",
 				page: svelte_page("Edge fields", EdgeFieldSettings),
+			},
+			{
+				type: "page",
+				name: "Excluded folders",
+				desc: "Skip notes in chosen folders when generating edges",
+				page: imp_page(
+					"Excluded folders",
+					_add_settings_exclude_folders,
+				),
 			},
 			{
 				type: "group",

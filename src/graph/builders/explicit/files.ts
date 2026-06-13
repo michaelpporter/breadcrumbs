@@ -48,9 +48,22 @@ export interface AllFiles {
 	obsidian: TFileWithCache[];
 }
 
-export const get_all_files = (app: App): AllFiles => ({
-	obsidian: collect_vault_files(app).map((file) => ({
-		file,
-		cache: app.metadataCache.getFileCache(file),
-	})),
+/** True if `path` is inside (or equal to) any of the excluded folders. */
+const is_excluded = (path: string, exclude_folders: string[]) =>
+	exclude_folders.some((raw) => {
+		const folder = raw.replace(/\/+$/, "");
+		if (!folder) return false;
+		return path === folder || path.startsWith(folder + "/");
+	});
+
+export const get_all_files = (
+	app: App,
+	exclude_folders: string[] = [],
+): AllFiles => ({
+	obsidian: collect_vault_files(app)
+		.filter((file) => !is_excluded(file.path, exclude_folders))
+		.map((file) => ({
+			file,
+			cache: app.metadataCache.getFileCache(file),
+		})),
 });
