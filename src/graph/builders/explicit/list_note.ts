@@ -12,7 +12,7 @@ import { validate_edge_field } from "./validate_field";
 
 interface NativeListItem {
 	position: { start: { line: number; col: number } };
-	outlinks: Array<{ path: string }>;
+	outlinks: { path: string }[];
 	children: NativeListItem[];
 	text: string;
 }
