@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.17.0](https://github.com/michaelpporter/breadcrumbs/compare/4.16.1...4.17.0) (2026-06-14)
+
+### Features
+
+* New per-edge-field **Hide in views** toggle (Settings → Edge fields). A field marked hidden stays in its groups, codeblocks, and the graph, but is no longer rendered in the Matrix and Tree side views — handy for structural fields you don't want cluttering the panels ([#132](https://github.com/michaelpporter/breadcrumbs/discussions/132)).
+
+### Fixed
+
+* Removing an edge field now also drops any transitive implied-relation rules that referenced it and clears edge-source default-field settings that pointed at it. Previously those references dangled, and a stale reverse-edge rule could surface a phantom field in the views.
+
 ### [4.16.1](https://github.com/michaelpporter/breadcrumbs/compare/4.16.0...4.16.1) (2026-06-13)
 
 ### Build
@@ -2570,4 +2580,4 @@ Internal maintenance release — no user-facing behavior changes.
 * TrailGrid overlap ([627c64d](https://github.com/SkepticMystic/breadcrumbs/commit/627c64d856a2cf9d152c6205eaa660faabcbd8e7))
 * trailOrTable ([ceb61cd](https://github.com/SkepticMystic/breadcrumbs/commit/ceb61cd4fdc4b7789ac52369d66541d109b4d878))
 
-[Unreleased]: https://github.com/michaelpporter/breadcrumbs/compare/4.15.2...HEAD
+[Unreleased]: https://github.com/michaelpporter/breadcrumbs/compare/4.17.0...HEAD
