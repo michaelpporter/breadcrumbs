@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* The codeblock `dataview-from` field is renamed to **`from`** (it never used the Dataview API — it's Breadcrumbs' own `#tag` / `"folder"` / `[[link]]` query). The old `dataview-from` still works as a deprecated alias and logs a console warning.
+* The codeblock `dataview-from` field is renamed to **`from`**. The name is now misleading — the Dataview dependency was removed, and Breadcrumbs parses the `#tag` / `"folder"` / `[[link]]` query itself. The old `dataview-from` still works as a deprecated alias and logs a console warning.
 * The Edge fields **Hide in views** toggle is renamed **Hide in side views** to reflect that it only affects the Matrix and Tree side panels.
 * The **Self is sibling** control moved from the Edge fields page to the Implied relations page, where it belongs.
 
