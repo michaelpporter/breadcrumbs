@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.18.1](https://github.com/michaelpporter/breadcrumbs/compare/4.18.0...4.18.1) (2026-06-17)
+
+### Security
+
+* Pinned the transitive `vite` dev-dependency to **8.0.16**, clearing two advisories (GHSA-v6wh-96g9-6wx3, GHSA-fx2h-pf6j-xcff) that affected `8.0.0`–`8.0.15`. Both are Windows dev-server issues; `vite` is only used to run the test suite and is never part of the shipped plugin, so end users were never exposed.
+
+### Build
+
+* Bumped JavaScript dev-dependencies (eslint, esbuild, vitest, tailwindcss, typescript-eslint and others) and the Rust/WASM crates (`itertools` 0.15, `smallvec`, `hashbrown`), and regenerated the committed `wasm/pkg/` bindings. No functional change.
+
 ### [4.18.0](https://github.com/michaelpporter/breadcrumbs/compare/4.17.0...4.18.0) (2026-06-16)
 
 ### Features
