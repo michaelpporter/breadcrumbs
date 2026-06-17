@@ -70,10 +70,10 @@
 		// (the paths pre-computed in postprocess_options may be stale if the
 		// graph wasn't ready when the MDRC first loaded).
 		let live_dv_paths: string[] | undefined;
-		if (options["dataview-from"]) {
+		if (options.from) {
 			try {
 				live_dv_paths = dataview_from_query(
-					options["dataview-from"],
+					options.from,
 					plugin.app,
 					file_path,
 				);
@@ -91,7 +91,7 @@
 			);
 			if (!any_in_graph) {
 				data = undefined;
-				error = "None of the dataview-from notes exist in the graph.";
+				error = "None of the `from` notes exist in the graph.";
 				return;
 			}
 		} else if (!plugin.graph.has_node(source_path)) {

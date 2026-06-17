@@ -6,6 +6,7 @@ import { mount, unmount } from "svelte";
 import EdgeFieldSettings from "../components/settings/EdgeFieldSettings.svelte";
 import TransitiveImpliedRelations from "../components/settings/TransitiveImpliedRelations.svelte";
 import { _add_settings_codeblocks } from "./CodeblockSettings";
+import { _add_settings_dataview_note } from "./DataviewNoteSettings";
 import { _add_settings_date_note } from "./DateNoteSettings";
 import { _add_settings_dendron_note } from "./DendronNoteSettings";
 import { _add_settings_edge_field_suggestor } from "./EdgeFieldSuggestorSettings";
@@ -171,6 +172,15 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 						name: "Date notes",
 						desc: "Link sequential daily and periodic notes by date",
 						page: imp_page("Date notes", _add_settings_date_note),
+					},
+					{
+						type: "page",
+						name: "Dataview notes",
+						desc: "Treat the results of a Dataview query as children of a note (requires Dataview)",
+						page: imp_page(
+							"Dataview notes",
+							_add_settings_dataview_note,
+						),
 					},
 					{
 						type: "page",

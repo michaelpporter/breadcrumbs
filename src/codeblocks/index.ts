@@ -110,17 +110,24 @@ function postprocess_options(
 	}
 
 	if (parsed["dataview-from"]) {
+		log.warn(
+			"Codeblock field `dataview-from` is deprecated; use `from` instead.",
+		);
+	}
+
+	// `from` is the canonical field (the schema coalesces `dataview-from` into it).
+	if (parsed.from) {
 		try {
-			parsed["dataview-from-paths"] = dataview_from_query(
-				parsed["dataview-from"],
+			parsed["from-paths"] = dataview_from_query(
+				parsed.from,
 				plugin.app,
 				source_path,
 			);
 		} catch {
 			errors.push({
-				path: "dataview-from",
+				path: "from",
 				code: "invalid_field_value",
-				message: `Input \`${parsed["dataview-from"]}\` is not a valid query. Supported: \`#tag\`, \`"folder"\`, \`[[link]]\`, and \`AND\`/\`OR\`/\`NOT\` combinations.`,
+				message: `Input \`${parsed.from}\` is not a valid query. Supported: \`#tag\`, \`"folder"\`, \`[[link]]\`, and \`AND\`/\`OR\`/\`NOT\` combinations.`,
 			});
 		}
 	}

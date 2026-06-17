@@ -103,6 +103,9 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 			default_field: "up",
 			default_sibling_field: "",
 		},
+		dataview_note: {
+			default_field: "up",
+		},
 		regex_note: {
 			default_field: "up",
 		},
@@ -154,9 +157,7 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 				up_field: "up",
 			},
 		},
-		traverse_note: {
-			default_field: "up",
-		},
+		traverse_note: {},
 	},
 
 	views: {

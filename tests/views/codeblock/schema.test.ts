@@ -38,12 +38,11 @@ describe("happy", () => {
 			depth: [1, 2],
 			title: "title",
 			collapse: true,
-			content: "open",
+			from: "#tag",
 			sort: "basename asc",
 			"merge-fields": true,
 			fields: ["up", "down"],
 			"start-note": "note.md",
-			"dataview-from": "#tag",
 			"mermaid-renderer": "elk",
 			"mermaid-direction": "LR",
 			"field-groups": ["ups", "downs"],
@@ -57,6 +56,46 @@ describe("happy", () => {
 			...input,
 			sort: { field: "basename", order: 1 },
 		});
+	});
+
+	test("type: graph is a valid type", (t) => {
+		const input: z.input<ReturnType<typeof CodeblockSchema.build>> = {
+			type: "graph",
+		};
+
+		const parsed = CodeblockSchema.build(input, data).safeParse(input);
+		if (!parsed.success) throw new Error("This should not happen");
+
+		t.expect(parsed.success).toEqual(true);
+		t.expect(parsed.data.type).toEqual("graph");
+	});
+
+	test("exclude-folders parses as a string array", (t) => {
+		const input: z.input<ReturnType<typeof CodeblockSchema.build>> = {
+			type: "graph",
+			"exclude-folders": ["Templates", "Archive"],
+		};
+
+		const parsed = CodeblockSchema.build(input, data).safeParse(input);
+		if (!parsed.success) throw new Error("This should not happen");
+
+		t.expect(parsed.success).toEqual(true);
+		t.expect(parsed.data["exclude-folders"]).toStrictEqual([
+			"Templates",
+			"Archive",
+		]);
+	});
+
+	test("deprecated dataview-from coalesces into from", (t) => {
+		const input: z.input<ReturnType<typeof CodeblockSchema.build>> = {
+			"dataview-from": "#tag",
+		};
+
+		const parsed = CodeblockSchema.build(input, data).safeParse(input);
+		if (!parsed.success) throw new Error("This should not happen");
+
+		t.expect(parsed.success).toEqual(true);
+		t.expect(parsed.data.from).toEqual("#tag");
 	});
 
 	test("field-groups get added to fields", (t) => {

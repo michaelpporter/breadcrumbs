@@ -18,6 +18,7 @@
 		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { remove_nullish_keys } from "src/utils/objects";
+	import { is_excluded } from "src/graph/builders/explicit/files";
 	import { Paths } from "src/utils/paths";
 	import { Links } from "src/utils/links";
 	import { active_file_store } from "src/stores/active_file";
@@ -32,11 +33,17 @@
 	let { plugin, options, errors, file_path }: Props = $props();
 
 	const DEFAULT_MAX_DEPTH = 10;
+	// Whole-vault graphs need a higher node ceiling than note-rooted mermaid.
+	const DEFAULT_GRAPH_MAX_NODES = 1000;
 
 	let code: string = $state("");
 	let error: string | undefined = $state(undefined);
 
 	let active_file = $derived($active_file_store);
+
+	// `type: graph` renders the whole vault (or a `from:`-scoped subset) rather
+	// than traversing out from the active note.
+	const is_graph = $derived(options.type === "graph");
 
 	export function update() {
 		const max_depth =
@@ -44,22 +51,57 @@
 				? DEFAULT_MAX_DEPTH
 				: (options.depth[1] ?? DEFAULT_MAX_DEPTH);
 
-		const source_path =
-			options["start-note"] || file_path || active_file?.path || "";
+		let entry_nodes: string[];
+		// Restricts which nodes a traversal may include (None = unrestricted).
+		let allowed_paths: string[] | undefined;
 
-		if (!plugin.graph.has_node(source_path)) {
-			code = "";
-			error = "The file does not exist in the graph.";
-			return;
+		if (is_graph) {
+			let base: string[];
+			if (options["from-paths"]?.length) {
+				base = options["from-paths"];
+			} else {
+				base = [];
+				plugin.graph.iterate_nodes((node: NodeData) =>
+					base.push(node.path),
+				);
+			}
+
+			// `exclude-folders` is additive to the global exclude_folders setting.
+			const exclude = options["exclude-folders"] ?? [];
+			entry_nodes = exclude.length
+				? base.filter((p) => !is_excluded(p, exclude))
+				: base;
+
+			if (!entry_nodes.length) {
+				code = "";
+				error = "The graph is empty.";
+				return;
+			}
+
+			// Restrict traversal targets to the allowed set so excluded notes
+			// don't reappear as neighbours of included ones.
+			allowed_paths = exclude.length ? entry_nodes : undefined;
+		} else {
+			const source_path =
+				options["start-note"] || file_path || active_file?.path || "";
+
+			if (!plugin.graph.has_node(source_path)) {
+				code = "";
+				error = "The file does not exist in the graph.";
+				return;
+			}
+
+			entry_nodes = [file_path];
+			allowed_paths = options["from-paths"];
 		}
 
 		const traversal_options = new TraversalOptions(
-			[file_path],
+			entry_nodes,
 			options.fields,
 			max_depth,
-			100, // max nodes to traverse
+			is_graph ? DEFAULT_GRAPH_MAX_NODES : 100, // max nodes to traverse
 			!options["merge-fields"],
-			options["dataview-from-paths"],
+			allowed_paths,
 		);
 
 		const flowchart_init = remove_nullish_keys({
@@ -79,7 +121,7 @@
 		const field_arrow_values = field_arrow_entries.map(([, v]) => v);
 
 		const mermaid_options = new MermaidGraphOptions(
-			file_path,
+			is_graph ? null : file_path,
 			`%%{ init: { "flowchart": ${JSON.stringify(flowchart_init)} } }%%`,
 			"graph",
 			options["mermaid-direction"] ?? "LR",

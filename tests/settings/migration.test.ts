@@ -151,6 +151,9 @@ describe("migration", () => {
 					default_field: "up",
 					default_sibling_field: "",
 				},
+				dataview_note: {
+					default_field: "up",
+				},
 				regex_note: {
 					default_field: "up",
 				},
@@ -202,9 +205,7 @@ describe("migration", () => {
 					default_field: "up",
 					default_sibling_field: "",
 				},
-				traverse_note: {
-					default_field: "up",
-				},
+				traverse_note: {},
 			},
 			views: {
 				page: {
@@ -381,6 +382,9 @@ describe("migration", () => {
 					default_field: "up",
 					default_sibling_field: "",
 				},
+				dataview_note: {
+					default_field: "up",
+				},
 				regex_note: {
 					default_field: "up",
 				},
@@ -432,9 +436,7 @@ describe("migration", () => {
 					default_field: "up",
 					default_sibling_field: "",
 				},
-				traverse_note: {
-					default_field: "up",
-				},
+				traverse_note: {},
 			},
 			views: {
 				page: {

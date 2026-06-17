@@ -17,10 +17,11 @@ const FIELDS = [
 	"flat",
 	"collapse",
 	"merge-fields",
+	"from",
+	// Deprecated alias for `from`; still accepted, warns at parse time.
 	"dataview-from",
-	"content",
+	"exclude-folders",
 	"sort",
-	"field-prefix",
 	"show-attributes",
 	"mermaid-direction",
 	"mermaid-renderer",
@@ -57,11 +58,30 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 					})
 					.optional(),
 
+				from: z
+					.string({
+						message: zod.error.not_string("from", input.from),
+					})
+					.optional(),
+
+				// Deprecated alias for `from`; coalesced into `from` below.
 				"dataview-from": z
 					.string({
 						message: zod.error.not_string(
 							"dataview-from",
 							input["dataview-from"],
+						),
+					})
+					.optional(),
+
+				// Per-codeblock folder exclusion (additive to the global
+				// exclude_folders setting). Currently applied by `type: graph`.
+				"exclude-folders": z
+					.array(z.string(), {
+						message: zod.error.not_array(
+							"exclude-folders",
+							['"Templates"', '"Archive"'],
+							input["exclude-folders"],
 						),
 					})
 					.optional(),
@@ -96,21 +116,11 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 					})
 					.default(true),
 
-				content: z
-					.enum(["open", "closed"], {
-						message: zod.error.invalid_enum(
-							"content",
-							["open", "closed"],
-							input.content,
-						),
-					})
-					.optional(),
-
 				type: z
-					.enum(["tree", "mermaid", "markmap"], {
+					.enum(["tree", "mermaid", "markmap", "graph"], {
 						message: zod.error.invalid_enum(
 							"type",
-							["tree", "mermaid", "markmap"],
+							["tree", "mermaid", "markmap", "graph"],
 							input.type,
 						),
 					})
@@ -268,6 +278,12 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 			.default({} as any)
 
 			.transform((options) => {
+				// Coalesce the deprecated `dataview-from` alias into `from` so
+				// the rest of the code only reads the canonical field.
+				if (!options.from && options["dataview-from"]) {
+					options.from = options["dataview-from"];
+				}
+
 				// If field-groups are given, resolve them to their fields
 				// adding them to the fields array
 				if (options["field-groups"]) {
@@ -311,6 +327,6 @@ export interface ICodeblock {
 
 	/** Once resolved, the non-optional fields WILL be there, with a default if missing */
 	Options: z.infer<ReturnType<typeof build>> & {
-		"dataview-from-paths"?: string[];
+		"from-paths"?: string[];
 	};
 }

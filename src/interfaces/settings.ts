@@ -124,13 +124,18 @@ export interface BreadcrumbsSettings {
 			year: PeriodNoteConfig;
 		};
 
+		dataview_note: {
+			default_field: string;
+		};
+
 		regex_note: {
 			default_field: string;
 		};
 
-		traverse_note: {
-			default_field: string;
-		};
+		// traverse_note has no settings: BC-traverse-note-field is the sole opt-in
+		// marker, so a default_field can't be honored (it would turn every note into
+		// a DFS root). Kept as an empty object for shape symmetry.
+		traverse_note: object;
 	};
 
 	views: {

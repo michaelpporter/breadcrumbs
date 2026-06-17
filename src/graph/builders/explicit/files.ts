@@ -49,7 +49,7 @@ export interface AllFiles {
 }
 
 /** True if `path` is inside (or equal to) any of the excluded folders. */
-const is_excluded = (path: string, exclude_folders: string[]) =>
+export const is_excluded = (path: string, exclude_folders: string[]) =>
 	exclude_folders.some((raw) => {
 		const folder = raw.replace(/\/+$/, "");
 		if (!folder) return false;

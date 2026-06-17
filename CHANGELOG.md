@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Features
+
+* New codeblock **`type: graph`** — renders the whole vault (or a `from:`-scoped subset) as one Mermaid graph, instead of traversing out from a single note. Useful for an overview MOC or seeing a folder/tag's structure at a glance.
+* `type: graph` codeblocks accept an **`exclude-folders`** list to drop folders from the graph. It's additive to the global Excluded folders setting, so you can hide extra folders per-codeblock without changing your vault-wide config.
+* **Dataview Notes** now have a settings page with a configurable default field, used when a note sets `BC-dataview-note-query` without `BC-dataview-note-field`.
+
+### Changed
+
+* The codeblock `dataview-from` field is renamed to **`from`** (it never used the Dataview API — it's Breadcrumbs' own `#tag` / `"folder"` / `[[link]]` query). The old `dataview-from` still works as a deprecated alias and logs a console warning.
+* The Edge fields **Hide in views** toggle is renamed **Hide in side views** to reflect that it only affects the Matrix and Tree side panels.
+* The **Self is sibling** control moved from the Edge fields page to the Implied relations page, where it belongs.
+
+### Fixed
+
+* Renaming or removing an edge field now updates *every* place that referenced it — including sibling-field defaults (tag/dendron/Johnny.Decimal) and date-note period fields — so no setting can be left pointing at a renamed or deleted field.
+
+### Removed
+
+* The unused `traverse_note` default-field setting (it could never be applied safely) and the dead `content` / `field-prefix` codeblock fields.
+
 ## 4.X
 
 ### [4.17.0](https://github.com/michaelpporter/breadcrumbs/compare/4.16.1...4.17.0) (2026-06-14)

@@ -10,6 +10,10 @@
 	} from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
 	import { reactive_settings } from "src/stores/reactive_settings.svelte";
+	import {
+		remove_field_references,
+		rename_field_references,
+	} from "src/utils/edge_fields";
 	import Tag from "../obsidian/tag.svelte";
 	import EdgeFieldSelector from "../selector/EdgeFieldSelector.svelte";
 
@@ -77,48 +81,9 @@
 					(f) => f.label !== edge_field.label,
 				);
 
-				settings.views.side.matrix.custom_sort_field_labels =
-					settings.views.side.matrix.custom_sort_field_labels.filter(
-						(label) => label !== edge_field.label,
-					);
-
-				settings.edge_field_groups.forEach((group) => {
-					group.fields = group.fields.filter(
-						(f) => f !== edge_field.label,
-					);
-				});
-
-				// Drop transitive rules that reference the removed field —
-				// unlike rename, there's no replacement label to substitute.
-				settings.implied_relations.transitive =
-					settings.implied_relations.transitive.filter(
-						(rule) =>
-							rule.close_field !== edge_field.label &&
-							!rule.chain.some(
-								(attr) => attr.field === edge_field.label,
-							),
-					);
-
-				// Clear any edge source default pointing at the removed field.
-				const sources = settings.explicit_edge_sources;
-				if (sources.tag_note.default_field === edge_field.label)
-					sources.tag_note.default_field = "";
-				if (
-					sources.list_note.default_neighbour_field ===
-					edge_field.label
-				)
-					sources.list_note.default_neighbour_field = "";
-				if (sources.dendron_note.default_field === edge_field.label)
-					sources.dendron_note.default_field = "";
-				if (
-					sources.johnny_decimal_note.default_field ===
-					edge_field.label
-				)
-					sources.johnny_decimal_note.default_field = "";
-				if (sources.date_note.default_field === edge_field.label)
-					sources.date_note.default_field = "";
-				if (sources.regex_note.default_field === edge_field.label)
-					sources.regex_note.default_field = "";
+				// Clear/drop every other reference to the removed field. See
+				// remove_field_references for the full list of slots covered.
+				remove_field_references(settings, edge_field.label);
 
 				autosave();
 			},
@@ -134,74 +99,11 @@
 					return new Notice("Field label must be unique.");
 				}
 
-				settings.edge_field_groups.forEach((group) => {
-					const index = group.fields.indexOf(edge_field.label);
-					if (index === -1) return;
+				// Point every reference at the new label. See
+				// rename_field_references for the full list of slots covered.
+				rename_field_references(settings, edge_field.label, new_label);
 
-					group.fields[index] = new_label;
-				});
-
-				settings.implied_relations.transitive.forEach((rule) => {
-					rule.chain = rule.chain.map((attr) =>
-						attr.field === edge_field.label
-							? { ...attr, field: new_label }
-							: attr,
-					);
-
-					rule.close_field =
-						rule.close_field === edge_field.label
-							? new_label
-							: rule.close_field;
-				});
-
-				settings.explicit_edge_sources.tag_note.default_field =
-					settings.explicit_edge_sources.tag_note.default_field ===
-					edge_field.label
-						? new_label
-						: settings.explicit_edge_sources.tag_note.default_field;
-
-				settings.explicit_edge_sources.list_note.default_neighbour_field =
-					settings.explicit_edge_sources.list_note
-						.default_neighbour_field === edge_field.label
-						? new_label
-						: settings.explicit_edge_sources.list_note
-								.default_neighbour_field;
-
-				settings.explicit_edge_sources.dendron_note.default_field =
-					settings.explicit_edge_sources.dendron_note
-						.default_field === edge_field.label
-						? new_label
-						: settings.explicit_edge_sources.dendron_note
-								.default_field;
-
-				settings.explicit_edge_sources.johnny_decimal_note.default_field =
-					settings.explicit_edge_sources.johnny_decimal_note
-						.default_field === edge_field.label
-						? new_label
-						: settings.explicit_edge_sources.johnny_decimal_note
-								.default_field;
-
-				settings.explicit_edge_sources.date_note.default_field =
-					settings.explicit_edge_sources.date_note.default_field ===
-					edge_field.label
-						? new_label
-						: settings.explicit_edge_sources.date_note
-								.default_field;
-
-				settings.explicit_edge_sources.regex_note.default_field =
-					settings.explicit_edge_sources.regex_note.default_field ===
-					edge_field.label
-						? new_label
-						: settings.explicit_edge_sources.regex_note
-								.default_field;
-
-				settings.views.side.matrix.custom_sort_field_labels =
-					settings.views.side.matrix.custom_sort_field_labels.map(
-						(label) =>
-							label === edge_field.label ? new_label : label,
-					);
-
-				// NOTE: Only rename the field after updating the groups
+				// NOTE: Only rename the field after updating the references
 				edge_field.label = new_label;
 
 				autosave();
@@ -229,6 +131,7 @@
 
 				autosave();
 			},
+
 		},
 
 		groups: {
@@ -516,7 +419,7 @@
 									e.currentTarget.checked,
 								)}
 						/>
-						Hide in views
+						Hide in side views
 					</label>
 
 					{#each group_labels as group_label}
@@ -648,49 +551,5 @@
 			<PlusIcon size={ICON_SIZE} />
 			New Group
 		</button>
-
-		<div class="mt-4 border p-2" style="border-radius: var(--radius-m); border: var(--modal-border-width) solid var(--background-modifier-border);">
-			<div class="mb-1 font-semibold">Self</div>
-			<p class="text-sm mb-2">
-				Notes with any outgoing edge of these fields get an implied
-				self-loop — they appear in their own sibling list.
-			</p>
-			<div class="flex flex-wrap items-center gap-1.5">
-				{#each settings.self_is_sibling as label (label)}
-					<Tag
-						tag={label}
-						title="Right click to remove"
-						oncontextmenu={(e) => {
-							const menu = new Menu();
-							menu.addItem((item) =>
-								item
-									.setTitle("Remove")
-									.setIcon("x")
-									.onClick(() => {
-										settings.self_is_sibling =
-											settings.self_is_sibling.filter(
-												(f) => f !== label,
-											);
-										autosave();
-									}),
-							);
-							menu.showAtMouseEvent(e);
-						}}
-					/>
-				{/each}
-
-				<EdgeFieldSelector
-					placeholder="Add Field"
-					fields={settings.edge_fields.filter(
-						(f) => !settings.self_is_sibling.includes(f.label),
-					)}
-					onselect={(f) => {
-						if (!f) return;
-						settings.self_is_sibling.push(f.label);
-						autosave();
-					}}
-				/>
-			</div>
-		</div>
 	</div>
 </div>

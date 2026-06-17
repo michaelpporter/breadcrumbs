@@ -70,7 +70,7 @@
 			max_depth,
 			100, // max nodes to traverse
 			!options["merge-fields"],
-			options["dataview-from-paths"],
+			options["from-paths"],
 		);
 
 		const postprocess_options = new TraversalPostprocessOptions(

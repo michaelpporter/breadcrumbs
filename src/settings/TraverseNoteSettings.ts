@@ -1,25 +1,15 @@
+import { Setting } from "obsidian";
+import { META_ALIAS } from "src/const/metadata_fields";
 import type BreadcrumbsPlugin from "src/main";
-import { new_setting } from "src/utils/settings";
 
 export const _add_settings_traverse_note = (
-	plugin: BreadcrumbsPlugin,
+	_plugin: BreadcrumbsPlugin,
 	containerEl: HTMLElement,
 ) => {
-	new_setting(containerEl, {
-		name: "Default field",
-		desc: "Field to use when BC-traverse-note-field is not specified in the note",
-		select: {
-			value: plugin.settings.explicit_edge_sources.traverse_note
-				.default_field,
-			options: plugin.settings.edge_fields.map((f) => f.label),
-			cb: async (value) => {
-				plugin.settings.explicit_edge_sources.traverse_note.default_field =
-					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
-			},
-		},
-	});
+	// Traverse notes have no configurable defaults: the per-note field below is
+	// the sole opt-in marker, so a "default field" can't be applied (it would
+	// turn every note into a traversal root). This page is informational.
+	new Setting(containerEl).setDesc(
+		`Add "${META_ALIAS["traverse-note-field"]}: <field>" to a note's frontmatter to make it a traversal root. Breadcrumbs walks outward along that note's resolved links, adding one edge per hop using the chosen field.`,
+	);
 };

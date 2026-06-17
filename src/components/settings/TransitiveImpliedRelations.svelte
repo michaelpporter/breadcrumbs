@@ -487,6 +487,53 @@
 				</button>
 			</div>
 		</details>
+
+		<div
+			class="mt-4 border p-2"
+			style="border-radius: var(--radius-m); border: var(--modal-border-width) solid var(--background-modifier-border);"
+		>
+			<div class="mb-1 font-semibold">Self is sibling</div>
+			<p class="text-sm mb-2">
+				Notes with any outgoing edge of these fields get an implied
+				self-loop — they appear in their own sibling list.
+			</p>
+			<div class="flex flex-wrap items-center gap-1.5">
+				{#each settings.self_is_sibling as label (label)}
+					<Tag
+						tag={label}
+						title="Right click to remove"
+						oncontextmenu={(e) => {
+							const menu = new Menu();
+							menu.addItem((item) =>
+								item
+									.setTitle("Remove")
+									.setIcon("x")
+									.onClick(() => {
+										settings.self_is_sibling =
+											settings.self_is_sibling.filter(
+												(f) => f !== label,
+											);
+										autosave();
+									}),
+							);
+							menu.showAtMouseEvent(e);
+						}}
+					/>
+				{/each}
+
+				<EdgeFieldSelector
+					placeholder="Add Field"
+					fields={settings.edge_fields.filter(
+						(f) => !settings.self_is_sibling.includes(f.label),
+					)}
+					onselect={(f) => {
+						if (!f) return;
+						settings.self_is_sibling.push(f.label);
+						autosave();
+					}}
+				/>
+			</div>
+		</div>
 	</div>
 </div>
 

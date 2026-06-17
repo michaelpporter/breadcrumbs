@@ -31,7 +31,11 @@ function get_dataview_note_info(
 		});
 	}
 	// NOTE: We check that the query is actually valid later
-	const field = metadata[META_ALIAS["dataview-note-field"]];
+	// The query is the opt-in marker (checked above), so the field can safely
+	// fall back to the configured default when BC-dataview-note-field is absent.
+	const field =
+		metadata[META_ALIAS["dataview-note-field"]] ??
+		plugin.settings.explicit_edge_sources.dataview_note.default_field;
 	if (!field) {
 		return fail(undefined);
 	} else if (typeof field !== "string") {
