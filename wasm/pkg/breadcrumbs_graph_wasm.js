@@ -255,6 +255,14 @@ export function sort_edges(graph, edges, sorter) {
     return v2;
 }
 
+/**
+ * @returns {NoteGraph}
+ */
+export function create_graph() {
+    const ret = wasm.create_graph();
+    return NoteGraph.__wrap(ret);
+}
+
 let cachedUint32ArrayMemory0 = null;
 
 function getUint32ArrayMemory0() {
@@ -274,13 +282,6 @@ function passArray32ToWasm0(arg, malloc) {
     getUint32ArrayMemory0().set(arg, ptr / 4);
     WASM_VECTOR_LEN = arg.length;
     return ptr;
-}
-/**
- * @returns {NoteGraph}
- */
-export function create_graph() {
-    const ret = wasm.create_graph();
-    return NoteGraph.__wrap(ret);
 }
 
 const AddEdgeGraphUpdateFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -1917,55 +1918,6 @@ export class NoteGraph {
         wasm.__wbg_notegraph_free(ptr, 0);
     }
     /**
-     * Runs a recursive traversal of the graph.
-     * @param {TraversalOptions} options
-     * @returns {TraversalResult}
-     */
-    rec_traverse(options) {
-        _assertClass(options, TraversalOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.notegraph_rec_traverse(this.__wbg_ptr, ptr0);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return TraversalResult.__wrap(ret[0]);
-    }
-    /**
-     * Runs a recursive traversal of the graph and post-processes the result.
-     * The post-processed result is more efficient to work with from
-     * JavaScript.
-     * @param {TraversalOptions} options
-     * @param {TraversalPostprocessOptions} postprocess_options
-     * @returns {FlatTraversalResult}
-     */
-    rec_traverse_and_process(options, postprocess_options) {
-        _assertClass(options, TraversalOptions);
-        var ptr0 = options.__destroy_into_raw();
-        _assertClass(postprocess_options, TraversalPostprocessOptions);
-        var ptr1 = postprocess_options.__destroy_into_raw();
-        const ret = wasm.notegraph_rec_traverse_and_process(this.__wbg_ptr, ptr0, ptr1);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return FlatTraversalResult.__wrap(ret[0]);
-    }
-    /**
-     * @param {TraversalOptions} traversal_options
-     * @param {MermaidGraphOptions} diagram_options
-     * @returns {MermaidGraphData}
-     */
-    generate_mermaid_graph(traversal_options, diagram_options) {
-        _assertClass(traversal_options, TraversalOptions);
-        var ptr0 = traversal_options.__destroy_into_raw();
-        _assertClass(diagram_options, MermaidGraphOptions);
-        var ptr1 = diagram_options.__destroy_into_raw();
-        const ret = wasm.notegraph_generate_mermaid_graph(this.__wbg_ptr, ptr0, ptr1);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return MermaidGraphData.__wrap(ret[0]);
-    }
-    /**
      * Returns all edge types that are present in the graph.
      * @returns {string[]}
      */
@@ -2133,6 +2085,55 @@ export class NoteGraph {
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.notegraph_has_node(this.__wbg_ptr, ptr0, len0);
         return ret !== 0;
+    }
+    /**
+     * @param {TraversalOptions} traversal_options
+     * @param {MermaidGraphOptions} diagram_options
+     * @returns {MermaidGraphData}
+     */
+    generate_mermaid_graph(traversal_options, diagram_options) {
+        _assertClass(traversal_options, TraversalOptions);
+        var ptr0 = traversal_options.__destroy_into_raw();
+        _assertClass(diagram_options, MermaidGraphOptions);
+        var ptr1 = diagram_options.__destroy_into_raw();
+        const ret = wasm.notegraph_generate_mermaid_graph(this.__wbg_ptr, ptr0, ptr1);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return MermaidGraphData.__wrap(ret[0]);
+    }
+    /**
+     * Runs a recursive traversal of the graph.
+     * @param {TraversalOptions} options
+     * @returns {TraversalResult}
+     */
+    rec_traverse(options) {
+        _assertClass(options, TraversalOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.notegraph_rec_traverse(this.__wbg_ptr, ptr0);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return TraversalResult.__wrap(ret[0]);
+    }
+    /**
+     * Runs a recursive traversal of the graph and post-processes the result.
+     * The post-processed result is more efficient to work with from
+     * JavaScript.
+     * @param {TraversalOptions} options
+     * @param {TraversalPostprocessOptions} postprocess_options
+     * @returns {FlatTraversalResult}
+     */
+    rec_traverse_and_process(options, postprocess_options) {
+        _assertClass(options, TraversalOptions);
+        var ptr0 = options.__destroy_into_raw();
+        _assertClass(postprocess_options, TraversalPostprocessOptions);
+        var ptr1 = postprocess_options.__destroy_into_raw();
+        const ret = wasm.notegraph_rec_traverse_and_process(this.__wbg_ptr, ptr0, ptr1);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return FlatTraversalResult.__wrap(ret[0]);
     }
 }
 

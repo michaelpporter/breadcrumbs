@@ -22,13 +22,13 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 petgraph = "0.8.1"
 web-time = "1.1.0"
 js-sys = "0.3.77"
-itertools = "0.14.0"
+itertools = "0.15.0"
 serde = { version = "1.0", features = ["derive"] }
 serde-wasm-bindgen = "0.6.5"
 smallvec = "1.15.0"
 vec-collections = "0.4.3"
 enum_dispatch = "0.3.13"
-hashbrown = "0.16.1"
+hashbrown = "0.17.1"
 indoc = "2.0.6"
 indexmap = "2.14.0"
 
