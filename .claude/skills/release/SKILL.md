@@ -81,50 +81,49 @@ Stop on failure.
 
 ### 8. Bump version
 
-Update `version` in both files to the new version string:
-- `package.json`
-- `manifest.json` (or `manifest-beta.json` for a beta)
+**First, edit `version` in `package.json` by hand** to the new version string. This is required: the bump scripts read the target version from `npm_package_version` (i.e. `package.json`'s `version`) and do **not** set it themselves. Skipping this makes `version:prod`/`version:beta` a no-op that re-stamps the *current* version.
 
-Then update `versions.json` with the new `"<version>": "<minAppVersion>"` entry (minAppVersion comes from the manifest). The repo's bump scripts do this **and re-sort `versions.json` by semver** — prefer running them over hand-editing:
+Then run the bump script — it copies that version into the manifest and adds the `versions.json` entry, **re-sorting `versions.json` by semver**:
 
 ```
-bun run version:prod    # stable: updates manifest.json, versions.json (sorted)
-bun run version:beta    # beta:   updates manifest-beta.json, versions.json (sorted)
+bun run version:prod    # stable: reads package.json version → updates manifest.json + versions.json (sorted)
+bun run version:beta    # beta:   reads package.json version → updates manifest-beta.json + versions.json (sorted)
 ```
+
+After running, verify all three files show the new version (`grep '"version"' package.json manifest.json` and check `versions.json`'s last entry) — the script is silent on the no-op failure above.
 
 If you do edit `versions.json` by hand, insert the entry in semver order — don't append at the end (the file is kept sorted, prereleases before their release).
 
 ### 9. Update CHANGELOG.md
 
-The changelog follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). The top of the file has a `## [Unreleased]` section; releases accumulate as `## [<version>] - <YYYY-MM-DD>` between `## [Unreleased]` and the legacy `## 4.X` umbrella (older entries below the umbrella are an archive — never reformat them).
+The changelog loosely follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), but **match the file's actual layout, not the KAC spec.** The real structure is:
+
+- An empty `## [Unreleased]` section at the very top (leave it empty — this repo does not accumulate changes under Unreleased between releases).
+- A `## 4.X` umbrella heading.
+- Under the umbrella, one entry **per release**, newest first, in this exact form:
+  `### [<version>](https://github.com/michaelpporter/breadcrumbs/compare/<prev>...<version>) (<YYYY-MM-DD>)`
+  — i.e. the compare link is **inline in the heading**, and the version is **not** wrapped in `[]` brackets beyond the markdown link. There is **no bottom reference-link section**; don't add one.
+- Older entries far below are an archive — never reformat them.
 
 Collect changes since the last tag:
 ```
 git log $(git describe --tags --abbrev=0)..HEAD --oneline
 ```
 
-**a. Convert the Unreleased section into the release:**
-- Rename `## [Unreleased]` to `## [<version>] - <YYYY-MM-DD>`.
-- Insert a fresh empty `## [Unreleased]` above it.
-- The heading carries **no** inline compare link — links live in the bottom reference section (step c).
+**a. Insert the new entry** directly under `## 4.X`, above the previous release's `### [...]` heading. Leave the top `## [Unreleased]` section empty.
 
-**b. Group changes under `###` subsections**, in this order, omitting any that are empty:
-- **Added** — new features (`feat:` introducing something new)
+**b. Group changes under `###` subsections.** Use the headings the existing entries already use — **`### Features`**, **`### Changed`**, **`### Removed`**, **`### Fixed`**, **`### Build`** (and **`### Security`**, **`### Performance`** when relevant). Note `### Features` (not KAC's "Added"). Omit empty sections. Rough mapping:
+- **Features** — new features (`feat:` introducing something new)
 - **Changed** — changes to existing behavior (`feat:` modifying behavior, `refactor:`)
-- **Deprecated** — soon-to-be-removed features
 - **Removed** — removed features
 - **Fixed** — bug fixes (`fix:`)
-- **Security** — vulnerability fixes (`security:`)
-- **Performance** — perf work (`perf:`) — custom type, KAC 1.1.0 allows it
-- **Build** — build/CI/tooling (`build:`, `ci:`) — custom type, when user-relevant
+- **Security** — vulnerability fixes (`security:`, dependency advisory pins)
+- **Performance** — perf work (`perf:`)
+- **Build** — build/CI/tooling and routine dependency bumps (`build:`, `ci:`, `chore(deps)`)
 
-`docs:`, `chore:`, and `test:` commits are usually omitted — the changelog is for humans, not a commit dump. Include them only if user-facing. Write descriptive bullets, not raw commit subjects; use existing entries as a style reference.
+`docs:`, `chore:` (non-deps), and `test:` commits are usually omitted — the changelog is for humans, not a commit dump. Include them only if user-facing. Write descriptive bullets, not raw commit subjects; use existing entries as a style reference.
 
-**c. Update the bottom reference links:**
-- Add a line for the new version:
-  `[<version>]: https://github.com/michaelpporter/breadcrumbs/compare/<prev>...<version>`
-- Repoint Unreleased:
-  `[Unreleased]: https://github.com/michaelpporter/breadcrumbs/compare/<version>...HEAD`
+A deps-only / security release is fine — see `4.18.1` for the pattern (a `### Security` note for an advisory pin plus a `### Build` note summarizing the bumps).
 
 ### 10. Commit
 
