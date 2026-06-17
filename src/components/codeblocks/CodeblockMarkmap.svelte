@@ -108,7 +108,9 @@
 			max_depth,
 			100, // max nodes to traverse
 			!options["merge-fields"],
-			undefined,
+			// When `from:` is given, keep traversal within that set so the
+			// map doesn't escape into the whole vault.
+			has_dv_paths ? live_dv_paths : undefined,
 		);
 
 		const postprocess_options = new TraversalPostprocessOptions(

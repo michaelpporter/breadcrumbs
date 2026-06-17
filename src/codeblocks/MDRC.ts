@@ -111,8 +111,7 @@ export class CodeblockMDRC extends MarkdownRenderChild {
 					plugin: this.plugin,
 				},
 			});
-		} else if (options.type === "mermaid" || options.type === "graph") {
-			// `graph` reuses the mermaid renderer with a whole-vault entry set.
+		} else if (options.type === "mermaid") {
 			this.component = mount(CodeblockMermaid, {
 				target: this.containerEl,
 				props: {

@@ -22,7 +22,7 @@ describe("happy", () => {
 			flat: false,
 			type: "tree",
 			collapse: false,
-			depth: [0, Infinity],
+			depth: [0, 5],
 			"merge-fields": true,
 			sort: {
 				field: "basename",
@@ -58,32 +58,14 @@ describe("happy", () => {
 		});
 	});
 
-	test("type: graph is a valid type", (t) => {
-		const input: z.input<ReturnType<typeof CodeblockSchema.build>> = {
-			type: "graph",
-		};
+	test("type: graph is no longer a valid type", (t) => {
+		// `graph` was removed; assert it is now rejected. Cast since the input
+		// type no longer permits it.
+		const input = { type: "graph" } as Record<string, unknown>;
 
 		const parsed = CodeblockSchema.build(input, data).safeParse(input);
-		if (!parsed.success) throw new Error("This should not happen");
 
-		t.expect(parsed.success).toEqual(true);
-		t.expect(parsed.data.type).toEqual("graph");
-	});
-
-	test("exclude-folders parses as a string array", (t) => {
-		const input: z.input<ReturnType<typeof CodeblockSchema.build>> = {
-			type: "graph",
-			"exclude-folders": ["Templates", "Archive"],
-		};
-
-		const parsed = CodeblockSchema.build(input, data).safeParse(input);
-		if (!parsed.success) throw new Error("This should not happen");
-
-		t.expect(parsed.success).toEqual(true);
-		t.expect(parsed.data["exclude-folders"]).toStrictEqual([
-			"Templates",
-			"Archive",
-		]);
+		t.expect(parsed.success).toEqual(false);
 	});
 
 	test("deprecated dataview-from coalesces into from", (t) => {

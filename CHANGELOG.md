@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.19.0](https://github.com/michaelpporter/breadcrumbs/compare/4.18.1...4.19.0) (2026-06-17)
+
+### Removed
+
+* Removed the **`type: graph`** codeblock and its **`exclude-folders`** option (both added in 4.18.0). A whole-vault graph quickly exceeds Mermaid's edge limit and freezes large vaults, so the feature needs a rethink before it returns. Existing `type: graph` blocks now report an invalid type — switch to `tree`, `mermaid`, or `markmap`.
+
+### Changed
+
+* Codeblock `from:` **folder queries now match case-insensitively** (e.g. `from: '"projects"'` matches a `Projects/` folder), mirroring Dataview.
+* `type: markmap` with `from:` now **keeps the map within the matched notes** instead of following edges out into the rest of the vault.
+* A `breadcrumbs` codeblock with no `depth:` now **defaults to depth `[0, 5]`** instead of unbounded, so traversals on large vaults no longer hang.
+
+### Performance
+
+* Codeblock tree traversal no longer clones its ancestor set at every node (O(n²) → O(n) allocations), speeding up deep or wide trees.
+
 ### [4.18.1](https://github.com/michaelpporter/breadcrumbs/compare/4.18.0...4.18.1) (2026-06-17)
 
 ### Security

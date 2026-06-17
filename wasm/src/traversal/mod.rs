@@ -85,7 +85,7 @@ impl NoteGraph {
                         &mut traversal_count,
                         options.max_traversal_count,
                         &allowed_targets,
-                        ancestors,
+                        &mut ancestors,
                     )?);
                 } else {
                     result.push(self.int_rec_traverse(
@@ -97,7 +97,7 @@ impl NoteGraph {
                         &mut traversal_count,
                         options.max_traversal_count,
                         &allowed_targets,
-                        ancestors,
+                        &mut ancestors,
                     )?);
                 }
             }
@@ -148,7 +148,7 @@ impl NoteGraph {
         traversal_count: &mut u32,
         max_traversal_count: u32,
         allowed_targets: &Option<HashSet<NGNodeIndex>>,
-        ancestors: HashSet<NGNodeIndex>,
+        ancestors: &mut HashSet<NGNodeIndex>,
     ) -> Result<TraversalData> {
         let mut new_children = Vec::new();
         let stop_traversal = depth >= max_depth || *traversal_count >= max_traversal_count;
@@ -189,8 +189,9 @@ impl NoteGraph {
                         ));
                     }
 
-                    let mut child_ancestors = ancestors.clone();
-                    child_ancestors.insert(target);
+                    // Push target onto the shared path set, recurse, then pop
+                    // (backtrack). Avoids cloning a growing HashSet per child.
+                    ancestors.insert(target);
 
                     new_children.push(self.int_rec_traverse(
                         target,
@@ -201,8 +202,10 @@ impl NoteGraph {
                         traversal_count,
                         max_traversal_count,
                         allowed_targets,
-                        child_ancestors,
-                    )?)
+                        ancestors,
+                    )?);
+
+                    ancestors.remove(&target);
                 }
             }
         }

@@ -59,12 +59,14 @@ function parse_atom(
 		while (pos.i < q.length && q[pos.i] !== '"') pos.i++;
 		const folder = q.slice(start, pos.i);
 		if (q[pos.i] === '"') pos.i++;
+		// Case-insensitive, matching Dataview's folder FROM behaviour.
+		const folder_lc = folder.toLowerCase();
 		return (file) => {
-			if (folder === "") return true;
-			const file_folder = file.parent?.path ?? "";
+			if (folder_lc === "") return true;
+			const file_folder = (file.parent?.path ?? "").toLowerCase();
 			return (
-				file_folder === folder ||
-				file_folder.startsWith(folder + "/")
+				file_folder === folder_lc ||
+				file_folder.startsWith(folder_lc + "/")
 			);
 		};
 	}

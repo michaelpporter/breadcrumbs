@@ -20,7 +20,6 @@ const FIELDS = [
 	"from",
 	// Deprecated alias for `from`; still accepted, warns at parse time.
 	"dataview-from",
-	"exclude-folders",
 	"sort",
 	"show-attributes",
 	"mermaid-direction",
@@ -74,18 +73,6 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 					})
 					.optional(),
 
-				// Per-codeblock folder exclusion (additive to the global
-				// exclude_folders setting). Currently applied by `type: graph`.
-				"exclude-folders": z
-					.array(z.string(), {
-						message: zod.error.not_array(
-							"exclude-folders",
-							['"Templates"', '"Archive"'],
-							input["exclude-folders"],
-						),
-					})
-					.optional(),
-
 				flat: z
 					.boolean({
 						message: zod.error.invalid_enum(
@@ -117,10 +104,10 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 					.default(true),
 
 				type: z
-					.enum(["tree", "mermaid", "markmap", "graph"], {
+					.enum(["tree", "mermaid", "markmap"], {
 						message: zod.error.invalid_enum(
 							"type",
-							["tree", "mermaid", "markmap", "graph"],
+							["tree", "mermaid", "markmap"],
 							input.type,
 						),
 					})
@@ -228,7 +215,7 @@ const build = (input: Record<string, unknown>, data: InputData) => {
 						message: `Minimum depth cannot be greater than maximum depth. _Try swapping the numbers._
 **Example**: \`depth: [0, 3]\`, or possibly: \`depth: [${(input.depth as number[] | null)?.[1] ?? 0}, ${(input.depth as number[] | null)?.[0] ?? 3}]\``,
 					})
-					.default([0, Infinity]),
+					.default([0, 5]),
 
 				sort: z
 					.unknown()
