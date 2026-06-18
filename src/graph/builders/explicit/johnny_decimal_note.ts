@@ -12,6 +12,31 @@ import { ensure_not_ends_with } from "src/utils/strings";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import { validate_edge_field } from "./validate_field";
 
+/**
+ * Decimals of the parent note, or `null` if this note has no parent.
+ *
+ * - Items/sub-items split on the delimiter: `"11.01"` → `"11"`.
+ * - Categories floor to their area: `"11"` → `"10"`, `"21"` → `"20"`.
+ * - Areas (`"10"`, `"20"`, …) have no parent → `null`.
+ */
+const johnny_decimal_parent = (
+	decimals: string,
+	delimiter: string,
+): string | null => {
+	if (decimals.includes(delimiter)) {
+		const parent = decimals.split(delimiter).slice(0, -1).join(delimiter);
+		return parent === "" ? null : parent;
+	}
+
+	const num = parseInt(decimals, 10);
+	if (isNaN(num)) return null;
+
+	const parent_num = Math.floor(num / 10) * 10;
+	if (parent_num === num) return null; // already an area (10, 20, …)
+
+	return String(parent_num).padStart(decimals.length, "0");
+};
+
 const get_johnny_decimal_note_info = (
 	plugin: BreadcrumbsPlugin,
 	metadata: Record<string, unknown> | undefined,
@@ -61,25 +86,11 @@ const handle_johnny_decimal_note = (
 		plugin.settings.explicit_edge_sources.johnny_decimal_note;
 
 	// Go one note up
-	let target_decimals: string;
-	if (source_note.decimals.includes(delimiter)) {
-		// Item/sub-item → parent via delimiter split (e.g. "11.01" → "11")
-		target_decimals = source_note.decimals
-			.split(delimiter)
-			.slice(0, -1)
-			.join(delimiter);
-	} else {
-		// Category → parent area via numeric floor (e.g. "11" → "10", "21" → "20")
-		const num = parseInt(source_note.decimals, 10);
-		if (isNaN(num)) return;
-		const parent_num = Math.floor(num / 10) * 10;
-		if (parent_num === num) return; // already an area (10, 20, …) — no parent
-		target_decimals = String(parent_num).padStart(
-			source_note.decimals.length,
-			"0",
-		);
-	}
-	if (target_decimals === "") return;
+	const target_decimals = johnny_decimal_parent(
+		source_note.decimals,
+		delimiter,
+	);
+	if (!target_decimals) return;
 
 	const target_note = notes.find((n) => n.decimals === target_decimals);
 	// I thought a while about building the unresolved path in this case.
@@ -184,10 +195,10 @@ export const _add_explicit_edges_johnny_decimal_note: ExplicitEdgeBuilder = (
 		// Group notes by parent decimal prefix — notes sharing the same parent are siblings
 		const by_parent = new Map<string, JohnnyDecimalNote[]>();
 		for (const note of johnny_decimal_notes) {
-			const parent_decimals = note.decimals
-				.split(delimiter)
-				.slice(0, -1)
-				.join(delimiter);
+			const parent_decimals = johnny_decimal_parent(
+				note.decimals,
+				delimiter,
+			);
 			if (!parent_decimals) continue;
 			const list = by_parent.get(parent_decimals) ?? [];
 			list.push(note);
