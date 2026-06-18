@@ -3,8 +3,10 @@ import SimpleInput from "src/components/input/SimpleInput.svelte";
 import { VIEW_IDS } from "src/const/views";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
+import { CreateCanvasModal } from "src/modals/CreateCanvasModal";
 import { CreateListIndexModal } from "src/modals/CreateListIndexModal";
 import { GenericModal } from "src/modals/GenericModal";
+import { NeighbourFuzzySuggester } from "src/modals/NeighbourFuzzySuggestModal";
 import { active_file_store } from "src/stores/active_file";
 import { Timer } from "src/utils/timer";
 import { redraw_page_views } from "src/views/page";
@@ -133,12 +135,46 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 		},
 	});
 
+	// Export the active note's neighbourhood to a JSON Canvas file
+	plugin.addCommand({
+		id: "export-to-canvas",
+		name: "Export to canvas",
+		checkCallback: (checking) => {
+			if (!get(active_file_store)) return false;
+			if (!checking) new CreateCanvasModal(plugin.app, plugin).open();
+			return true;
+		},
+	});
+
+	// Fuzzy-pick a neighbour of the active note and jump to it
+	plugin.addCommand({
+		id: "jump-to-neighbour-picker",
+		name: "Jump to neighbour (picker)",
+		checkCallback: (checking) => {
+			const active_file = get(active_file_store);
+			if (!active_file) return false;
+			if (!checking) {
+				new NeighbourFuzzySuggester(plugin, active_file.path).open();
+			}
+			return true;
+		},
+	});
+
 	/// Jump to first neighbour
 	plugin.settings.edge_field_groups.forEach((group) => {
 		plugin.addCommand({
 			id: `jump-to-first-neighbour-group:${group.label}`,
 			name: `Jump to first neighbour by group:${group.label}`,
 			callback: () => jump_to_neighbour(plugin, { fields: group.fields }),
+		});
+	});
+
+	/// Jump to first neighbour by individual field (hotkey-bindable per direction)
+	plugin.settings.edge_fields.forEach(({ label }) => {
+		plugin.addCommand({
+			id: `jump-to-first-neighbour-field:${label}`,
+			name: `Jump to first neighbour by field:${label}`,
+			callback: () => jump_to_neighbour(plugin, { fields: [label] }),
 		});
 	});
 

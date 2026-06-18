@@ -6,6 +6,7 @@ import { mount, unmount } from "svelte";
 import EdgeFieldSettings from "../components/settings/EdgeFieldSettings.svelte";
 import TransitiveImpliedRelations from "../components/settings/TransitiveImpliedRelations.svelte";
 import { _add_settings_codeblocks } from "./CodeblockSettings";
+import { _add_settings_create_canvas } from "./CreateCanvasSettings";
 import { _add_settings_dataview_note } from "./DataviewNoteSettings";
 import { _add_settings_date_note } from "./DateNoteSettings";
 import { _add_settings_dendron_note } from "./DendronNoteSettings";
@@ -268,6 +269,15 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 						name: "Thread",
 						desc: "Create a new note along an edge field",
 						page: imp_page("Thread", _add_settings_thread),
+					},
+					{
+						type: "page",
+						name: "Create canvas",
+						desc: "Export a note's neighbourhood to a JSON Canvas",
+						page: imp_page(
+							"Create canvas",
+							_add_settings_create_canvas,
+						),
 					},
 				],
 			},

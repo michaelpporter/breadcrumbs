@@ -234,6 +234,16 @@ export interface BreadcrumbsSettings {
 				destination: CrumbDestination | "none";
 			};
 		};
+
+		create_canvas: {
+			default_options: {
+				target_path_template: string;
+				depth: number;
+				fields: string[];
+				field_group_labels: string[];
+				direction: "LR" | "TB";
+			};
+		};
 	};
 
 	suggestors: {

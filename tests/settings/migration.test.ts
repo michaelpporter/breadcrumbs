@@ -344,6 +344,16 @@ describe("migration", () => {
 							"{{source.folder}}/{{attr.field}} {{source.basename}}",
 					},
 				},
+				create_canvas: {
+					default_options: {
+						target_path_template:
+							"{{source.folder}}/{{source.basename}} canvas",
+						depth: 5,
+						fields: [],
+						field_group_labels: [],
+						direction: "LR",
+					},
+				},
 			},
 			suggestors: {
 				edge_field: {
@@ -572,6 +582,16 @@ describe("migration", () => {
 						destination: "frontmatter",
 						target_path_template:
 							"{{source.folder}}/{{attr.field}} {{source.basename}}",
+					},
+				},
+				create_canvas: {
+					default_options: {
+						target_path_template:
+							"{{source.folder}}/{{source.basename}} canvas",
+						depth: 5,
+						fields: [],
+						field_group_labels: [],
+						direction: "LR",
 					},
 				},
 			},
