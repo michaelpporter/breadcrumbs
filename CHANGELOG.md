@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.19.1](https://github.com/michaelpporter/breadcrumbs/compare/4.19.0...4.19.1) (2026-06-18)
+
+### Features
+
+* **Export to canvas** — a new command that lays out a note's neighbourhood as a native JSON Canvas (`.canvas`). Pick which edge field-groups to follow and the depth, choose left-to-right or top-to-bottom layout, and the canvas is built as a tidy tree with each parent centred over its children. Defaults are configurable under Settings → Commands → Create canvas; re-exporting an existing canvas prompts to overwrite or create a new one.
+* **Jump to neighbour (picker)** — a fuzzy-suggest command listing all of the active note's neighbours (grouped by field) to jump to, complementing the existing "jump to first neighbour" commands.
+* **Per-field jump commands** — "Jump to first neighbour by field:`<field>`" is now registered for every edge field, so directions like `up`/`down`/`next`/`prev` can each be bound to their own hotkey.
+
+### Fixed
+
+* Johnny.Decimal **sibling edges now work at the category level** (e.g. `11`↔`12` under area `10`), not just for delimited items (`11.01`↔`11.02`). The sibling grouping now shares the same parent resolution as the up-edge builder.
+
 ### [4.19.0](https://github.com/michaelpporter/breadcrumbs/compare/4.18.1...4.19.0) (2026-06-17)
 
 ### Removed
