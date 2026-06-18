@@ -10,6 +10,7 @@ Breadcrumbs lets you add _typed links_ to your notes — `up`/`down`, `next`/`pr
 - **Browse the hierarchy.** The **Tree** side view expands the full structure beneath the current note; the **Matrix** view groups every incoming and outgoing relationship by type.
 - **Move through your notes.** **Previous / Next** buttons turn a chain of notes into a readable sequence.
 - **Embed diagrams.** Drop a ` ```breadcrumbs ``` ` codeblock into any note to render its neighbourhood as a tree, a **Mermaid** diagram, or an interactive **Markmap** mind-map.
+- **Export to Canvas.** Lay out a note's neighbourhood as a native Obsidian **Canvas** — a tidy tree of file nodes and labelled edges you can rearrange and edit.
 
 ## Ways to define relationships
 
