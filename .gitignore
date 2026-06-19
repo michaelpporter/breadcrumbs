@@ -33,9 +33,7 @@ meta.txt
 .claude/settings.local.json
 
 # Personal Claude skills (local paths, not for public contributors)
-.claude/skills/copy-to-demo/
-.claude/skills/update-docs/
-
+.claude/*
 .codegraph/*
 
 # Local triage / scratch notes (not for the repo)
