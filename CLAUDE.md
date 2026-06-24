@@ -108,7 +108,7 @@ Each explicit builder can read a per-note override from frontmatter via the `BC-
 - **Shape** defined in `src/interfaces/settings.ts` (`BreadcrumbsSettings`)
 - **Defaults** in `src/const/settings.ts` (`DEFAULT_SETTINGS`)
 - **Migration** in `src/settings/migration.ts` — handles old v2/v3 settings shapes; runs on every load
-- When adding a new settings field: add to the interface, add a default, and add it to every hardcoded `tree:` / `matrix:` object in `tests/settings/migration.test.ts`
+- When adding a new settings field: add to the interface and add a default. The `tests/settings/migration.test.ts` fixtures assert against `deep_merge_objects(delta, DEFAULT_SETTINGS)` — the `delta` lists only what each migration changes — so a new field with a default flows in automatically and needs no test change. Only touch a fixture's `delta` if a migration actually transforms the new field.
 
 ### Views
 
