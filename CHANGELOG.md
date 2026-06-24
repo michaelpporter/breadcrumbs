@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Invalid edge-field errors from the explicit edge builders now consistently name the `BC-…-field` frontmatter key (e.g. `BC-tag-note-field`), and the Dataview builder's field validation matches the other builders. Internally, the seven builders that resolve a single edge field from frontmatter now share one `read_edge_field` helper, removing duplicated override → default → validate logic.
+* The `typed_link` builder's inline-field parsing is now a pure, unit-tested `parse_inline_field` helper, and a redundant frontmatter/inline dedup layer was removed (the graph engine already deduplicates edges by resolved target and field). No behaviour change.
 
 ### Fixed
 

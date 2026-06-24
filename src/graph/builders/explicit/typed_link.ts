@@ -13,6 +13,16 @@ const INLINE_FIELD_REGEX =
 	/^(?:\s*[-*+\d.]+\s+)?[([]?\s*([\w][\w\s-]*)\s*::\s*/;
 
 /**
+ * Parse the field name from a line that opens with a Dataview-style inline
+ * field (`field:: ...`). Pure over a single line — returns the trimmed field
+ * name, or `null` when the line does not open with an inline field.
+ */
+export const parse_inline_field = (line: string): string | null => {
+	const match = INLINE_FIELD_REGEX.exec(line);
+	return match ? match[1].trim() : null;
+};
+
+/**
  * **typed_link** — the primary edge builder.
  *
  * Two passes:
@@ -76,29 +86,15 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 				if (file.extension !== "md") return;
 				if (!cache?.links?.length) return;
 
-				// Build a set of (field, link) pairs already covered by pass 1
-				// to avoid duplicate edges for fields that appear in both frontmatter
-				// and inline form.
-				const fm_covered = new Set<string>();
-				cache.frontmatterLinks?.forEach((fl) => {
-					const field = fl.key.split(".")[0];
-					if (field_labels.has(field)) {
-						fm_covered.add(`${field}\0${fl.link}`);
-					}
-				});
-
 				const content = await plugin.app.vault.cachedRead(file);
 				const lines = content.split("\n");
 
 				for (const link_cache of cache.links) {
 					const line_num = link_cache.position.start.line;
 					const line_text = lines[line_num] ?? "";
-					const match = INLINE_FIELD_REGEX.exec(line_text);
-					if (!match) continue;
-
-					const field = match[1].trim();
+					const field = parse_inline_field(line_text);
+					if (!field) continue;
 					if (!field_labels.has(field)) continue;
-					if (fm_covered.has(`${field}\0${link_cache.link}`)) continue;
 
 					const resolved = resolve_relative_target_path(
 						plugin.app,
