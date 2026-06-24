@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Invalid edge-field errors from the explicit edge builders now consistently name the `BC-…-field` frontmatter key (e.g. `BC-tag-note-field`), and the Dataview builder's field validation matches the other builders. Internally, the seven builders that resolve a single edge field from frontmatter now share one `read_edge_field` helper, removing duplicated override → default → validate logic.
 
+### Fixed
+
+* **Renaming or deleting an edge field now updates the Dataview builder's default field.** Previously the rename/delete cascade skipped the Dataview source's `default field`, so it kept pointing at the old (now invalid) field name until you fixed it by hand.
+
 ## 4.X
 
 ### [4.19.1](https://github.com/michaelpporter/breadcrumbs/compare/4.19.0...4.19.1) (2026-06-18)

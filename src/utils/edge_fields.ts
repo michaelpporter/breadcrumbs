@@ -1,3 +1,4 @@
+import type { ExplicitEdgeSource } from "src/const/graph";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
 import { remove_duplicates } from "./arrays";
 
@@ -33,57 +34,127 @@ interface ArrayFieldRef {
 }
 
 /**
- * Every place in settings that references an edge field by label.
+ * A settings slot holding a single edge-field label, addressed by the settings
+ * object so the registry below can be a module-level constant.
+ */
+interface EdgeFieldSlot {
+	get: (settings: BreadcrumbsSettings) => string;
+	set: (settings: BreadcrumbsSettings, value: string) => void;
+}
+
+const slot = (
+	get: EdgeFieldSlot["get"],
+	set: EdgeFieldSlot["set"],
+): EdgeFieldSlot => ({ get, set });
+
+/**
+ * The single source of truth for the per-source settings slots that hold an
+ * edge-field label. Both the rename/remove cascade
+ * ({@link collect_field_references}) and the explicit builders' `read_edge_field`
+ * helper read from this map, so the two can never disagree on which slots
+ * exist. Add a source's primary / sibling / neighbour slot here, once.
+ */
+export const EDGE_FIELD_SLOTS: Partial<
+	Record<
+		ExplicitEdgeSource,
+		{
+			primary?: EdgeFieldSlot;
+			sibling?: EdgeFieldSlot;
+			neighbour?: EdgeFieldSlot;
+		}
+	>
+> = {
+	tag_note: {
+		primary: slot(
+			(s) => s.explicit_edge_sources.tag_note.default_field,
+			(s, v) => (s.explicit_edge_sources.tag_note.default_field = v),
+		),
+		sibling: slot(
+			(s) => s.explicit_edge_sources.tag_note.default_sibling_field,
+			(s, v) =>
+				(s.explicit_edge_sources.tag_note.default_sibling_field = v),
+		),
+	},
+	dendron_note: {
+		primary: slot(
+			(s) => s.explicit_edge_sources.dendron_note.default_field,
+			(s, v) => (s.explicit_edge_sources.dendron_note.default_field = v),
+		),
+		sibling: slot(
+			(s) => s.explicit_edge_sources.dendron_note.default_sibling_field,
+			(s, v) =>
+				(s.explicit_edge_sources.dendron_note.default_sibling_field = v),
+		),
+	},
+	johnny_decimal_note: {
+		primary: slot(
+			(s) => s.explicit_edge_sources.johnny_decimal_note.default_field,
+			(s, v) =>
+				(s.explicit_edge_sources.johnny_decimal_note.default_field = v),
+		),
+		sibling: slot(
+			(s) =>
+				s.explicit_edge_sources.johnny_decimal_note
+					.default_sibling_field,
+			(s, v) =>
+				(s.explicit_edge_sources.johnny_decimal_note.default_sibling_field =
+					v),
+		),
+	},
+	regex_note: {
+		primary: slot(
+			(s) => s.explicit_edge_sources.regex_note.default_field,
+			(s, v) => (s.explicit_edge_sources.regex_note.default_field = v),
+		),
+	},
+	dataview_note: {
+		primary: slot(
+			(s) => s.explicit_edge_sources.dataview_note.default_field,
+			(s, v) => (s.explicit_edge_sources.dataview_note.default_field = v),
+		),
+	},
+	list_note: {
+		neighbour: slot(
+			(s) => s.explicit_edge_sources.list_note.default_neighbour_field,
+			(s, v) =>
+				(s.explicit_edge_sources.list_note.default_neighbour_field = v),
+		),
+	},
+	date_note: {
+		primary: slot(
+			(s) => s.explicit_edge_sources.date_note.default_field,
+			(s, v) => (s.explicit_edge_sources.date_note.default_field = v),
+		),
+	},
+};
+
+/**
+ * Every place in settings that references an edge field by label, used by the
+ * rename/remove cascade — when a field is renamed or deleted, both operations
+ * walk this list so a reference can never be silently missed.
  *
- * This is the single source of truth for the rename/remove cascade — when a
- * field is renamed or deleted, both operations walk this list so a new
- * reference can never be silently missed. Add new field-label references here,
- * not in the settings UI. (Transitive rules are handled separately because
- * *removing* a field drops the whole rule rather than clearing a slot.)
+ * Per-source single-label slots come from {@link EDGE_FIELD_SLOTS} (add new ones
+ * there, once); this function adds the references that don't fit that shape
+ * (date-note period fields, matrix sort order, `self_is_sibling`, field
+ * groups). Transitive rules are handled separately because *removing* a field
+ * drops the whole rule rather than clearing a slot.
  */
 const collect_field_references = (
 	settings: BreadcrumbsSettings,
 ): { scalars: ScalarFieldRef[]; arrays: ArrayFieldRef[] } => {
 	const sources = settings.explicit_edge_sources;
 
-	const scalars: ScalarFieldRef[] = [
-		{
-			get: () => sources.tag_note.default_field,
-			set: (v) => (sources.tag_note.default_field = v),
-		},
-		{
-			get: () => sources.tag_note.default_sibling_field,
-			set: (v) => (sources.tag_note.default_sibling_field = v),
-		},
-		{
-			get: () => sources.list_note.default_neighbour_field,
-			set: (v) => (sources.list_note.default_neighbour_field = v),
-		},
-		{
-			get: () => sources.dendron_note.default_field,
-			set: (v) => (sources.dendron_note.default_field = v),
-		},
-		{
-			get: () => sources.dendron_note.default_sibling_field,
-			set: (v) => (sources.dendron_note.default_sibling_field = v),
-		},
-		{
-			get: () => sources.johnny_decimal_note.default_field,
-			set: (v) => (sources.johnny_decimal_note.default_field = v),
-		},
-		{
-			get: () => sources.johnny_decimal_note.default_sibling_field,
-			set: (v) => (sources.johnny_decimal_note.default_sibling_field = v),
-		},
-		{
-			get: () => sources.date_note.default_field,
-			set: (v) => (sources.date_note.default_field = v),
-		},
-		{
-			get: () => sources.regex_note.default_field,
-			set: (v) => (sources.regex_note.default_field = v),
-		},
-	];
+	// Per-source single-label slots, bound to this `settings`. Shared with
+	// read_edge_field via EDGE_FIELD_SLOTS so the two can never drift.
+	const scalars: ScalarFieldRef[] = Object.values(EDGE_FIELD_SLOTS)
+		.flatMap((slots) =>
+			slots ? [slots.primary, slots.sibling, slots.neighbour] : [],
+		)
+		.filter((ref): ref is EdgeFieldSlot => ref !== undefined)
+		.map((ref) => ({
+			get: () => ref.get(settings),
+			set: (v) => ref.set(settings, v),
+		}));
 
 	// Date-note period configs each reference two fields.
 	(["week", "month", "quarter", "year"] as const).forEach((period) => {
