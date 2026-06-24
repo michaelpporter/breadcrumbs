@@ -10,7 +10,7 @@ import { implied_pair_close_field } from "src/utils/implied_pair_close_field";
 import { Paths } from "src/utils/paths";
 import { succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
-import { validate_edge_field } from "./validate_field";
+import { read_edge_field } from "./read_edge_field";
 
 function dendron_edge_key(
 	source: string,
@@ -33,14 +33,9 @@ function get_dendron_note_info(
 	// NOTE: Don't return early here. Dendron notes can be valid without any metadata in them
 	//   We just have to iterate and check each note
 	// if (!metadata) return fail(undefined);
-	const field_res = validate_edge_field(
-		plugin,
-		metadata?.[META_ALIAS["dendron-note-field"]] ??
-			//   Which is why we have a default_field on dendron_note
-			plugin.settings.explicit_edge_sources.dendron_note.default_field,
-		path,
-		"dendron-note-field",
-	);
+	// NOTE: read_edge_field uses optional chaining, so a dendron note with no
+	//   frontmatter still resolves via the default_field.
+	const field_res = read_edge_field(plugin, "dendron_note", metadata, path);
 	if (!field_res.ok) return field_res;
 
 	return succ({ field: field_res.data });

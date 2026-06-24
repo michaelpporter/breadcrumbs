@@ -1,5 +1,4 @@
 import { normalizePath } from "obsidian";
-import { META_ALIAS } from "src/const/metadata_fields";
 import type {
 	EdgeBuilderResults,
 	ExplicitEdgeBuilder,
@@ -10,7 +9,7 @@ import { Paths } from "src/utils/paths";
 import { succ } from "src/utils/result";
 import { ensure_not_ends_with } from "src/utils/strings";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
-import { validate_edge_field } from "./validate_field";
+import { read_edge_field } from "./read_edge_field";
 
 /**
  * Decimals of the parent note, or `null` if this note has no parent.
@@ -42,18 +41,14 @@ const get_johnny_decimal_note_info = (
 	metadata: Record<string, unknown> | undefined,
 	path: string,
 ) => {
-	// NOTE: Don't return early here. Johnny.Decimal notes can be valid without any metadata in them
-	//   We just have to iterate and check each note
-	// if (!metadata) return fail(undefined);
-
-	const field_res = validate_edge_field(
+	// NOTE: Don't return early on missing metadata. Johnny.Decimal notes can be
+	//   valid without any frontmatter — read_edge_field's optional chaining lets
+	//   them resolve via the default_field.
+	const field_res = read_edge_field(
 		plugin,
-		metadata?.[META_ALIAS["johnny-decimal-note-field"]] ??
-			//   Which is why we have a default_field on johnny_decimal_note
-			plugin.settings.explicit_edge_sources.johnny_decimal_note
-				.default_field,
+		"johnny_decimal_note",
+		metadata,
 		path,
-		"johnny-decimal-note-field",
 	);
 	if (!field_res.ok) return field_res;
 

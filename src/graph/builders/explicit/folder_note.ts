@@ -10,7 +10,7 @@ import type { Result } from "src/interfaces/result";
 import type BreadcrumbsPlugin from "src/main";
 import { fail, succ } from "src/utils/result";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
-import { validate_edge_field } from "./validate_field";
+import { read_edge_field } from "./read_edge_field";
 
 interface FolderNoteData {
 	field: string;
@@ -24,12 +24,8 @@ const get_folder_note_info = (
 ): Result<FolderNoteData, BreadcrumbsError | undefined> => {
 	if (!metadata) return fail(undefined);
 
-	const field_res = validate_edge_field(
-		plugin,
-		metadata[META_ALIAS["folder-note-field"]],
-		path,
-		"folder-note-field",
-	);
+	// folder_note has no default_field — the per-note field is required.
+	const field_res = read_edge_field(plugin, "folder_note", metadata, path);
 	if (!field_res.ok) return field_res;
 
 	const recurse = Boolean(metadata[META_ALIAS["folder-note-recurse"]]);
