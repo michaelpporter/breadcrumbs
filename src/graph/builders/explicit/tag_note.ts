@@ -8,6 +8,7 @@ import type BreadcrumbsPlugin from "src/main";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { ensure_starts_with } from "src/utils/strings";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { read_edge_field } from "./read_edge_field";
 import { validate_edge_field } from "./validate_field";
 
 const parse_frontmatter_tags = (
@@ -50,13 +51,7 @@ const get_tag_note_info = (
 	}
 	const tag = ensure_starts_with(raw_tag, "#");
 
-	const field_res = validate_edge_field(
-		plugin,
-		metadata[META_ALIAS["tag-note-field"]] ??
-			plugin.settings.explicit_edge_sources.tag_note.default_field,
-		path,
-		"tag-note-field",
-	);
+	const field_res = read_edge_field(plugin, "tag_note", metadata, path);
 	if (!field_res.ok) return field_res;
 	const field = field_res.data;
 

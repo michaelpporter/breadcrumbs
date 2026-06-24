@@ -10,6 +10,7 @@ import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { read_edge_field } from "./read_edge_field";
 
 function get_dataview_note_info(
 	plugin: BreadcrumbsPlugin,
@@ -30,30 +31,14 @@ function get_dataview_note_info(
 			message: "dataview-note-query is not a string",
 		});
 	}
-	// NOTE: We check that the query is actually valid later
+	// NOTE: We check that the query is actually valid later.
 	// The query is the opt-in marker (checked above), so the field can safely
 	// fall back to the configured default when BC-dataview-note-field is absent.
-	const field =
-		metadata[META_ALIAS["dataview-note-field"]] ??
-		plugin.settings.explicit_edge_sources.dataview_note.default_field;
-	if (!field) {
-		return fail(undefined);
-	} else if (typeof field !== "string") {
-		return graph_build_fail({
-			path,
-			code: "invalid_field_value",
-			message: "dataview-note-field is not a string",
-		});
-	} else if (!plugin.settings.edge_fields.find((f) => f.label === field)) {
-		return graph_build_fail({
-			path,
-			code: "invalid_edge_field",
-			message: `dataview-note-field is not a valid field: '${field}'`,
-		});
-	}
+	const field_res = read_edge_field(plugin, "dataview_note", metadata, path);
+	if (!field_res.ok) return field_res;
 
 	return succ({
-		field,
+		field: field_res.data,
 		query,
 	});
 }

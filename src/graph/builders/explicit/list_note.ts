@@ -8,6 +8,7 @@ import type BreadcrumbsPlugin from "src/main";
 import { resolve_relative_target_path } from "src/utils/obsidian";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import { read_edge_field } from "./read_edge_field";
 import { validate_edge_field } from "./validate_field";
 
 interface NativeListItem {
@@ -111,12 +112,8 @@ const get_list_note_info = (
 		return fail(undefined);
 	}
 
-	const field_res = validate_edge_field(
-		plugin,
-		metadata[META_ALIAS["list-note-field"]],
-		path,
-		"list-note-field",
-	);
+	// list_note has no default_field — the per-note field is required.
+	const field_res = read_edge_field(plugin, "list_note", metadata, path);
 	if (!field_res.ok) return field_res;
 	const field = field_res.data;
 
