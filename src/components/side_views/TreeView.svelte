@@ -16,12 +16,8 @@
 	import EdgeSortIdSelector from "../selector/EdgeSortIdSelector.svelte";
 	import FieldGroupLabelsSelector from "../selector/FieldGroupLabelsSelector.svelte";
 	import ShowAttributesSelectorMenu from "../selector/ShowAttributesSelectorMenu.svelte";
-	import {
-		FlatTraversalResult,
-		TraversalOptions,
-		TraversalPostprocessOptions,
-		create_edge_sorter,
-	} from "wasm/pkg/breadcrumbs_graph_wasm";
+	import { FlatTraversalResult } from "wasm/pkg/breadcrumbs_graph_wasm";
+	import { sort_traversal, traverse } from "src/graph/traversal";
 	import { untrack } from "svelte";
 	import { prepareFuzzySearch } from "obsidian";
 	import { effect_counter } from "src/utils/perf";
@@ -64,12 +60,10 @@
 		),
 	);
 
-	let sort = $derived(
-		create_edge_sorter(
-			settings.edge_sort_id.field,
-			settings.edge_sort_id.order === -1,
-		),
-	);
+	let sort_spec = $derived({
+		field: settings.edge_sort_id.field,
+		order: settings.edge_sort_id.order,
+	});
 
 	let active_file = $derived($active_file_store);
 
@@ -115,17 +109,13 @@
 
 	let tree: FlatTraversalResult | undefined = $derived.by(() => {
 		if (entry_paths && entry_paths.length > 0) {
-			return plugin.graph.rec_traverse_and_process(
-				new TraversalOptions(
-					entry_paths,
-					edge_field_labels,
-					depth,
-					100,
-					settings.merge_fields,
-					undefined,
-				),
-				new TraversalPostprocessOptions(sort, false),
-			);
+			return traverse(plugin.graph, {
+				entry: entry_paths,
+				fields: edge_field_labels,
+				depth,
+				separateEdges: settings.merge_fields,
+				sort: sort_spec,
+			});
 		} else {
 			return undefined;
 		}
@@ -134,8 +124,10 @@
 	// We want to re-sort, when the sorter changes.
 	// Because svelte can't track changes to the tree, we need to wrap it in an object.
 	let sorted_tree = $derived.by(() => {
-		const s = sort;
-		untrack(() => tree?.sort(plugin.graph, s));
+		const s = sort_spec;
+		untrack(() => {
+			if (tree) sort_traversal(plugin.graph, tree, s);
+		});
 		return {
 			tree: tree,
 		};

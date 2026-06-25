@@ -1,9 +1,9 @@
+import { build_traversal_options } from "src/graph/traversal";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
 import type { NodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import {
 	MermaidGraphOptions,
 	TransitiveGraphRule,
-	TraversalOptions,
 } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 const MERMAID_DIRECTIONS = ["LR", "RL", "TB", "BT"] as const;
@@ -90,7 +90,12 @@ function from_transitive_rule(
 	wasm_rule.free();
 
 	const mermaid_data = graph.generate_mermaid_graph(
-		new TraversalOptions(["1"], undefined, 100, 1000, false, undefined),
+		build_traversal_options({
+			entry: ["1"],
+			depth: 100,
+			maxCount: 1000,
+			separateEdges: false,
+		}),
 		new MermaidGraphOptions(
 			undefined,
 			"",

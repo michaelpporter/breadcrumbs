@@ -10,10 +10,8 @@
 	import {
 		FlatTraversalResult,
 		NoteGraphError,
-		TraversalOptions,
-		TraversalPostprocessOptions,
-		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
+	import { traverse } from "src/graph/traversal";
 	import NestedEdgeList from "../NestedEdgeList.svelte";
 	import CopyToClipboardButton from "../button/CopyToClipboardButton.svelte";
 	import CodeblockErrors from "./CodeblockErrors.svelte";
@@ -28,9 +26,6 @@
 
 	let { plugin, options, errors, file_path }: Props = $props();
 
-	let sort = $derived(
-		create_edge_sorter(options.sort.field, options.sort.order === -1),
-	);
 	let node_stringify_options = $derived(
 		to_node_stringify_options(
 			plugin.settings,
@@ -64,25 +59,16 @@
 			return;
 		}
 
-		const traversal_options = new TraversalOptions(
-			[source_path],
-			options.fields,
-			max_depth,
-			100, // max nodes to traverse
-			!options["merge-fields"],
-			options["from-paths"],
-		);
-
-		const postprocess_options = new TraversalPostprocessOptions(
-			sort,
-			options.flat,
-		);
-
 		try {
-			const new_data = plugin.graph.rec_traverse_and_process(
-				traversal_options,
-				postprocess_options,
-			);
+			const new_data = traverse(plugin.graph, {
+				entry: [source_path],
+				fields: options.fields,
+				depth: max_depth,
+				separateEdges: !options["merge-fields"],
+				dataviewFrom: options["from-paths"],
+				sort: options.sort,
+				flatten: options.flat,
+			});
 			data?.free(); // free previous FlatTraversalResult
 			data = new_data;
 			error = undefined;

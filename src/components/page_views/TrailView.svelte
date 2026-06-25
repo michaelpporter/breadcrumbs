@@ -6,8 +6,8 @@
 	import TrailViewPath from "./TrailViewPath.svelte";
 	import {
 		PathList,
-		TraversalOptions,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
+	import { build_traversal_options } from "src/graph/traversal";
 	import { log } from "src/logger";
 	import { useViewSettings } from "src/stores/use_view_settings.svelte";
 	import { effect_counter } from "src/utils/perf";
@@ -43,14 +43,12 @@
 			settings.field_group_labels,
 		);
 
-		let traversal_options = new TraversalOptions(
-			[file_path],
-			edge_field_labels,
-			5, // depth limit
-			100, // max nodes to traverse
-			!settings.merge_fields,
-			undefined,
-		);
+		const traversal_options = build_traversal_options({
+			entry: [file_path],
+			fields: edge_field_labels,
+			depth: 5,
+			separateEdges: !settings.merge_fields,
+		});
 
 		let traversal_data = plugin.graph.rec_traverse(traversal_options);
 		// Extract primitives before freeing; TraversalResult must be freed explicitly.

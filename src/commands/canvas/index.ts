@@ -1,5 +1,6 @@
 import type { TFile } from "obsidian";
 import { Notice, Setting } from "obsidian";
+import { with_traversal } from "src/graph/traversal";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
@@ -7,10 +8,6 @@ import { GenericModal } from "src/modals/GenericModal";
 import { build_canvas, Canvas } from "src/utils/canvas";
 import { Paths } from "src/utils/paths";
 import { resolve_templates } from "src/utils/strings";
-import {
-	TraversalOptions,
-	TraversalPostprocessOptions,
-} from "wasm/pkg/breadcrumbs_graph_wasm";
 
 export async function export_to_canvas(
 	plugin: BreadcrumbsPlugin,
@@ -26,27 +23,18 @@ export async function export_to_canvas(
 	// Follow only the selected edge fields; empty selection = all fields.
 	const fields = options.fields.length ? options.fields : undefined;
 
-	const traversal_options = new TraversalOptions(
-		[source_path],
-		fields,
-		options.depth,
-		100, // max nodes to traverse
-		false,
-		undefined,
-	);
-
-	const result = plugin.graph.rec_traverse_and_process(
-		traversal_options,
-		TraversalPostprocessOptions.without_sorter(true),
-	);
-
-	const canvas = build_canvas(
+	const canvas = with_traversal(
 		plugin.graph,
-		result,
-		source_path,
-		options.direction,
+		{
+			entry: [source_path],
+			fields,
+			depth: options.depth,
+			separateEdges: false,
+			flatten: true,
+		},
+		(result) =>
+			build_canvas(plugin.graph, result, source_path, options.direction),
 	);
-	result.free();
 
 	// Resolve the target path template (mirrors the thread command).
 	const target_path = Paths.normalize(
