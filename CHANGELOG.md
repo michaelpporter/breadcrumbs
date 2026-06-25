@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* **The tree view's "Merge fields" toggle was inverted** — it separated fields when set to merge and vice versa. It now matches its label (and the trail view / codeblock behaviour). Surfaced while routing the view through the new traversal facade.
 * **Renaming or deleting an edge field now updates the Dataview builder's default field.** Previously the rename/delete cascade skipped the Dataview source's `default field`, so it kept pointing at the old (now invalid) field name until you fixed it by hand.
 
 ## 4.X
