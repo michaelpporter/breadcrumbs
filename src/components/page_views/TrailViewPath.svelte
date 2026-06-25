@@ -6,6 +6,7 @@
 		type Path,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { to_node_stringify_options } from "src/graph/utils";
+	import { useOwned } from "src/stores/use_owned.svelte";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -14,17 +15,13 @@
 
 	let { plugin, all_paths }: Props = $props();
 
-	let node_stringify_options = $derived(
+	const owned_stringify = useOwned(() =>
 		to_node_stringify_options(
 			plugin.settings,
 			plugin.settings.views.page.trail.show_node_options,
 		),
 	);
-
-	$effect(() => {
-		const o = node_stringify_options;
-		return () => o.free();
-	});
+	let node_stringify_options = $derived(owned_stringify.current);
 
 	let reversed = $derived(all_paths.map((path) => path.reverse_edges));
 </script>

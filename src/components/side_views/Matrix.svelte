@@ -18,6 +18,7 @@
 	import { log } from "src/logger";
 	import { to_node_stringify_options } from "src/graph/utils";
 	import { useViewSettings } from "src/stores/use_view_settings.svelte";
+	import { useOwned } from "src/stores/use_owned.svelte";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -83,14 +84,10 @@
 		),
 	);
 
-	let node_stringify_options = $derived(
+	const owned_stringify = useOwned(() =>
 		to_node_stringify_options(plugin.settings, settings.show_node_options),
 	);
-
-	$effect(() => {
-		const o = node_stringify_options;
-		return () => o.free();
-	});
+	let node_stringify_options = $derived(owned_stringify.current);
 
 	let search_open = $state(false);
 	let search_query = $state("");

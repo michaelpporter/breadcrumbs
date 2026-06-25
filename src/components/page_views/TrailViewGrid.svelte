@@ -8,6 +8,7 @@
 	import EdgeLink from "../EdgeLink.svelte";
 	import type { Path } from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { to_node_stringify_options } from "src/graph/utils";
+	import { useOwned } from "src/stores/use_owned.svelte";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -16,17 +17,13 @@
 
 	let { plugin, all_paths }: Props = $props();
 
-	let node_stringify_options = $derived(
+	const owned_stringify = useOwned(() =>
 		to_node_stringify_options(
 			plugin.settings,
 			plugin.settings.views.page.trail.show_node_options,
 		),
 	);
-
-	$effect(() => {
-		const o = node_stringify_options;
-		return () => o.free();
-	});
+	let node_stringify_options = $derived(owned_stringify.current);
 
 	let trail_grid = $derived.by(() => {
 		// Precompute target-path strings once to avoid repeated WASM calls in sort.

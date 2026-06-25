@@ -9,6 +9,7 @@
 		to_node_stringify_options,
 		type EdgeAttribute,
 	} from "src/graph/utils";
+	import { useOwned } from "src/stores/use_owned.svelte";
 
 	// NOTE: These are available on settings, but they're modified in the parent component,
 
@@ -33,14 +34,10 @@
 		plugin.settings.views.side.matrix.show_node_options,
 	);
 
-	let node_stringify_options = $derived(
+	const owned_stringify = useOwned(() =>
 		to_node_stringify_options(plugin.settings, show_node_options),
 	);
-
-	$effect(() => {
-		const o = node_stringify_options;
-		return () => o.free();
-	});
+	let node_stringify_options = $derived(owned_stringify.current);
 </script>
 
 <details

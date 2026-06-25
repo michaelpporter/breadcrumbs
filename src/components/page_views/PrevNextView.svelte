@@ -6,6 +6,7 @@
 	import { implied_pair_close_field } from "src/utils/implied_pair_close_field";
 	import EdgeLink from "../EdgeLink.svelte";
 	import { to_node_stringify_options } from "src/graph/utils";
+	import { useOwned } from "src/stores/use_owned.svelte";
 
 	interface Props {
 		file_path: string;
@@ -35,17 +36,13 @@
 		]),
 	);
 
-	let node_stringify_options = $derived(
+	const owned_stringify = useOwned(() =>
 		to_node_stringify_options(
 			plugin.settings,
 			plugin.settings.views.page.prev_next.show_node_options,
 		),
 	);
-
-	$effect(() => {
-		const o = node_stringify_options;
-		return () => o.free();
-	});
+	let node_stringify_options = $derived(owned_stringify.current);
 
 	let grouped_out_edges = $derived.by(() => {
 		if (!plugin.graph.has_node(file_path)) return null;
