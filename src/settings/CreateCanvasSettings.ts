@@ -26,7 +26,7 @@ export const _add_settings_create_canvas = (
 					options.field_group_labels,
 				);
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -41,7 +41,7 @@ export const _add_settings_create_canvas = (
 				if (isNaN(n) || n < 0) return;
 
 				options.depth = n;
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -54,7 +54,7 @@ export const _add_settings_create_canvas = (
 			value: options.direction,
 			cb: async (value) => {
 				options.direction = value as "LR" | "TB";
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -66,7 +66,7 @@ export const _add_settings_create_canvas = (
 			value: options.target_path_template,
 			cb: async (value) => {
 				options.target_path_template = value;
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});

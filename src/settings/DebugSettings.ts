@@ -16,7 +16,7 @@ export const _add_settings_debug = (
 				log.set_level(value);
 				plugin.settings.debug.level = value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});

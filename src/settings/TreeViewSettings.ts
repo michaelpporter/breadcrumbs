@@ -21,8 +21,7 @@ export const _add_settings_tree_view = (
 			cb: async (checked) => {
 				plugin.settings.views.side.tree.collapse = checked;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -35,8 +34,7 @@ export const _add_settings_tree_view = (
 			cb: async (checked) => {
 				plugin.settings.views.side.tree.find_root = checked;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -54,8 +52,7 @@ export const _add_settings_tree_view = (
 				plugin.settings.views.side.tree.find_root_field_group_labels =
 					value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -77,8 +74,7 @@ export const _add_settings_tree_view = (
 
 				plugin.settings.views.side.tree.default_depth = int;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -90,8 +86,7 @@ export const _add_settings_tree_view = (
 			select_cb: async (value: EdgeSortId) => {
 				plugin.settings.views.side.tree.edge_sort_id = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -103,8 +98,7 @@ export const _add_settings_tree_view = (
 			select_cb: async (value: EdgeAttribute[]) => {
 				plugin.settings.views.side.tree.show_attributes = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -121,8 +115,7 @@ export const _add_settings_tree_view = (
 			select_cb: async (value: string[]) => {
 				plugin.settings.views.side.tree.field_group_labels = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -135,8 +128,7 @@ export const _add_settings_tree_view = (
 			cb: async (value) => {
 				plugin.settings.views.side.tree.merge_fields = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -149,8 +141,7 @@ export const _add_settings_tree_view = (
 			cb: async (value) => {
 				plugin.settings.views.side.tree.lock_view = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -164,10 +155,7 @@ export const _add_settings_tree_view = (
 				if (!value) plugin.settings.views.side.tree.lock_path = value;
 				else {
 					plugin.settings.views.side.tree.lock_path = value;
-					await Promise.all([
-						plugin.rebuildGraph(),
-						plugin.saveSettings(),
-					]);
+					await plugin.commitSettings("graph");
 				}
 			},
 		},

@@ -16,7 +16,7 @@ export const _add_settings_thread = (
 			cb: async (value) => {
 				settings.commands.thread.default_options.destination = value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -31,7 +31,7 @@ export const _add_settings_thread = (
 				settings.commands.thread.default_options.target_path_template =
 					value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});

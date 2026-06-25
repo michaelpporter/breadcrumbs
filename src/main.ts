@@ -27,6 +27,8 @@ import { METADATA_FIELDS_MAP } from "./const/metadata_fields";
 import { dataview_plugin } from "./external/dataview";
 import type { BreadcrumbsError } from "./interfaces/graph";
 import { log } from "./logger";
+import type { SettingEffect } from "./settings/commit";
+import { commit_setting } from "./settings/commit";
 import { migrate_old_settings } from "./settings/migration";
 import { reactive_settings } from "./stores/reactive_settings.svelte";
 import { EdgeFieldSuggestor } from "./suggestor/edge_fields";
@@ -361,6 +363,14 @@ export default class BreadcrumbsPlugin extends Plugin {
 	async saveSettings() {
 		reactive_settings.current.is_dirty = false;
 		await this.saveData(reactive_settings.snapshot());
+	}
+
+	/**
+	 * Save a settings change and run the follow-up effects its `policy` requires.
+	 * Call from a settings callback after writing the field. See {@link SettingEffect}.
+	 */
+	commitSettings(policy: SettingEffect) {
+		return commit_setting(this, policy);
 	}
 
 	async backup_old_settings(): Promise<void> {

@@ -20,7 +20,7 @@ export const _add_settings_freeze_implied_edges = (
 				settings.commands.freeze_implied_edges.default_options.destination =
 					value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -38,7 +38,7 @@ export const _add_settings_freeze_implied_edges = (
 				plugin.settings.commands.freeze_implied_edges.default_options.included_fields =
 					value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -53,7 +53,7 @@ export const _add_settings_freeze_implied_edges = (
 				settings.commands.freeze_implied_edges.default_options.use_alias =
 					checked;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});

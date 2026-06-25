@@ -35,7 +35,7 @@ export const _add_settings_list_index = (
 							.field_group_labels,
 					);
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -49,7 +49,7 @@ export const _add_settings_list_index = (
 			cb: async (value) => {
 				settings.commands.list_index.default_options.link_kind = value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -62,7 +62,7 @@ export const _add_settings_list_index = (
 			cb: async (value) => {
 				settings.commands.list_index.default_options.indent = value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -76,7 +76,7 @@ export const _add_settings_list_index = (
 				settings.commands.list_index.default_options.edge_sort_id =
 					value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -90,7 +90,7 @@ export const _add_settings_list_index = (
 				settings.commands.list_index.default_options.show_attributes =
 					value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});

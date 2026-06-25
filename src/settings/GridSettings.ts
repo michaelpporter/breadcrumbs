@@ -17,8 +17,7 @@ export const _add_settings_trail_view = (
 			cb: async (value) => {
 				plugin.settings.views.page.trail.enabled = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -32,8 +31,7 @@ export const _add_settings_trail_view = (
 			cb: async (value) => {
 				plugin.settings.views.page.trail.format = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -47,8 +45,7 @@ export const _add_settings_trail_view = (
 			cb: async (value) => {
 				plugin.settings.views.page.trail.selection = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -70,8 +67,7 @@ export const _add_settings_trail_view = (
 
 				plugin.settings.views.page.trail.default_depth = int;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -85,8 +81,7 @@ export const _add_settings_trail_view = (
 			select_cb: async (value: string[]) => {
 				plugin.settings.views.page.trail.field_group_labels = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -99,8 +94,7 @@ export const _add_settings_trail_view = (
 			cb: async (value) => {
 				plugin.settings.views.page.trail.merge_fields = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -113,8 +107,7 @@ export const _add_settings_trail_view = (
 			cb: async (value) => {
 				plugin.settings.views.page.trail.show_controls = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -127,8 +120,7 @@ export const _add_settings_trail_view = (
 			cb: async (value) => {
 				plugin.settings.views.page.trail.no_path_message = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
