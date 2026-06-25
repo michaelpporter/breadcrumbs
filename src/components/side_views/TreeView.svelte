@@ -18,6 +18,7 @@
 	import ShowAttributesSelectorMenu from "../selector/ShowAttributesSelectorMenu.svelte";
 	import { FlatTraversalResult } from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { sort_traversal, traverse } from "src/graph/traversal";
+	import { useOwned } from "src/stores/use_owned.svelte";
 	import { untrack } from "svelte";
 	import { prepareFuzzySearch } from "obsidian";
 	import { effect_counter } from "src/utils/perf";
@@ -107,7 +108,7 @@
 		root_open = !settings.collapse;
 	});
 
-	let tree: FlatTraversalResult | undefined = $derived.by(() => {
+	const owned_tree = useOwned(() => {
 		if (entry_paths && entry_paths.length > 0) {
 			return traverse(plugin.graph, {
 				entry: entry_paths,
@@ -120,6 +121,7 @@
 			return undefined;
 		}
 	});
+	let tree: FlatTraversalResult | undefined = $derived(owned_tree.current);
 
 	// We want to re-sort, when the sorter changes.
 	// Because svelte can't track changes to the tree, we need to wrap it in an object.
@@ -133,19 +135,10 @@
 		};
 	});
 
-	let node_stringify_options = $derived(
+	const owned_stringify = useOwned(() =>
 		to_node_stringify_options(plugin.settings, settings.show_node_options),
 	);
-
-	// Free WASM objects when derived values change or component unmounts.
-	$effect(() => {
-		const t = tree;
-		return () => t?.free();
-	});
-	$effect(() => {
-		const o = node_stringify_options;
-		return () => o.free();
-	});
+	let node_stringify_options = $derived(owned_stringify.current);
 
 	let search_open = $state(false);
 	let search_query = $state("");

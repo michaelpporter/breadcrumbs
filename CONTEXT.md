@@ -71,12 +71,31 @@ call sites stop hand-assembling the positional `TraversalOptions` (magic
 - `sort_traversal(graph, result, sort)` — re-sort helper; fully hides
   `create_edge_sorter`.
 
-**Deferred (the remaining smear):** view consumers (`NestedEdgeList` via
-TreeView/CodeblockTree) still hand-write the `$effect` `.free()` lifecycle for
-the live handle — a `use_traversal` rune helper (analogous to `useViewSettings`)
-is the follow-up; it touches the rendering hot path so it's its own change.
+The view-side `.free()` lifecycle is owned by **`useOwned`** (see below), so
+consumers no longer hand-write the free `$effect`.
 
 **Suspect surfaced, not fixed:** `separateEdges` is fed `settings.merge_fields`
 in TreeView but `!merge_fields` everywhere else (TrailView/codeblocks) — opposite
 values for the same setting. The named option makes the inversion visible at the
 call sites; preserved as-is pending a decision on which is correct.
+
+---
+
+## Owned WASM lifecycle (`useOwned`)
+
+`src/stores/use_owned.svelte.ts` — a rune helper that owns a derived WASM
+object's `.free()`: re-creates it when its reactive inputs change, frees the
+superseded handle, and frees the last on unmount. Read the value via `.current`.
+
+```ts
+const owned = useOwned(() => to_node_stringify_options(plugin.settings, opts));
+let node_stringify_options = $derived(owned.current);
+```
+
+Replaces the `$effect(() => { const o = x; return () => o.free(); })` block that
+was copy-pasted across 8 components (for `node_stringify_options` and TreeView's
+traversal result). The `$derived(owned.current)` alias keeps the existing value
+name so templates/props are untouched. The **imperative** consumers that drive
+their own WASM lifecycle outside reactivity (CodeblockTree's `data` via
+`update()`/`onDestroy`) keep hand-managing it — `useOwned` is for the reactive
+derive sites.
