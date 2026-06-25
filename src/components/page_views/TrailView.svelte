@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { BreadcrumbsSettings } from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
 	import { resolve_field_group_labels } from "src/utils/edge_fields";
 	import MergeFieldsButton from "../button/MergeFieldsButton.svelte";
@@ -9,9 +8,8 @@
 		PathList,
 		TraversalOptions,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
-	import { untrack } from "svelte";
 	import { log } from "src/logger";
-	import { json_clone } from "src/utils/json_clone";
+	import { useViewSettings } from "src/stores/use_view_settings.svelte";
 	import { effect_counter } from "src/utils/perf";
 
 	interface Props {
@@ -21,45 +19,19 @@
 
 	let { plugin, file_path }: Props = $props();
 
-	type TrailPageSettings = BreadcrumbsSettings["views"]["page"]["trail"];
-
-	let last_plugin: BreadcrumbsPlugin | null = null;
-	// svelte-ignore state_referenced_locally — seed valid $state for bindings; `$effect.pre` resyncs if `plugin` changes
-	let settings = $state<TrailPageSettings>(
-		json_clone(plugin.settings.views.page.trail),
-	);
-
-	$effect.pre(() => {
-		if (last_plugin !== plugin) {
-			last_plugin = plugin;
-			settings = json_clone(
-				untrack(() =>
-					$state.snapshot(plugin.settings.views.page.trail),
-				),
-			);
-		}
+	// svelte-ignore state_referenced_locally — `plugin` is a constant singleton per instance
+	const settings = useViewSettings(plugin, {
+		label: "TrailView",
+		read: (p) => p.settings.views.page.trail,
+		write: (p, v) => {
+			p.settings.views.page.trail = v;
+		},
 	});
 
 	const tick_trail_log = effect_counter("TrailView.log");
 	$effect(() => {
 		tick_trail_log();
 		log.debug("Rendering Trail page view for file:", file_path);
-	});
-
-	let is_initial_mount = true;
-	const tick_trail_writeback = effect_counter("TrailView.writeback");
-
-	$effect(() => {
-		tick_trail_writeback();
-		const trail_snapshot = $state.snapshot(settings);
-		untrack(() => {
-			plugin.settings.views.page.trail = trail_snapshot;
-		});
-		if (is_initial_mount) {
-			is_initial_mount = false;
-		} else {
-			plugin.saveSettingsDebounced();
-		}
 	});
 
 	let data: {

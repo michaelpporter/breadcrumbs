@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Invalid edge-field errors from the explicit edge builders now consistently name the `BC-…-field` frontmatter key (e.g. `BC-tag-note-field`), and the Dataview builder's field validation matches the other builders. Internally, the seven builders that resolve a single edge field from frontmatter now share one `read_edge_field` helper, removing duplicated override → default → validate logic.
 * The `typed_link` builder's inline-field parsing is now a pure, unit-tested `parse_inline_field` helper, and a redundant frontmatter/inline dedup layer was removed (the graph engine already deduplicates edges by resolved target and field). No behaviour change.
+* The Tree, Matrix, and Trail views now share one `useViewSettings` helper for the local-settings-mirror + loop-safe writeback that each had duplicated. As part of this, the views no longer write their settings to disk on mount (only on an actual edit). The helper is unit-tested, including its loop-breaking semantics.
 
 ### Fixed
 
