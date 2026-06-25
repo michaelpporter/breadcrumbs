@@ -18,8 +18,7 @@ export const _add_settings_prev_next_view = (
 				.onChange(async (value) => {
 					plugin.settings.views.page.prev_next.enabled = value;
 
-					plugin.refreshViews();
-					await plugin.saveSettings();
+					await plugin.commitSettings("views");
 				});
 		});
 
@@ -36,8 +35,7 @@ export const _add_settings_prev_next_view = (
 				plugin.settings.views.page.prev_next.field_group_labels.prev =
 					value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -55,8 +53,7 @@ export const _add_settings_prev_next_view = (
 				plugin.settings.views.page.prev_next.field_group_labels.next =
 					value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -78,8 +75,7 @@ export const _add_settings_prev_next_view = (
 				cb: async (value) => {
 					plugin.settings.views.page.prev_next.period_rows[kind] =
 						value;
-					plugin.refreshViews();
-					await plugin.saveSettings();
+					await plugin.commitSettings("views");
 				},
 			},
 		});

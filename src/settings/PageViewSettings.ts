@@ -14,7 +14,7 @@ export const _add_settings_page_views = (
 			cb: async (value) => {
 				plugin.settings.views.page.all.sticky = value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 				redraw_page_views(plugin);
 			},
 		},

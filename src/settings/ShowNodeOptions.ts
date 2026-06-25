@@ -32,9 +32,7 @@ export const _add_settings_show_node_options = (
 				cb.set(show_node_options);
 
 				if (options?.save_and_refresh !== false) {
-					await Promise.all([plugin.saveSettings()]);
-					// Don't await if not rebuilding
-					plugin.refreshViews();
+					await plugin.commitSettings("views");
 				}
 			});
 	});
@@ -50,9 +48,7 @@ export const _add_settings_show_node_options = (
 				cb.set(show_node_options);
 
 				if (options?.save_and_refresh !== false) {
-					await Promise.all([plugin.saveSettings()]);
-					// Don't await if not rebuilding
-					plugin.refreshViews();
+					await plugin.commitSettings("views");
 				}
 			});
 	});
@@ -68,9 +64,7 @@ export const _add_settings_show_node_options = (
 				cb.set(show_node_options);
 
 				if (options?.save_and_refresh !== false) {
-					await Promise.all([plugin.saveSettings()]);
-					// Don't await if not rebuilding
-					plugin.refreshViews();
+					await plugin.commitSettings("views");
 				}
 			});
 	});

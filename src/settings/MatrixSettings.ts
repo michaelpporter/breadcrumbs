@@ -21,8 +21,7 @@ export const _add_settings_matrix = (
 			cb: async (checked) => {
 				plugin.settings.views.side.matrix.collapse = checked;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -35,8 +34,7 @@ export const _add_settings_matrix = (
 			cb: async (checked) => {
 				plugin.settings.views.side.matrix.custom_sort_fields = checked;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -51,8 +49,7 @@ export const _add_settings_matrix = (
 				plugin.settings.views.side.matrix.custom_sort_field_labels =
 					value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -64,8 +61,7 @@ export const _add_settings_matrix = (
 			select_cb: async (value: EdgeSortId) => {
 				plugin.settings.views.side.matrix.edge_sort_id = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -78,8 +74,7 @@ export const _add_settings_matrix = (
 			select_cb: async (value: EdgeAttribute[]) => {
 				plugin.settings.views.side.matrix.show_attributes = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -93,8 +88,7 @@ export const _add_settings_matrix = (
 			select_cb: async (value: string[]) => {
 				plugin.settings.views.side.matrix.field_group_labels = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -107,8 +101,7 @@ export const _add_settings_matrix = (
 			cb: async (value) => {
 				plugin.settings.views.side.matrix.lock_view = value;
 
-				plugin.refreshViews();
-				await plugin.saveSettings();
+				await plugin.commitSettings("views");
 			},
 		},
 	});
@@ -122,10 +115,7 @@ export const _add_settings_matrix = (
 				if (!value) plugin.settings.views.side.matrix.lock_path = value;
 				else {
 					plugin.settings.views.side.matrix.lock_path = value;
-					await Promise.all([
-						plugin.rebuildGraph(),
-						plugin.saveSettings(),
-					]);
+					await plugin.commitSettings("graph");
 				}
 			},
 		},

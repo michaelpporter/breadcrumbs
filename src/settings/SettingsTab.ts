@@ -316,7 +316,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 										);
 										plugin.settings.debug.level =
 											value as (typeof LOG_LEVELS)[number];
-										await plugin.saveSettings();
+										await plugin.commitSettings("none");
 									});
 							});
 						},

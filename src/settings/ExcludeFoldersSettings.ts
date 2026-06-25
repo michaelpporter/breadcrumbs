@@ -23,10 +23,7 @@ export const _add_settings_exclude_folders = (
 					.map((line) => line.trim())
 					.filter((line) => line.length > 0);
 
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			};
 		});
 };

@@ -17,10 +17,7 @@ export const _add_settings_list_note = (
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.list_note.default_neighbour_field =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});

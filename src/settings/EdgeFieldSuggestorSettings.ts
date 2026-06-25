@@ -22,7 +22,7 @@ export const _add_settings_edge_field_suggestor = (
 					);
 				}
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});
@@ -40,7 +40,7 @@ export const _add_settings_edge_field_suggestor = (
 
 				settings.suggestors.edge_field.trigger = value;
 
-				await plugin.saveSettings();
+				await plugin.commitSettings("none");
 			},
 		},
 	});

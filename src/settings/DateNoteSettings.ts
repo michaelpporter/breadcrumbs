@@ -39,10 +39,7 @@ function add_period_settings(
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.date_note[kind].enabled =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -69,10 +66,7 @@ function add_period_settings(
 					plugin.settings.explicit_edge_sources.date_note[
 						kind
 					].date_format = value;
-					await Promise.all([
-						plugin.rebuildGraph(),
-						plugin.saveSettings(),
-					]);
+					await plugin.commitSettings("graph");
 				}
 			},
 		},
@@ -87,10 +81,7 @@ function add_period_settings(
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.date_note[kind].folder =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -107,10 +98,7 @@ function add_period_settings(
 				plugin.settings.explicit_edge_sources.date_note[
 					kind
 				].next_field = value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -124,10 +112,7 @@ function add_period_settings(
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.date_note[kind].up_field =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -154,10 +139,7 @@ export const _add_settings_date_note = (
 			value: plugin.settings.explicit_edge_sources.date_note.enabled,
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.date_note.enabled = value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -172,10 +154,7 @@ export const _add_settings_date_note = (
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.date_note.default_field =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -198,10 +177,7 @@ export const _add_settings_date_note = (
 				else {
 					plugin.settings.explicit_edge_sources.date_note.date_format =
 						value;
-					await Promise.all([
-						plugin.rebuildGraph(),
-						plugin.saveSettings(),
-					]);
+					await plugin.commitSettings("graph");
 				}
 			},
 		},
@@ -216,10 +192,7 @@ export const _add_settings_date_note = (
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.date_note.stretch_to_existing =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
@@ -239,10 +212,7 @@ export const _add_settings_date_note = (
 				.onChange(async (value) => {
 					plugin.settings.explicit_edge_sources.date_note.week_start =
 						value as "monday" | "sunday";
-					await Promise.all([
-						plugin.rebuildGraph(),
-						plugin.saveSettings(),
-					]);
+					await plugin.commitSettings("graph");
 				}),
 		);
 

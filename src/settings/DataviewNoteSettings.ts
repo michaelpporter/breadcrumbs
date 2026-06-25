@@ -15,10 +15,7 @@ export const _add_settings_dataview_note = (
 			cb: async (value) => {
 				plugin.settings.explicit_edge_sources.dataview_note.default_field =
 					value;
-				await Promise.all([
-					plugin.rebuildGraph(),
-					plugin.saveSettings(),
-				]);
+				await plugin.commitSettings("graph");
 			},
 		},
 	});
