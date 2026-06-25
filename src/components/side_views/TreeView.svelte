@@ -114,7 +114,7 @@
 				entry: entry_paths,
 				fields: edge_field_labels,
 				depth,
-				separateEdges: settings.merge_fields,
+				separateEdges: !settings.merge_fields,
 				sort: sort_spec,
 			});
 		} else {

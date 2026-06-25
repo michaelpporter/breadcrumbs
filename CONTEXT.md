@@ -74,10 +74,12 @@ call sites stop hand-assembling the positional `TraversalOptions` (magic
 The view-side `.free()` lifecycle is owned by **`useOwned`** (see below), so
 consumers no longer hand-write the free `$effect`.
 
-**Suspect surfaced, not fixed:** `separateEdges` is fed `settings.merge_fields`
-in TreeView but `!merge_fields` everywhere else (TrailView/codeblocks) — opposite
-values for the same setting. The named option makes the inversion visible at the
-call sites; preserved as-is pending a decision on which is correct.
+**Bug the facade surfaced and fixed:** TreeView fed `separateEdges:
+settings.merge_fields` while everyone else fed `!merge_fields`. Per the engine
+(`separate_edges = true` ⇒ branches kept to one edge type ⇒ fields *separated*),
+the correct mapping is `!merge_fields`, so TreeView's merge-fields toggle had
+been inverted. The named option made the inversion obvious at the call site;
+now `!settings.merge_fields` everywhere.
 
 ---
 
