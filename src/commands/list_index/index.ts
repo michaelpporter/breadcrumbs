@@ -1,5 +1,6 @@
 import type { App } from "obsidian";
 import type { EdgeSortId } from "src/const/graph";
+import { with_traversal } from "src/graph/traversal";
 import type { EdgeAttribute } from "src/graph/utils";
 import { to_node_stringify_options } from "src/graph/utils";
 import type { LinkKind } from "src/interfaces/links";
@@ -13,11 +14,6 @@ import type {
 	FlatTraversalResult,
 	NoteGraph,
 	NodeStringifyOptions,
-} from "wasm/pkg/breadcrumbs_graph_wasm";
-import {
-	TraversalOptions,
-	TraversalPostprocessOptions,
-	create_edge_sorter,
 } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 export interface ListIndexOptions {
@@ -143,35 +139,23 @@ export function build_list_index(
 	options: ListIndexOptions,
 	app?: App,
 ): string {
-	const traversal_options = new TraversalOptions(
-		[start_node],
-		options.fields,
-		options.max_depth ?? 100,
-		options.max_count ?? 1000,
-		false,
-		undefined,
-	);
-
-	const postprocess_options = new TraversalPostprocessOptions(
-		create_edge_sorter(
-			options.edge_sort_id.field,
-			options.edge_sort_id.order === -1,
-		),
-		false,
-	);
-
-	const traversal_result = graph.rec_traverse_and_process(
-		traversal_options,
-		postprocess_options,
-	);
-
-	const result = edge_tree_to_list_index(
+	return with_traversal(
 		graph,
-		traversal_result,
-		plugin_settings,
-		options,
-		app,
+		{
+			entry: [start_node],
+			fields: options.fields,
+			depth: options.max_depth ?? 100,
+			maxCount: options.max_count ?? 1000,
+			separateEdges: false,
+			sort: options.edge_sort_id,
+		},
+		(traversal_result) =>
+			edge_tree_to_list_index(
+				graph,
+				traversal_result,
+				plugin_settings,
+				options,
+				app,
+			),
 	);
-	traversal_result.free();
-	return result;
 }

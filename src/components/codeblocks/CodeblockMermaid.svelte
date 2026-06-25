@@ -14,9 +14,9 @@
 		MermaidGraphOptions,
 		NodeData,
 		NoteGraphError,
-		TraversalOptions,
 		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
+	import { build_traversal_options } from "src/graph/traversal";
 	import { remove_nullish_keys } from "src/utils/objects";
 	import { Paths } from "src/utils/paths";
 	import { Links } from "src/utils/links";
@@ -57,14 +57,13 @@
 		// Restricts which nodes a traversal may include (None = unrestricted).
 		const allowed_paths = options["from-paths"];
 
-		const traversal_options = new TraversalOptions(
-			entry_nodes,
-			options.fields,
-			max_depth,
-			100, // max nodes to traverse
-			!options["merge-fields"],
-			allowed_paths,
-		);
+		const traversal_options = build_traversal_options({
+			entry: entry_nodes,
+			fields: options.fields,
+			depth: max_depth,
+			separateEdges: !options["merge-fields"],
+			dataviewFrom: allowed_paths,
+		});
 
 		const flowchart_init = remove_nullish_keys({
 			curve: options["mermaid-curve"],

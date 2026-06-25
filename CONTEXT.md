@@ -44,3 +44,39 @@ outside `untrack`) — the friction that motivated the seam.
 > Not to be confused with **settings panels** (`src/settings/`), which bind
 > *directly* to `plugin.settings` and call `refreshViews()`. Panels and views
 > have different write cadences; only views need the mirror.
+
+---
+
+## Settings commit policy
+
+`BreadcrumbsPlugin.commitSettings(policy)` (pure core `commit_setting` in
+`src/settings/commit.ts`) is the single follow-up a settings-panel callback runs
+after writing a field. The policy names *what the setting affects*:
+`"graph"` (rebuild + save), `"views"` (refresh + save), `"none"` (save only).
+Centralised so the ~140 callbacks can't drift on which effect to pair with save.
+
+---
+
+## Graph traversal facade
+
+`src/graph/traversal.ts` — the TS seam over the WASM traversal lifecycle, so
+call sites stop hand-assembling the positional `TraversalOptions` (magic
+`max_traversal_count`, the `separate_edges` flag) + sorter:
+
+- `build_traversal_options(opts)` — named form of the positional constructor.
+- `traverse(graph, opts)` — `build` + postprocess + `rec_traverse_and_process`,
+  returns the **live** `FlatTraversalResult` (caller owns `.free()`).
+- `with_traversal(graph, opts, fn)` — scoped variant that frees after `fn`, for
+  one-shot consumers (commands).
+- `sort_traversal(graph, result, sort)` — re-sort helper; fully hides
+  `create_edge_sorter`.
+
+**Deferred (the remaining smear):** view consumers (`NestedEdgeList` via
+TreeView/CodeblockTree) still hand-write the `$effect` `.free()` lifecycle for
+the live handle — a `use_traversal` rune helper (analogous to `useViewSettings`)
+is the follow-up; it touches the rendering hot path so it's its own change.
+
+**Suspect surfaced, not fixed:** `separateEdges` is fed `settings.merge_fields`
+in TreeView but `!merge_fields` everywhere else (TrailView/codeblocks) — opposite
+values for the same setting. The named option makes the inversion visible at the
+call sites; preserved as-is pending a decision on which is correct.
