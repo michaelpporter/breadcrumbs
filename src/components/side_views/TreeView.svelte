@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { BreadcrumbsSettings } from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
 	import { active_file_store } from "src/stores/active_file";
 	import {
@@ -29,7 +28,7 @@
 	import { effect_counter } from "src/utils/perf";
 	import { to_node_stringify_options } from "src/graph/utils";
 	import { log } from "src/logger";
-	import { json_clone } from "src/utils/json_clone";
+	import { useViewSettings } from "src/stores/use_view_settings.svelte";
 	import SearchToggleButton from "../button/SearchToggleButton.svelte";
 
 	function walk_to_roots(
@@ -73,31 +72,13 @@
 	} = $props();
 	log.debug("Rendering Tree side view");
 
-	type TreeSideSettings = BreadcrumbsSettings["views"]["side"]["tree"];
-
-	let last_plugin: BreadcrumbsPlugin | null = null;
-	// svelte-ignore state_referenced_locally — seed valid $state for bindings; `$effect.pre` resyncs if `plugin` changes
-	let settings = $state<TreeSideSettings>(
-		json_clone(plugin.settings.views.side.tree),
-	);
-
-	$effect.pre(() => {
-		if (last_plugin !== plugin) {
-			last_plugin = plugin;
-			settings = json_clone(
-				untrack(() => $state.snapshot(plugin.settings.views.side.tree)),
-			);
-		}
-	});
-
-	const tick_tree_writeback = effect_counter("TreeView.writeback");
-	$effect(() => {
-		tick_tree_writeback();
-		const tree_snapshot = $state.snapshot(settings);
-		untrack(() => {
-			plugin.settings.views.side.tree = tree_snapshot;
-			plugin.saveSettingsDebounced();
-		});
+	// svelte-ignore state_referenced_locally — `plugin` is a constant singleton per instance
+	const settings = useViewSettings(plugin, {
+		label: "TreeView",
+		read: (p) => p.settings.views.side.tree,
+		write: (p, v) => {
+			p.settings.views.side.tree = v;
+		},
 	});
 
 	let edge_field_labels = $derived(

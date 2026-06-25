@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { BreadcrumbsSettings } from "src/interfaces/settings";
 	import type BreadcrumbsPlugin from "src/main";
 	import { active_file_store } from "src/stores/active_file";
 	import {
@@ -15,12 +14,10 @@
 	import ShowAttributesSelectorMenu from "../selector/ShowAttributesSelectorMenu.svelte";
 	import MatrixEdgeField from "./MatrixEdgeField.svelte";
 	import SearchToggleButton from "../button/SearchToggleButton.svelte";
-	import { untrack } from "svelte";
 	import { prepareFuzzySearch } from "obsidian";
 	import { log } from "src/logger";
-	import { json_clone } from "src/utils/json_clone";
 	import { to_node_stringify_options } from "src/graph/utils";
-	import { effect_counter } from "src/utils/perf";
+	import { useViewSettings } from "src/stores/use_view_settings.svelte";
 
 	interface Props {
 		plugin: BreadcrumbsPlugin;
@@ -29,39 +26,13 @@
 	let { plugin }: Props = $props();
 	log.debug("Rendering Matrix side view");
 
-	type MatrixSideSettings = BreadcrumbsSettings["views"]["side"]["matrix"];
-
-	let last_plugin: BreadcrumbsPlugin | null = null;
-	// svelte-ignore state_referenced_locally — seed valid $state for bindings; `$effect.pre` resyncs if `plugin` changes
-	let settings = $state<MatrixSideSettings>(
-		json_clone(plugin.settings.views.side.matrix),
-	);
-
-	$effect.pre(() => {
-		if (last_plugin !== plugin) {
-			last_plugin = plugin;
-			settings = json_clone(
-				untrack(() =>
-					$state.snapshot(plugin.settings.views.side.matrix),
-				),
-			);
-		}
-	});
-
-	let is_initial_mount = true;
-	const tick_matrix_writeback = effect_counter("Matrix.writeback");
-
-	$effect(() => {
-		tick_matrix_writeback();
-		const matrix_snapshot = $state.snapshot(settings);
-		untrack(() => {
-			plugin.settings.views.side.matrix = matrix_snapshot;
-			plugin.saveSettingsDebounced();
-		});
-		if (is_initial_mount) {
-			is_initial_mount = false;
-			return;
-		}
+	// svelte-ignore state_referenced_locally — `plugin` is a constant singleton per instance
+	const settings = useViewSettings(plugin, {
+		label: "Matrix",
+		read: (p) => p.settings.views.side.matrix,
+		write: (p, v) => {
+			p.settings.views.side.matrix = v;
+		},
 	});
 
 	let edge_field_labels = $derived(
