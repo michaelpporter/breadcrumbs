@@ -18,7 +18,6 @@
 	import ShowAttributesSelectorMenu from "../selector/ShowAttributesSelectorMenu.svelte";
 	import {
 		FlatTraversalResult,
-		NoteGraph,
 		TraversalOptions,
 		TraversalPostprocessOptions,
 		create_edge_sorter,
@@ -27,43 +26,10 @@
 	import { prepareFuzzySearch } from "obsidian";
 	import { effect_counter } from "src/utils/perf";
 	import { to_node_stringify_options } from "src/graph/utils";
+	import { walk_to_roots } from "src/graph/walk_to_roots";
 	import { log } from "src/logger";
 	import { useViewSettings } from "src/stores/use_view_settings.svelte";
 	import SearchToggleButton from "../button/SearchToggleButton.svelte";
-
-	function walk_to_roots(
-		graph: NoteGraph,
-		start: string,
-		up_field_labels: string[],
-	): string[] {
-		const visited = new Set<string>([start]);
-		let frontier: string[] = [start];
-		const roots: string[] = [];
-
-		for (let depth = 0; depth < 50; depth++) {
-			if (frontier.length === 0) break;
-			const next_frontier: string[] = [];
-			for (const current of frontier) {
-				const edges = graph
-					.get_filtered_outgoing_edges(current, up_field_labels)
-					.to_array();
-				if (edges.length === 0) {
-					if (!roots.includes(current)) roots.push(current);
-				} else {
-					for (const edge of edges) {
-						const target = edge.target_path(graph);
-						if (!visited.has(target)) {
-							visited.add(target);
-							next_frontier.push(target);
-						}
-					}
-				}
-			}
-			frontier = next_frontier;
-		}
-
-		return roots.length > 0 ? roots : [start];
-	}
 
 	let {
 		plugin,
