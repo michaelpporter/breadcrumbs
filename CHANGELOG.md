@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.X
+
+### [4.19.3](https://github.com/michaelpporter/breadcrumbs/compare/4.19.2...4.19.3) (2026-06-27)
+
 ### Changed
 
 * The trail view's grid format now defaults its path selection to **`longest`**. Date notes (and any note with skip-level "shortcut" edges) link up to every ancestor level at once, so the old `all` default drew every redundant path and the grid read as a cluttered fan of repeated ancestors. `longest` keeps only the deepest chain — e.g. `2026 → 2026-Q2 → 2026-06 → 2026-W26` — so the trail reads as a clean tree. Existing trails keep their saved selection; switch via the trail's selection dropdown.
-
-## 4.X
 
 ### [4.19.2](https://github.com/michaelpporter/breadcrumbs/compare/4.19.1...4.19.2) (2026-06-27)
 
