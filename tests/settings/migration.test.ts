@@ -59,7 +59,8 @@ describe("migration", () => {
 					},
 				},
 				views: {
-					page: { trail: { show_controls: false } },
+					// selection: preserved from the fixture; default is now "longest"
+					page: { trail: { show_controls: false, selection: "all" } },
 					side: {
 						matrix: { show_node_options: { ext: true } },
 						tree: { collapse: true },
@@ -92,7 +93,8 @@ describe("migration", () => {
 
 		expect(migrated).toStrictEqual(
 			with_defaults({
-				views: { page: { trail: { format: "path" } } },
+				// selection: preserved from the fixture; default is now "longest"
+				views: { page: { trail: { format: "path", selection: "all" } } },
 				commands: {
 					list_index: {
 						default_options: {

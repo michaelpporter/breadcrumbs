@@ -169,7 +169,7 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 			trail: {
 				enabled: true,
 				format: "grid",
-				selection: "all",
+				selection: "longest",
 				default_depth: 999,
 				no_path_message: "",
 				show_controls: true,
