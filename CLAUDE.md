@@ -14,7 +14,7 @@ Minimum code that solves the problem. No features beyond what was asked, no abst
 Touch only what you must. Don't refactor adjacent code that isn't broken. Match existing style. Remove imports/variables YOUR changes made unused — don't remove pre-existing dead code unless asked.
 
 ### Goal-Driven Execution
-For multi-step tasks, state a brief plan with verifiable checks. Strong success criteria: run tests, type-check, build.
+For multi-step tasks, state a brief plan with verifiable checks. Strong success criteria: run tests, type-check, build. The gate before calling a change done: `bun run build && bun run test` must pass (and `bun run wasm:test` after any Rust change).
 
 ---
 
