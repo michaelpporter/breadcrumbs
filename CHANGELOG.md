@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.19.4](https://github.com/michaelpporter/breadcrumbs/compare/4.19.3...4.19.4) (2026-06-27)
+
+### Security
+
+* Pinned `undici` to `>=6.27.0` to clear an advisory flagged by the Obsidian community scanner. It was pulled in transitively (`markmap-lib` → `markmap-html-parser` → `cheerio` → `undici@6.26.0`) and is tree-shaken out of the shipped `main.js`, so there was no runtime exposure — but the lockfile reference still had to be moved out of the vulnerable range.
+
 ### [4.19.3](https://github.com/michaelpporter/breadcrumbs/compare/4.19.2...4.19.3) (2026-06-27)
 
 ### Changed
