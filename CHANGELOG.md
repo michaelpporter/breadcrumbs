@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.20.0](https://github.com/michaelpporter/breadcrumbs/compare/4.19.4...4.20.0) (2026-06-29)
+
+### Features
+
+* Added a **Generate edge audit report** command. It walks the current graph and writes a read-only Markdown report to a configurable vault file (default `Breadcrumbs Edge Audit.md`; re-running overwrites it). The report surfaces **unused fields** (defined in settings but producing no edges), **implied-only fields** (only ever derived, never explicit), **mergeable fields** (whose explicit edges are strictly identical, so they're interchangeable), **orphan notes** (no breadcrumb edges in or out), and **dangling edges** (pointing at notes that don't exist). It only ever reports — it never rewrites your frontmatter. Configure the output path under **Settings → Commands → Edge audit**.
+
 ### [4.19.4](https://github.com/michaelpporter/breadcrumbs/compare/4.19.3...4.19.4) (2026-06-27)
 
 ### Security
