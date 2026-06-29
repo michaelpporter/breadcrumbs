@@ -244,6 +244,10 @@ export interface BreadcrumbsSettings {
 				direction: "LR" | "TB";
 			};
 		};
+
+		edge_audit: {
+			report_path: string;
+		};
 	};
 
 	suggestors: {

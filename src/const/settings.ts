@@ -266,6 +266,10 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 				direction: "LR",
 			},
 		},
+
+		edge_audit: {
+			report_path: "Breadcrumbs Edge Audit.md",
+		},
 	},
 
 	suggestors: {

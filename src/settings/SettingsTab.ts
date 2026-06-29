@@ -10,6 +10,7 @@ import { _add_settings_create_canvas } from "./CreateCanvasSettings";
 import { _add_settings_dataview_note } from "./DataviewNoteSettings";
 import { _add_settings_date_note } from "./DateNoteSettings";
 import { _add_settings_dendron_note } from "./DendronNoteSettings";
+import { _add_settings_edge_audit } from "./EdgeAuditSettings";
 import { _add_settings_edge_field_suggestor } from "./EdgeFieldSuggestorSettings";
 import { _add_settings_exclude_folders } from "./ExcludeFoldersSettings";
 import { _add_settings_freeze_implied_edges } from "./FreezeImpliedEdgesSettings";
@@ -278,6 +279,12 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 							"Create canvas",
 							_add_settings_create_canvas,
 						),
+					},
+					{
+						type: "page",
+						name: "Edge audit",
+						desc: "Generate a read-only report of unused, mergeable, and orphaned edges",
+						page: imp_page("Edge audit", _add_settings_edge_audit),
 					},
 				],
 			},

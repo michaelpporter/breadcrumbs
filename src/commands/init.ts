@@ -12,6 +12,7 @@ import { Timer } from "src/utils/timer";
 import { redraw_page_views } from "src/views/page";
 import { mount } from "svelte";
 import { get } from "svelte/store";
+import { generate_edge_audit_report } from "./edge_audit";
 import { freeze_implied_edges_to_note } from "./freeze_edges";
 import { jump_to_neighbour } from "./jump";
 import { get_graph_stats } from "./stats";
@@ -58,6 +59,12 @@ export function init_all_commands(plugin: BreadcrumbsPlugin) {
 				"Graph stats printed to console and copied to clipboard",
 			);
 		},
+	});
+
+	plugin.addCommand({
+		id: "generate-edge-audit-report",
+		name: "Generate edge audit report",
+		callback: async () => await generate_edge_audit_report(plugin),
 	});
 
 	plugin.addCommand({
