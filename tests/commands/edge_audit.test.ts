@@ -5,6 +5,7 @@ import {
 	find_mergeable_fields,
 	find_orphan_notes,
 	find_unused_fields,
+	prune_ignored,
 	type EdgeFact,
 	type GraphFacts,
 	type NodeFact,
@@ -138,19 +139,18 @@ describe("find_mergeable_fields", () => {
 });
 
 describe("find_orphan_notes", () => {
-	test("resolved notes with no edges, excluding the report file", () => {
+	test("resolved notes with no edges; unresolved notes are not orphans", () => {
 		const f = facts(
 			[
 				node("a.md"),
 				node("b.md"),
 				node("lonely.md"),
-				node("report.md"),
 				node("ghost.md", false),
 			],
 			[edge("up", "a.md", "b.md")],
 		);
 
-		expect(find_orphan_notes(f, ["report.md"])).toStrictEqual(["lonely.md"]);
+		expect(find_orphan_notes(f)).toStrictEqual(["lonely.md"]);
 	});
 
 	test("a note that is only an edge target is not an orphan", () => {
@@ -179,6 +179,50 @@ describe("find_dangling_edges", () => {
 	});
 });
 
+describe("prune_ignored", () => {
+	test("drops ignored notes and every edge touching one", () => {
+		const f = facts(
+			[node("a.md"), node("Templates/t.md"), node("b.md")],
+			[
+				edge("up", "a.md", "b.md"),
+				edge("up", "a.md", "Templates/t.md"),
+				edge("up", "Templates/t.md", "b.md"),
+			],
+		);
+
+		expect(prune_ignored(f, ["Templates"])).toStrictEqual(
+			facts([node("a.md"), node("b.md")], [edge("up", "a.md", "b.md")]),
+		);
+	});
+
+	test("matches folder prefixes, not bare string prefixes", () => {
+		const f = facts(
+			[node("Templates/t.md"), node("TemplatesArchive/x.md")],
+			[],
+		);
+
+		// "TemplatesArchive" must not be caught by the "Templates" entry.
+		expect(prune_ignored(f, ["Templates"])).toStrictEqual(
+			facts([node("TemplatesArchive/x.md")], []),
+		);
+	});
+
+	test("an exact path entry ignores just that note", () => {
+		const f = facts([node("a.md"), node("report.md")], []);
+
+		expect(prune_ignored(f, ["report.md"])).toStrictEqual(
+			facts([node("a.md")], []),
+		);
+	});
+
+	test("blank and empty entries are no-ops", () => {
+		const f = facts([node("a.md")], []);
+
+		expect(prune_ignored(f, [])).toStrictEqual(f);
+		expect(prune_ignored(f, ["", "   "])).toStrictEqual(f);
+	});
+});
+
 describe("build_edge_audit", () => {
 	test("assembles every section", () => {
 		const f = facts(
@@ -192,7 +236,6 @@ describe("build_edge_audit", () => {
 
 		const report = build_edge_audit(f, {
 			field_labels: ["up", "parent", "unused"],
-			exclude_paths: [],
 		});
 
 		expect(report).toStrictEqual({
@@ -204,5 +247,26 @@ describe("build_edge_audit", () => {
 				{ field: "up", source: "a.md", target: "missing.md" },
 			],
 		});
+	});
+
+	test("ignore_paths removes notes from every check", () => {
+		const f = facts(
+			[node("a.md"), node("b.md"), node("Templates/lonely.md")],
+			[
+				edge("up", "a.md", "b.md"),
+				// a dangling edge from an ignored note must not be reported
+				edge("up", "Templates/lonely.md", "missing.md", {
+					target_resolved: false,
+				}),
+			],
+		);
+
+		const report = build_edge_audit(f, {
+			field_labels: ["up"],
+			ignore_paths: ["Templates"],
+		});
+
+		expect(report.orphan_notes).toStrictEqual([]);
+		expect(report.dangling_edges).toStrictEqual([]);
 	});
 });

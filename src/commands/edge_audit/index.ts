@@ -143,8 +143,11 @@ export const generate_edge_audit_report = async (plugin: BreadcrumbsPlugin) => {
 
 	const report = build_edge_audit(facts, {
 		field_labels: plugin.settings.edge_fields.map((f) => f.label),
-		// Keep the report note itself off the orphan list.
-		exclude_paths: [report_path],
+		// User-configured ignores, plus the report note itself.
+		ignore_paths: [
+			...plugin.settings.commands.edge_audit.ignore_paths,
+			report_path,
+		],
 	});
 
 	const content = render_edge_audit_report(report, new Date());

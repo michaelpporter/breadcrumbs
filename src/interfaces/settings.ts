@@ -247,6 +247,8 @@ export interface BreadcrumbsSettings {
 
 		edge_audit: {
 			report_path: string;
+			/** Folder/path prefixes whose notes are left out of the audit report. */
+			ignore_paths: string[];
 		};
 	};
 

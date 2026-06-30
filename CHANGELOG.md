@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.21.0](https://github.com/michaelpporter/breadcrumbs/compare/4.20.0...4.21.0) (2026-06-30)
+
+### Features
+
+* The edge audit report now has an **Ignore paths** setting (**Settings → Commands → Edge audit**). Notes inside a listed folder/path are left out of the whole report — orphans, dangling edges, and the field checks alike. Matching uses folder semantics (one path per line; a note matches if its path equals, or is inside, a listed path), so `Templates` covers everything under that folder. This is report-only: unlike the global **Excluded folders** setting, ignored notes still get their breadcrumb edges in the graph — they just don't clutter the audit.
+
 ### [4.20.0](https://github.com/michaelpporter/breadcrumbs/compare/4.19.4...4.20.0) (2026-06-29)
 
 ### Features

@@ -51,6 +51,39 @@ export interface EdgeAuditReport {
 /** Stable key for a directed (source → target) edge pair. */
 const pair_key = (e: EdgeFact) => `${e.source}\n${e.target}`;
 
+/**
+ * True if `path` is inside (or equal to) any ignore entry. Entries are
+ * folder/path prefixes, matched the same way as the graph's excluded folders.
+ * (Kept local so this module stays free of the Obsidian/WASM-coupled helper.)
+ */
+const is_ignored = (path: string, ignore_paths: string[]) =>
+	ignore_paths.some((raw) => {
+		const entry = raw.replace(/\/+$/, "");
+		if (!entry) return false;
+		return path === entry || path.startsWith(entry + "/");
+	});
+
+/**
+ * Drop ignored notes and every edge touching one, so all checks below run as if
+ * those paths don't exist in the graph. Report-scoped: the graph itself is
+ * untouched. Entries are folder/path prefixes.
+ */
+export const prune_ignored = (
+	facts: GraphFacts,
+	ignore_paths: string[],
+): GraphFacts => {
+	if (ignore_paths.length === 0) return facts;
+
+	return {
+		nodes: facts.nodes.filter((n) => !is_ignored(n.path, ignore_paths)),
+		edges: facts.edges.filter(
+			(e) =>
+				!is_ignored(e.source, ignore_paths) &&
+				!is_ignored(e.target, ignore_paths),
+		),
+	};
+};
+
 /** Edge fields defined in settings that produce no edges at all (explicit or implied). */
 export const find_unused_fields = (
 	facts: GraphFacts,
@@ -114,26 +147,16 @@ export const find_mergeable_fields = (facts: GraphFacts): MergeableGroup[] => {
 		.sort((a, b) => a.fields[0].localeCompare(b.fields[0]));
 };
 
-/**
- * Resolved notes with no edges in or out — outside the breadcrumb structure.
- * `exclude_paths` keeps the report file itself off the list.
- */
-export const find_orphan_notes = (
-	facts: GraphFacts,
-	exclude_paths: string[] = [],
-): string[] => {
+/** Resolved notes with no edges in or out — outside the breadcrumb structure. */
+export const find_orphan_notes = (facts: GraphFacts): string[] => {
 	const connected = new Set<string>();
 	for (const e of facts.edges) {
 		connected.add(e.source);
 		connected.add(e.target);
 	}
 
-	const excluded = new Set(exclude_paths);
-
 	return facts.nodes
-		.filter(
-			(n) => n.resolved && !connected.has(n.path) && !excluded.has(n.path),
-		)
+		.filter((n) => n.resolved && !connected.has(n.path))
 		.map((n) => n.path)
 		.sort();
 };
@@ -152,11 +175,15 @@ export const find_dangling_edges = (facts: GraphFacts): DanglingEdge[] =>
 
 export const build_edge_audit = (
 	facts: GraphFacts,
-	opts: { field_labels: string[]; exclude_paths?: string[] },
-): EdgeAuditReport => ({
-	unused_fields: find_unused_fields(facts, opts.field_labels),
-	implied_only_fields: find_implied_only_fields(facts),
-	mergeable_groups: find_mergeable_fields(facts),
-	orphan_notes: find_orphan_notes(facts, opts.exclude_paths),
-	dangling_edges: find_dangling_edges(facts),
-});
+	opts: { field_labels: string[]; ignore_paths?: string[] },
+): EdgeAuditReport => {
+	const pruned = prune_ignored(facts, opts.ignore_paths ?? []);
+
+	return {
+		unused_fields: find_unused_fields(pruned, opts.field_labels),
+		implied_only_fields: find_implied_only_fields(pruned),
+		mergeable_groups: find_mergeable_fields(pruned),
+		orphan_notes: find_orphan_notes(pruned),
+		dangling_edges: find_dangling_edges(pruned),
+	};
+};
