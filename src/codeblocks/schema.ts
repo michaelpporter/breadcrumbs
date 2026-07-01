@@ -313,7 +313,5 @@ export interface ICodeblock {
 	InputData: InputData;
 
 	/** Once resolved, the non-optional fields WILL be there, with a default if missing */
-	Options: z.infer<ReturnType<typeof build>> & {
-		"from-paths"?: string[];
-	};
+	Options: z.infer<ReturnType<typeof build>>;
 }
