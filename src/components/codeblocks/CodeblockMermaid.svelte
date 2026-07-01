@@ -17,6 +17,11 @@
 		create_edge_sorter,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { build_traversal_options } from "src/graph/traversal";
+	import {
+		resolve_codeblock_source,
+		validate_codeblock_entry,
+	} from "src/codeblocks/resolve_codeblock_source";
+	import { try_dataview_from_query } from "src/codeblocks/dataview_from";
 	import { remove_nullish_keys } from "src/utils/objects";
 	import { Paths } from "src/utils/paths";
 	import { Links } from "src/utils/links";
@@ -39,26 +44,32 @@
 	let active_file = $derived($active_file_store);
 
 	export function update() {
-		const max_depth =
-			options.depth[1] === Infinity
-				? DEFAULT_MAX_DEPTH
-				: (options.depth[1] ?? DEFAULT_MAX_DEPTH);
+		const { source_path, max_depth } = resolve_codeblock_source(
+			options,
+			file_path,
+			active_file?.path,
+			DEFAULT_MAX_DEPTH,
+		);
 
-		const source_path =
-			options["start-note"] || file_path || active_file?.path || "";
-
-		if (!plugin.graph.has_node(source_path)) {
+		const validation_error = validate_codeblock_entry(
+			plugin.graph,
+			source_path,
+		);
+		if (validation_error) {
 			code = "";
-			error = "The file does not exist in the graph.";
+			error = validation_error;
 			return;
 		}
 
-		const entry_nodes = [file_path];
-		// Restricts which nodes a traversal may include (None = unrestricted).
-		const allowed_paths = options["from-paths"];
+		// Restricts which nodes a traversal may include (undefined = unrestricted).
+		const allowed_paths = try_dataview_from_query(
+			options.from,
+			plugin.app,
+			file_path,
+		);
 
 		const traversal_options = build_traversal_options({
-			entry: entry_nodes,
+			entry: [source_path],
 			fields: options.fields,
 			depth: max_depth,
 			separateEdges: !options["merge-fields"],
