@@ -23,7 +23,7 @@
 	import { prepareFuzzySearch } from "obsidian";
 	import { effect_counter } from "src/utils/perf";
 	import { to_node_stringify_options } from "src/graph/utils";
-	import { walk_to_roots } from "src/graph/walk_to_roots";
+	import { resolve_tree_entry_paths } from "src/graph/resolve_tree_entry_paths";
 	import { log } from "src/logger";
 	import { useViewSettings } from "src/stores/use_view_settings.svelte";
 	import SearchToggleButton from "../button/SearchToggleButton.svelte";
@@ -75,23 +75,14 @@
 		depth = settings.default_depth;
 	});
 
-	let entry_paths = $derived.by(() => {
-		if (!active_file || !plugin.graph.has_node(active_file.path))
-			return undefined;
-		if (settings.lock_view && plugin.graph.has_node(settings.lock_path!)) {
-			log.debug("Using locked path for TreeView:", settings.lock_path);
-			return [settings.lock_path!];
-		} else if (settings.find_root && find_root_field_labels.length > 0) {
-			const roots = walk_to_roots(
-				plugin.graph,
-				active_file.path,
-				find_root_field_labels,
-			);
-			log.debug("find_root: walked up to roots", roots);
-			return roots;
-		}
-		return [active_file.path];
-	});
+	let entry_paths = $derived(
+		resolve_tree_entry_paths(plugin.graph, active_file?.path, {
+			lock_view: settings.lock_view,
+			lock_path: settings.lock_path,
+			find_root: settings.find_root,
+			find_root_field_labels,
+		}),
+	);
 
 	let entry_path = $derived(
 		entry_paths?.length === 1 ? entry_paths[0] : undefined,
