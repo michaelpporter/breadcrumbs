@@ -278,8 +278,8 @@
 			</div>
 			<div
 				bind:this={toolbar_el}
-				class="absolute bottom-2 right-2"
-				style="z-index: 1;"
+				class="absolute"
+				style="z-index: 1; bottom: 0.5rem; right: 0.5rem;"
 			></div>
 			<svg
 				bind:this={svg_el}
