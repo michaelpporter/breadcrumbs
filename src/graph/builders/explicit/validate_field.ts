@@ -40,3 +40,24 @@ export const validate_edge_field = (
 
 	return succ(field);
 };
+
+/**
+ * Validate an *optional* secondary edge-field (e.g. a sibling/neighbour
+ * field): the caller has already merged the per-note override with its
+ * settings default. Unset stays unset (`succ(undefined)`, not `fail`) so the
+ * caller can continue building the note rather than bailing out — only a
+ * present-but-invalid value is an error.
+ */
+export const validate_optional_edge_field = (
+	plugin: BreadcrumbsPlugin,
+	field: unknown,
+	path: string,
+	field_name: string,
+): Result<string | undefined, BreadcrumbsError> => {
+	if (!field) return succ(undefined);
+
+	const res = validate_edge_field(plugin, field, path, field_name);
+	// `field` is truthy here, so validate_edge_field can't take its
+	// fail(undefined) branch -- error is always a real BreadcrumbsError.
+	return res.ok ? succ(res.data) : { ok: false, error: res.error! };
+};
