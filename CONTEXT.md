@@ -83,6 +83,24 @@ now `!settings.merge_fields` everywhere.
 
 ---
 
+## Tree entry-path resolution
+
+`resolve_tree_entry_paths` (`src/graph/resolve_tree_entry_paths.ts`) — a pure
+function, sibling to `walk_to_roots`, that decides which node(s) `TreeView`
+renders from: **locked path → find-root walk → active file**, in that
+precedence, falling through when a preferred option isn't available (e.g. a
+locked path no longer in the graph, or `find_root` with no field labels
+configured).
+
+Before this seam, the precedence tree lived inline in TreeView's
+`entry_paths` `$derived.by`, fused with Svelte's reactive tracking — the
+policy (which branch wins, and the fallthrough behavior) had no test surface
+of its own; verifying it meant mounting the component. The component's
+`entry_paths` is now a one-line call; the branch logic is unit-tested
+directly (9 cases: guards, each branch, precedence, fallthroughs).
+
+---
+
 ## Owned WASM lifecycle (`useOwned`)
 
 `src/stores/use_owned.svelte.ts` — a rune helper that owns a derived WASM
