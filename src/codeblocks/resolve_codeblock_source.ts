@@ -12,7 +12,7 @@ export interface ResolvedCodeblockSource {
  * to the caller's default (each type has its own).
  */
 export function resolve_codeblock_source(
-	options: { "start-note"?: string; depth: [number, number] },
+	options: { "start-note"?: string; depth: number[] },
 	file_path: string,
 	active_file_path: string | undefined,
 	default_max_depth: number,
