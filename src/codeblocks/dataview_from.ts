@@ -161,3 +161,21 @@ export function dataview_from_query(
 		)
 		.map((file) => file.path);
 }
+
+/**
+ * Evaluate a `from` query, swallowing parse errors (invalid syntax is
+ * surfaced separately at codeblock parse-time) and re-running on every call
+ * so callers see fresh vault state rather than a value cached from load.
+ */
+export function try_dataview_from_query(
+	query: string | undefined,
+	app: App,
+	source_path: string,
+): string[] | undefined {
+	if (!query) return undefined;
+	try {
+		return dataview_from_query(query, app, source_path);
+	} catch {
+		return undefined;
+	}
+}
