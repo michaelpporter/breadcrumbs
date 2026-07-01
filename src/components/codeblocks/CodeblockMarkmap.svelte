@@ -24,6 +24,7 @@
 	import { Links } from "src/utils/links";
 	import { Transformer } from "markmap-lib";
 	import { Markmap, globalCSS, loadCSS } from "markmap-view";
+	import { Toolbar } from "markmap-toolbar";
 
 	// Inject markmap styles into the document once.
 	loadCSS([{ type: "style", data: globalCSS }]);
@@ -178,6 +179,7 @@
 
 	// Markmap SVG rendering
 	let svg_el: SVGElement | undefined = $state(undefined);
+	let toolbar_el: HTMLDivElement | undefined = $state(undefined);
 	let mm: Markmap | undefined;
 	const transformer = new Transformer();
 
@@ -235,6 +237,14 @@
 			mm = Markmap.create(svg_el, undefined, root);
 			svg_el.addEventListener("click", handle_node_click);
 			void mm.fit();
+
+			const toolbar = Toolbar.create(mm);
+			toolbar.showBrand = false;
+			// "dark" duplicates Obsidian's own theme toggle -- drop it.
+			toolbar.setItems(
+				toolbar.items.filter((item) => item !== "dark"),
+			);
+			toolbar_el?.appendChild(toolbar.el);
 		}
 	});
 
@@ -266,6 +276,11 @@
 					cls="clickable-icon nav-action-button"
 				/>
 			</div>
+			<div
+				bind:this={toolbar_el}
+				class="absolute bottom-2 right-2"
+				style="z-index: 1;"
+			></div>
 			<svg
 				bind:this={svg_el}
 				style="width: 100%; height: 400px; display: block;"

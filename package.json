@@ -79,6 +79,7 @@
 		"lucide-svelte": "^1.0.1",
 		"luxon": "^3.7.2",
 		"markmap-lib": "^0.18.12",
+		"markmap-toolbar": "^0.18.12",
 		"markmap-view": "^0.18.12",
 		"obsidian-typings": "^6.13.0",
 		"zod": "^4.4.3"

@@ -10,6 +10,7 @@
         "lucide-svelte": "^1.0.1",
         "luxon": "^3.7.2",
         "markmap-lib": "^0.18.12",
+        "markmap-toolbar": "^0.18.12",
         "markmap-view": "^0.18.12",
         "obsidian-typings": "^6.13.0",
         "zod": "^4.4.3",
@@ -904,6 +905,8 @@
     "markmap-html-parser": ["markmap-html-parser@0.18.11", "", { "dependencies": { "@babel/runtime": "^7.22.6", "cheerio": "1.0.0" }, "peerDependencies": { "markmap-common": "*" } }, "sha512-+kC5C4sCGntGUhGvTa5VIb5rtM75cSy/VCy3tzZoNAcn2qZGdgYvljN0WvjsOzrEzp+V6XKgwzO0u2TdzNAiOg=="],
 
     "markmap-lib": ["markmap-lib@0.18.12", "", { "dependencies": { "@babel/runtime": "^7.22.6", "@vscode/markdown-it-katex": "^1.1.0", "highlight.js": "^11.8.0", "katex": "^0.16.8", "markdown-it": "^14.1.0", "markdown-it-ins": "^4.0.0", "markdown-it-mark": "^4.0.0", "markdown-it-sub": "^2.0.0", "markdown-it-sup": "^2.0.0", "markmap-html-parser": "0.18.11", "markmap-view": "0.18.12", "prismjs": "^1.29.0", "yaml": "^2.5.1" }, "peerDependencies": { "markmap-common": "*" } }, "sha512-WCA4OT+b71jYg0e4PS/6NRKqihod5OpPsvw1jEGHQwCtqQrY/yXXCeRyuL3axOS5cMy5pV8BSl4CwKfJU1LxJg=="],
+
+    "markmap-toolbar": ["markmap-toolbar@0.18.12", "", { "dependencies": { "@babel/runtime": "^7.22.6", "@gera2ld/jsx-dom": "^2.2.2" }, "peerDependencies": { "markmap-common": "*" } }, "sha512-+MQ/95ywl/ZLhVKb0tKjRa3p/AuUSYsuJRs1MPHmkxcxBaumXgzLNHUUnLjKmsbNxeZUSQGe3QJaFyRQYcHZJg=="],
 
     "markmap-view": ["markmap-view@0.18.12", "", { "dependencies": { "@babel/runtime": "^7.22.6", "d3": "^7.8.5" }, "peerDependencies": { "markmap-common": "*" } }, "sha512-D8bzT1YwIC/8rkbwm6WzigVUrpOAGv7ioEGTi1Lj+Oo8gO5sAm6hhli27jvTgUcZ9TwBeIWZ+dSUP+AupYUGlQ=="],
 
