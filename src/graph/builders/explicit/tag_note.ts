@@ -9,7 +9,7 @@ import { fail, graph_build_fail, succ } from "src/utils/result";
 import { ensure_starts_with } from "src/utils/strings";
 import { GCEdgeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import { read_edge_field } from "./read_edge_field";
-import { validate_edge_field } from "./validate_field";
+import { validate_optional_edge_field } from "./validate_field";
 
 const parse_frontmatter_tags = (
 	frontmatter: Record<string, unknown> | undefined,
@@ -61,19 +61,15 @@ const get_tag_note_info = (
 		metadata[META_ALIAS["tag-note-sibling-field"]] ??
 		plugin.settings.explicit_edge_sources.tag_note.default_sibling_field;
 
-	let sibling_field: string | undefined;
-	if (raw_sibling_field) {
-		const sibling_res = validate_edge_field(
-			plugin,
-			raw_sibling_field,
-			path,
-			"tag-note-sibling-field",
-		);
-		if (!sibling_res.ok) return sibling_res;
-		sibling_field = sibling_res.data;
-	}
+	const sibling_res = validate_optional_edge_field(
+		plugin,
+		raw_sibling_field,
+		path,
+		"tag-note-sibling-field",
+	);
+	if (!sibling_res.ok) return sibling_res;
 
-	return succ({ tag, field, exact, sibling_field });
+	return succ({ tag, field, exact, sibling_field: sibling_res.data });
 };
 
 /**

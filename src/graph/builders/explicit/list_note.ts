@@ -9,7 +9,7 @@ import { resolve_relative_target_path } from "src/utils/obsidian";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import { read_edge_field } from "./read_edge_field";
-import { validate_edge_field } from "./validate_field";
+import { validate_optional_edge_field } from "./validate_field";
 
 interface NativeListItem {
 	position: { start: { line: number; col: number } };
@@ -117,19 +117,17 @@ const get_list_note_info = (
 	if (!field_res.ok) return field_res;
 	const field = field_res.data;
 
-	const neighbour_field =
+	const raw_neighbour_field =
 		metadata[META_ALIAS["list-note-neighbour-field"]] ??
 		plugin.settings.explicit_edge_sources.list_note.default_neighbour_field;
 
-	if (neighbour_field) {
-		const neighbour_res = validate_edge_field(
-			plugin,
-			neighbour_field,
-			path,
-			"list-note-neighbour-field",
-		);
-		if (!neighbour_res.ok) return neighbour_res;
-	}
+	const neighbour_res = validate_optional_edge_field(
+		plugin,
+		raw_neighbour_field,
+		path,
+		"list-note-neighbour-field",
+	);
+	if (!neighbour_res.ok) return neighbour_res;
 
 	// list-note-exclude-index ignores out-edges, but _only for list-notes_
 	const exclude_index = Boolean(
@@ -144,7 +142,7 @@ const get_list_note_info = (
 		field,
 		exclude_index,
 		section,
-		neighbour_field: (neighbour_field ?? undefined) as string | undefined,
+		neighbour_field: neighbour_res.data,
 	});
 };
 
