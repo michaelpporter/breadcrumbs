@@ -12,6 +12,11 @@
 		NoteGraphError,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
 	import { traverse } from "src/graph/traversal";
+	import {
+		resolve_codeblock_source,
+		validate_codeblock_entry,
+	} from "src/codeblocks/resolve_codeblock_source";
+	import { try_dataview_from_query } from "src/codeblocks/dataview_from";
 	import NestedEdgeList from "../NestedEdgeList.svelte";
 	import CopyToClipboardButton from "../button/CopyToClipboardButton.svelte";
 	import CodeblockErrors from "./CodeblockErrors.svelte";
@@ -43,19 +48,28 @@
 	let active_file = $derived($active_file_store);
 
 	export function update() {
-		const max_depth =
-			options.depth[1] === Infinity
-				? DEFAULT_MAX_DEPTH
-				: (options.depth[1] ?? DEFAULT_MAX_DEPTH);
+		const { source_path, max_depth } = resolve_codeblock_source(
+			options,
+			file_path,
+			active_file?.path,
+			DEFAULT_MAX_DEPTH,
+		);
 
-		const source_path =
-			options["start-note"] || file_path || active_file?.path || "";
-
-		if (!plugin.graph.has_node(source_path)) {
+		const validation_error = validate_codeblock_entry(
+			plugin.graph,
+			source_path,
+		);
+		if (validation_error) {
 			data = undefined;
-			error = "The file does not exist in the graph.";
+			error = validation_error;
 			return;
 		}
+
+		const dv_paths = try_dataview_from_query(
+			options.from,
+			plugin.app,
+			file_path,
+		);
 
 		try {
 			const new_data = traverse(plugin.graph, {
@@ -63,12 +77,13 @@
 				fields: options.fields,
 				depth: max_depth,
 				separateEdges: !options["merge-fields"],
-				dataviewFrom: options["from-paths"],
+				dataviewFrom: dv_paths,
 				sort: options.sort,
 				flatten: options.flat,
 			});
-			data?.free(); // free previous FlatTraversalResult
-			data = new_data;
+			const old_data = data;
+			data = new_data; // assign before freeing so derivations never read a freed handle
+			old_data?.free();
 			error = undefined;
 		} catch (e) {
 			log.error("Error updating codeblock tree", e);
