@@ -17,7 +17,8 @@ export type FieldSource =
 	| "regex_note"
 	| "dataview_note"
 	| "folder_note"
-	| "list_note";
+	| "list_note"
+	| "traverse_note";
 
 interface EdgeFieldSourceConfig {
 	/** The `BC-…-field` key — both the frontmatter override and the error label. */
@@ -26,7 +27,8 @@ interface EdgeFieldSourceConfig {
 
 // The builder default (when the per-note override is absent) comes from
 // EDGE_FIELD_SLOTS[source].primary, shared with the rename/remove cascade.
-// folder_note and list_note have no primary slot there → required, no default.
+// folder_note, list_note, and traverse_note have no primary slot there →
+// required, no default.
 const EDGE_FIELD_SOURCES: Record<FieldSource, EdgeFieldSourceConfig> = {
 	tag_note: { alias_key: "tag-note-field" },
 	dendron_note: { alias_key: "dendron-note-field" },
@@ -35,6 +37,7 @@ const EDGE_FIELD_SOURCES: Record<FieldSource, EdgeFieldSourceConfig> = {
 	dataview_note: { alias_key: "dataview-note-field" },
 	folder_note: { alias_key: "folder-note-field" },
 	list_note: { alias_key: "list-note-field" },
+	traverse_note: { alias_key: "traverse-note-field" },
 };
 
 /**
