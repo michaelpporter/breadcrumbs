@@ -116,13 +116,12 @@ function postprocess_options(
 	}
 
 	// `from` is the canonical field (the schema coalesces `dataview-from` into it).
+	// Only validated here -- each codeblock type live-queries it on its own
+	// update() (via try_dataview_from_query) rather than reading a value
+	// precomputed once at parse time, which could go stale.
 	if (parsed.from) {
 		try {
-			parsed["from-paths"] = dataview_from_query(
-				parsed.from,
-				plugin.app,
-				source_path,
-			);
+			dataview_from_query(parsed.from, plugin.app, source_path);
 		} catch {
 			errors.push({
 				path: "from",
