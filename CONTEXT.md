@@ -169,6 +169,30 @@ review:**
 
 ---
 
+## `dataview_from_query` — parser/evaluator fusion, deliberately not split
+
+`src/codeblocks/dataview_from.ts` parses a Dataview-style `from` query
+(`#tag`, `"folder"`, `[[link]]`, `AND`/`OR`/`NOT`) straight into `FilePredicate`
+closures rather than an intermediate AST — parsing and evaluation are one
+step. Flagged in the 2026-06-24 review as a shallow-abstraction candidate;
+checked during the 2026-07-01 follow-up and **not split**: it has exactly one
+real consumer (the codeblock `from` field, called identically from
+`index.ts` and all three codeblock components for the same feature) — no
+second adapter to justify the seam. Don't re-propose the AST split unless a
+genuinely distinct second consumer shows up.
+
+Also traced: no branch in `parse_atom`/`parse_and`/`parse_or`/`consume_keyword`
+can throw — an unrecognised atom returns a false-matching predicate, not an
+exception. The `try`/`catch` in `try_dataview_from_query` and the parse-time
+validation in `codeblocks/index.ts` guard against an exception this grammar
+structurally can't produce today. Harmless as-is; know this before "fixing"
+error handling here.
+
+Test coverage added instead (`tests/codeblocks/dataview_from.test.ts`) — the
+file had none before.
+
+---
+
 ## Owned WASM lifecycle (`useOwned`)
 
 `src/stores/use_owned.svelte.ts` — a rune helper that owns a derived WASM
