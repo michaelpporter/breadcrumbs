@@ -11,13 +11,15 @@
 	import CopyToClipboardButton from "../button/CopyToClipboardButton.svelte";
 	import CodeblockErrors from "./CodeblockErrors.svelte";
 	import {
-		create_edge_sorter,
 		FlatTraversalResult,
 		NoteGraphError,
-		TraversalOptions,
-		TraversalPostprocessOptions,
 	} from "wasm/pkg/breadcrumbs_graph_wasm";
-	import { dataview_from_query } from "src/codeblocks/dataview_from";
+	import { try_dataview_from_query } from "src/codeblocks/dataview_from";
+	import {
+		resolve_codeblock_source,
+		validate_codeblock_entry,
+	} from "src/codeblocks/resolve_codeblock_source";
+	import { traverse } from "src/graph/traversal";
 	import { log } from "src/logger";
 	import { Links } from "src/utils/links";
 	import { Transformer } from "markmap-lib";
@@ -42,9 +44,6 @@
 		parent_component = undefined,
 	}: Props = $props();
 
-	let sort = $derived(
-		create_edge_sorter(options.sort.field, options.sort.order === -1),
-	);
 	let show_node_options = $derived(
 		plugin.settings.views.codeblocks.show_node_options,
 	);
@@ -58,29 +57,21 @@
 	let active_file = $derived($active_file_store);
 
 	export function update() {
-		const max_depth =
-			options.depth[1] === Infinity
-				? DEFAULT_MAX_DEPTH
-				: (options.depth[1] ?? DEFAULT_MAX_DEPTH);
+		const { source_path, max_depth } = resolve_codeblock_source(
+			options,
+			file_path,
+			active_file?.path,
+			DEFAULT_MAX_DEPTH,
+		);
 
-		const source_path =
-			options["start-note"] || file_path || active_file?.path || "";
-
-		// Re-query on every update so we pick up fresh vault state
-		// (the paths pre-computed in postprocess_options may be stale if the
-		// graph wasn't ready when the MDRC first loaded).
-		let live_dv_paths: string[] | undefined;
-		if (options.from) {
-			try {
-				live_dv_paths = dataview_from_query(
-					options.from,
-					plugin.app,
-					file_path,
-				);
-			} catch (_) {
-				// Fall through to source_path traversal
-			}
-		}
+		// Re-query on every update so we pick up fresh vault state (the
+		// paths pre-computed at parse time may be stale if the graph wasn't
+		// ready when the MDRC first loaded).
+		const live_dv_paths = try_dataview_from_query(
+			options.from,
+			plugin.app,
+			file_path,
+		);
 
 		const has_dv_paths = !!live_dv_paths?.length;
 		active_dv_paths = live_dv_paths;
@@ -94,35 +85,32 @@
 				error = "None of the `from` notes exist in the graph.";
 				return;
 			}
-		} else if (!plugin.graph.has_node(source_path)) {
-			data = undefined;
-			error = "The file does not exist in the graph.";
-			return;
+		} else {
+			const validation_error = validate_codeblock_entry(
+				plugin.graph,
+				source_path,
+			);
+			if (validation_error) {
+				data = undefined;
+				error = validation_error;
+				return;
+			}
 		}
 
 		const entry_nodes = has_dv_paths ? live_dv_paths! : [source_path];
 
-		const traversal_options = new TraversalOptions(
-			entry_nodes,
-			options.fields,
-			max_depth,
-			100, // max nodes to traverse
-			!options["merge-fields"],
-			// When `from:` is given, keep traversal within that set so the
-			// map doesn't escape into the whole vault.
-			has_dv_paths ? live_dv_paths : undefined,
-		);
-
-		const postprocess_options = new TraversalPostprocessOptions(
-			sort,
-			options.flat,
-		);
-
 		try {
-			const new_data = plugin.graph.rec_traverse_and_process(
-				traversal_options,
-				postprocess_options,
-			);
+			const new_data = traverse(plugin.graph, {
+				entry: entry_nodes,
+				fields: options.fields,
+				depth: max_depth,
+				separateEdges: !options["merge-fields"],
+				// When `from:` is given, keep traversal within that set so
+				// the map doesn't escape into the whole vault.
+				dataviewFrom: has_dv_paths ? live_dv_paths : undefined,
+				sort: options.sort,
+				flatten: options.flat,
+			});
 			const old_data = data;
 			data = new_data; // update state before freeing so derivations read valid data
 			old_data?.free();
