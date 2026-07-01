@@ -101,6 +101,42 @@ directly (9 cases: guards, each branch, precedence, fallthroughs).
 
 ---
 
+## Codeblock source resolution
+
+`resolve_codeblock_source` + `validate_codeblock_entry`
+(`src/codeblocks/resolve_codeblock_source.ts`) — the `source_path`/`max_depth`
+arithmetic and `has_node` validation shared by all three codeblock types
+(Tree, Mermaid, Markmap): `start-note` override → the codeblock's containing
+file → the active file; `depth[1] === Infinity` falls back to the caller's
+own default (each type has a different one).
+
+`try_dataview_from_query` (`src/codeblocks/dataview_from.ts`) — a safe
+wrapper around `dataview_from_query` that swallows parse errors and always
+re-queries live. Markmap always did this (it depended on the external
+Dataview plugin's async-ready index before it had its own `dataview_from.ts`,
+so live-querying was never optional); Tree and Mermaid used to read a `from`
+match precomputed once at `CodeblockMDRC.onload()` time and never refreshed
+it — so a `GRAPH_UPDATE`-triggered `update()` could act on a stale match.
+Both now call `try_dataview_from_query` on every update.
+
+**`from`'s two semantics stay separate, deliberately:** Tree/Mermaid treat a
+`from` match as a *restrict-filter* — they always enter the traversal from
+`source_path`, and only use the match to bound which nodes may appear
+(`dataviewFrom`). Markmap treats a match as *replacing the entry point* — it
+walks from every matched path instead of the active file, for a
+map-of-everything-matching-this-query view. This is not drift from one
+design: Markmap's shape predates Tree/Mermaid's `from` support and has a
+different origin (the external-Dataview-plugin era). Don't unify them without
+a deliberate decision — that's a behavior change to `from`, not a refactor.
+
+**Bug the extraction surfaced and fixed:** Mermaid resolved `source_path`
+honoring `start-note`, but its traversal entry was hardcoded to
+`[file_path]` — so `start-note` never actually moved a mermaid codeblock's
+entry point. It now enters from the resolved `source_path`, like Tree and
+Markmap always have.
+
+---
+
 ## Owned WASM lifecycle (`useOwned`)
 
 `src/stores/use_owned.svelte.ts` — a rune helper that owns a derived WASM
