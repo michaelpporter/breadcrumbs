@@ -137,6 +137,38 @@ Markmap always have.
 
 ---
 
+## Edge-field resolution: read_edge_field vs. validate_optional_edge_field
+
+`read_edge_field` (`src/graph/builders/explicit/read_edge_field.ts`) is the
+seam for a builder's *primary* field: per-note `BC-<source>-field` override,
+falling back to a settings default when the source has one
+(`EDGE_FIELD_SLOTS[source].primary`), invalid → bail the note out entirely.
+`FieldSource` now includes `traverse_note` (folded in — it had re-implemented
+the exact same shape via a direct `validate_edge_field` call).
+
+`validate_optional_edge_field` (`src/graph/builders/explicit/validate_field.ts`)
+is the seam for a builder's *secondary*, optional field (a sibling/neighbour
+field): same override-then-default merge, but unset stays unset
+(`succ(undefined)`) rather than bailing the note out — only a
+present-but-invalid value is an error. Used by `tag_note`'s `sibling_field`
+and `list_note`'s `neighbour_field`.
+
+**Not part of either seam, checked and ruled out during the 2026-07-01
+review:**
+- `date_note` — no per-note override at all; its fields (`default_field`,
+  `next_field`, `up_field`) are pure settings validation. A different
+  mechanism, not a `read_edge_field` bypass.
+- `typed_link` — scans *every* frontmatter/inline-field key against the full
+  set of registered field labels (Set membership), not a single
+  override-with-fallback. Also a different mechanism.
+- `dendron_note`/`johnny_decimal_note`'s `sibling_field` — settings-only, no
+  per-note override, no validation call. A third, simpler shape; don't route
+  it through `validate_optional_edge_field` without adding the missing
+  validation as a deliberate decision, not an incidental side effect of a
+  refactor.
+
+---
+
 ## Owned WASM lifecycle (`useOwned`)
 
 `src/stores/use_owned.svelte.ts` — a rune helper that owns a derived WASM
