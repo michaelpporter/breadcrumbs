@@ -6,9 +6,11 @@ import { resolve_relative_target_path } from "src/utils/obsidian";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 // Matches Dataview-style inline fields at the start of a line:
-//   [optional list marker] field-name:: rest-of-line
-// Supports: "same:: ...", "- same:: ...", "up :: ..." etc.
-const INLINE_FIELD_REGEX = /^(?:\s*[-*+\d.]+\s+)?([\w][\w\s-]*)\s*::\s*/;
+//   [optional list marker] [optional ( or [ wrapper] field-name:: rest-of-line
+// Supports: "same:: ...", "- same:: ...", "up :: ...",
+// and Dataview's bracket/paren wrappers "(down:: ...)" / "[down:: ...]".
+const INLINE_FIELD_REGEX =
+	/^(?:\s*[-*+\d.]+\s+)?[([]?\s*([\w][\w\s-]*)\s*::\s*/;
 
 /**
  * **typed_link** — the primary edge builder.
