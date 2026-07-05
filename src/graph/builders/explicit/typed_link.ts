@@ -92,7 +92,17 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 				for (const link_cache of cache.links) {
 					const line_num = link_cache.position.start.line;
 					const line_text = lines[line_num] ?? "";
-					const field = parse_inline_field(line_text);
+					let field = parse_inline_field(line_text);
+					if (
+						!field &&
+						line_num > 0 &&
+						!line_text.includes(link_cache.link)
+					) {
+						const prev_line = lines[line_num - 1] ?? "";
+						if (prev_line.includes(link_cache.link)) {
+							field = parse_inline_field(prev_line);
+						}
+					}
 					if (!field) continue;
 					if (!field_labels.has(field)) continue;
 

@@ -150,6 +150,17 @@ describe("typed_link builder — body inline fields", () => {
 		);
 		t.expect(r.edges).toHaveLength(0);
 	});
+
+	test("supports one-based inline link line positions", async () => {
+		const files = [mock_file("a.md", { links: [{ line: 1, link: "Convolutions" }] })];
+		const r = await _add_explicit_edges_typed_link(
+			inline_plugin("up:: [[Convolutions]]"),
+			make_all_files(files),
+		);
+		expect(r.edges).toHaveLength(1);
+		expect(r.edges[0]!.edge_type).toBe("up");
+		expect(r.edges[0]!.target).toBe("Convolutions.md");
+	});
 });
 
 describe("parse_inline_field", () => {
@@ -183,4 +194,3 @@ describe("parse_inline_field", () => {
 		expect(parse_inline_field(line)).toBeNull();
 	});
 });
-
