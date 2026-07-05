@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.21.1](https://github.com/michaelpporter/breadcrumbs/compare/4.21.0...4.21.1) (2026-07-05)
+
+### Features
+
+* Markmap codeblocks now have a zoom/fit toolbar, matching the interactive controls markmap ships with elsewhere.
+
+### Build
+
+* Bumped JS dependencies (9 updates).
+
 ### [4.21.0](https://github.com/michaelpporter/breadcrumbs/compare/4.20.0...4.21.0) (2026-06-30)
 
 ### Features
