@@ -150,5 +150,35 @@ describe("typed_link builder — body inline fields", () => {
 		);
 		t.expect(r.edges).toHaveLength(0);
 	});
+
+	test("blockquote-wrapped field at line start", async (t) => {
+		const line = "> [up:: [[Note]]]";
+		const files = [
+			mock_file("a.md", {
+				links: [{ line: 0, col: line.indexOf("[[Note]]"), link: "Note" }],
+			}),
+		];
+		const r = await _add_explicit_edges_typed_link(
+			inline_plugin(line),
+			make_all_files(files),
+		);
+		expect(r.edges).toHaveLength(1);
+		expect(r.edges[0]!.edge_type).toBe("up");
+	});
+
+	test("wrapped field mid-sentence (not at line start)", async (t) => {
+		const line = "This other note is a child of (up:: [[Note]]).";
+		const files = [
+			mock_file("a.md", {
+				links: [{ line: 0, col: line.indexOf("[[Note]]"), link: "Note" }],
+			}),
+		];
+		const r = await _add_explicit_edges_typed_link(
+			inline_plugin(line),
+			make_all_files(files),
+		);
+		expect(r.edges).toHaveLength(1);
+		expect(r.edges[0]!.edge_type).toBe("up");
+	});
 });
 
