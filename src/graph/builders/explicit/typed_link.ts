@@ -6,9 +6,16 @@ import { resolve_relative_target_path } from "src/utils/obsidian";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 // Matches Dataview-style inline fields at the start of a line:
-//   [optional list marker] field-name:: rest-of-line
-// Supports: "same:: ...", "- same:: ...", "up :: ..." etc.
-const INLINE_FIELD_REGEX = /^(?:\s*[-*+\d.]+\s+)?([\w][\w\s-]*)\s*::\s*/;
+//   [optional blockquote marker] [optional list marker] [optional ( or [ wrapper] field-name:: rest-of-line
+// Supports: "same:: ...", "- same:: ...", "up :: ...", "> same:: ...",
+// and Dataview's bracket/paren wrappers "(down:: ...)" / "[down:: ...]".
+const LINE_START_FIELD_REGEX =
+	/^(?:\s*>+\s*)?(?:\s*[-*+\d.]+\s+)?[([]?\s*([\w][\w\s-]*)\s*::\s*/;
+
+// Matches Dataview's bracket/paren-wrapped inline fields anywhere within a
+// line of prose, e.g. "This note is a child of (up:: [[Note]])." — Dataview
+// only recognizes these mid-line when wrapped, unlike the line-start form.
+const WRAPPED_FIELD_REGEX = /[([]\s*([\w][\w\s-]*)\s*::\s*/g;
 
 /**
  * **typed_link** — the primary edge builder.
@@ -91,10 +98,29 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 				for (const link_cache of cache.links) {
 					const line_num = link_cache.position.start.line;
 					const line_text = lines[line_num] ?? "";
-					const match = INLINE_FIELD_REGEX.exec(line_text);
-					if (!match) continue;
 
-					const field = match[1].trim();
+					const start_match = LINE_START_FIELD_REGEX.exec(line_text);
+					let field: string | undefined = start_match?.[1]?.trim();
+
+					if (!field) {
+						// Fall back to the nearest wrapped field preceding the
+						// link on this line (mid-sentence inline annotations).
+						const before_link = line_text.slice(
+							0,
+							link_cache.position.start.col,
+						);
+						WRAPPED_FIELD_REGEX.lastIndex = 0;
+						let wrapped_match: RegExpExecArray | null;
+						let last: RegExpExecArray | undefined;
+						while (
+							(wrapped_match = WRAPPED_FIELD_REGEX.exec(before_link))
+						) {
+							last = wrapped_match;
+						}
+						field = last?.[1]?.trim();
+					}
+
+					if (!field) continue;
 					if (!field_labels.has(field)) continue;
 					if (fm_covered.has(`${field}\0${link_cache.link}`)) continue;
 

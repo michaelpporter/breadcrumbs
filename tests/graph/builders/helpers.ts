@@ -23,7 +23,7 @@ export function mock_file(
 		/** Markdown list items (list_note builder): one per line */
 		listItems?: { line: number; col: number; parent: number }[];
 		/** Body wikilinks keyed by line (list_note builder) */
-		links?: { line: number; link: string }[];
+		links?: { line: number; col?: number; link: string }[];
 	} = {},
 ) {
 	const slash_path = path.replace(/\\/g, "/");
@@ -66,8 +66,8 @@ export function mock_file(
 				links: opts.links?.map((l) => ({
 					link: l.link,
 					position: {
-						start: { line: l.line, col: 0, offset: 0 },
-						end: { line: l.line, col: 0, offset: 0 },
+						start: { line: l.line, col: l.col ?? 0, offset: 0 },
+						end: { line: l.line, col: l.col ?? 0, offset: 0 },
 					},
 				})),
 			}
