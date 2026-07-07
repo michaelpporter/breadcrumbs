@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 4.X
 
+### [4.14.3](https://github.com/michaelpporter/breadcrumbs/compare/4.14.2...4.14.3) (2026-07-06)
+
+### Bug Fixes
+
+* **typed_link (1.12-compat)** — inline Dataview properties are recognized again for users still on Obsidian < 1.13: paren/bracket wrappers (`(down:: [[Note]])`, `[down:: [[Note]]]`), blockquoted fields (`> [up:: [[Note]]]`), and wrapped fields appearing mid-sentence rather than only at the start of a line (`... is a child of (up:: [[Note]])`). Promotes the 4.14.3-beta.1/beta.2 backport to stable (#724).
+
 ### [4.14.3-beta.2](https://github.com/michaelpporter/breadcrumbs/compare/4.14.3-beta.1...4.14.3-beta.2) (2026-07-06)
 
 ### Bug Fixes
