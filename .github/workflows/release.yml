@@ -47,14 +47,21 @@ jobs:
               run: |
                   tag="${GITHUB_REF#refs/tags/}"
                   prerelease_flag=""
+                  latest_flag=""
                   if [[ "$tag" == *beta* ]]; then
                     prerelease_flag="--prerelease"
                   else
-                    # Stable releases must originate from main
-                    branch=$(git branch -r --contains "$GITHUB_SHA" | grep -E '^\s*origin/main$' || true)
+                    # Stable releases must originate from main or the 1.12-compat
+                    # maintenance branch (older Obsidian versions).
+                    branch=$(git branch -r --contains "$GITHUB_SHA" | grep -E '^\s*origin/(main|1\.12-compat)$' || true)
                     if [[ -z "$branch" ]]; then
-                      echo "ERROR: Stable tag '$tag' was not pushed from main. Aborting."
+                      echo "ERROR: Stable tag '$tag' was not pushed from main or 1.12-compat. Aborting."
                       exit 1
+                    fi
+                    # Releases from 1.12-compat target older Obsidian users only —
+                    # don't let them supersede main's release as "Latest".
+                    if echo "$branch" | grep -qE 'origin/1\.12-compat$'; then
+                      latest_flag="--latest=false"
                     fi
                   fi
 
@@ -63,4 +70,5 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     $prerelease_flag \
+                    $latest_flag \
                     main.js manifest.json styles.css
