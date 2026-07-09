@@ -22,7 +22,6 @@
         "@tsconfig/svelte": "^5.0.8",
         "@types/luxon": "^3.7.1",
         "@types/node": "^26.0.1",
-        "@types/obsidian-typings": "npm:obsidian-typings@^6.13.0",
         "@vitest/coverage-v8": "4.1.9",
         "@vitest/ui": "4.1.9",
         "esbuild": "^0.28.1",
@@ -311,8 +310,6 @@
     "@types/luxon": ["@types/luxon@3.7.2", "", {}, "sha512-gW+Oib+vUtGJBtNC8V9Reww0oIpusw+4m81uncg9REGZAJfqOQHfo/nkabnc7w0QReXyPqjrbWMJk6NuAkiX3Q=="],
 
     "@types/node": ["@types/node@26.0.1", "", { "dependencies": { "undici-types": "~8.3.0" } }, "sha512-fc3KiUoBt6kie0N9bIW3E47vZsuaMf0PM2AaUpLCLT0s/LvX1nxAim6Fc049cNxODPpGm6qRAuUOB86SkRuPQw=="],
-
-    "@types/obsidian-typings": ["obsidian-typings@6.18.0", "", { "dependencies": { "@obsidian-typings/obsidian-public-latest": "^6.18.0" } }, "sha512-KLKFi+b/qKzQ8tKzgiUnFi10h3xacVNyOI2U63boHQAZ7BV+NAG5Q93RhfSWz2qGDmzHKHfoiZBe8K7nfGAzWg=="],
 
     "@types/tern": ["@types/tern@0.23.9", "", { "dependencies": { "@types/estree": "*" } }, "sha512-ypzHFE/wBzh+BlH6rrBgS5I/Z7RD21pGhZ2rltb/+ZrVM1awdZwjx7hE5XfuYgHWk9uvV5HLZN3SloevCAp3Bw=="],
 

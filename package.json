@@ -44,7 +44,6 @@
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/luxon": "^3.7.1",
 		"@types/node": "^26.0.1",
-		"@types/obsidian-typings": "npm:obsidian-typings@^6.13.0",
 		"@vitest/coverage-v8": "4.1.9",
 		"@vitest/ui": "4.1.9",
 		"esbuild": "^0.28.1",
