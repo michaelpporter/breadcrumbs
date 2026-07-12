@@ -38,3 +38,6 @@ meta.txt
 
 # Local triage / scratch notes (not for the repo)
 _notes/
+
+# Local implementation plans (not for the repo)
+plans/
