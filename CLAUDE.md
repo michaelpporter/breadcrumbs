@@ -4,17 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Coding Guidelines
 
-### Think Before Coding
-State assumptions explicitly. If multiple interpretations exist, present them — don't pick silently. If something is unclear, stop and ask.
+See my global conventions for how to work. Project-specific gate before calling any change done: `bun run build && bun run test` must pass (and `bun run wasm:test` after any Rust change).
 
-### Simplicity First
-Minimum code that solves the problem. No features beyond what was asked, no abstractions for single-use code, no error handling for impossible scenarios.
-
-### Surgical Changes
-Touch only what you must. Don't refactor adjacent code that isn't broken. Match existing style. Remove imports/variables YOUR changes made unused — don't remove pre-existing dead code unless asked.
-
-### Goal-Driven Execution
-For multi-step tasks, state a brief plan with verifiable checks. Strong success criteria: run tests, type-check, build. The gate before calling a change done: `bun run build && bun run test` must pass (and `bun run wasm:test` after any Rust change).
+> `1.12-compat` is a permanent parallel branch for Obsidian 1.12.x — never merge into main; reapply shared fixes on both.
 
 ---
 
