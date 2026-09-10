@@ -27,4 +27,17 @@ declare module "obsidian" {
 		initialized: boolean;
 		on(name: "initialized", callback: () => void, ctx?: unknown): EventRef;
 	}
+
+	/**
+	 * Optional stable ID for a setting or setting page (Obsidian 1.14+). Keeps a
+	 * reference stable when a setting or page is renamed, and disambiguates
+	 * siblings sharing a name. Not yet in the 1.13.1 `obsidian` typings.
+	 */
+	interface SettingDefinitionBase {
+		id?: string;
+	}
+
+	interface SettingDefinitionPage {
+		id?: string;
+	}
 }

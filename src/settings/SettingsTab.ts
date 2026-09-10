@@ -108,12 +108,14 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 		return [
 			{
 				type: "page",
+				id: "edge-fields",
 				name: "Edge fields",
 				desc: "Define the named relationships edges can use, like up and down",
 				page: svelte_page("Edge fields", EdgeFieldSettings),
 			},
 			{
 				type: "page",
+				id: "excluded-folders",
 				name: "Excluded folders",
 				desc: "Skip notes in chosen folders when generating edges",
 				page: imp_page(
@@ -127,6 +129,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				items: [
 					{
 						type: "page",
+						id: "implied-transitive",
 						name: "Transitive",
 						desc: "Derive new edges from chains of existing ones (e.g. the up of an up is an up)",
 						page: svelte_page(
@@ -142,18 +145,21 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				items: [
 					{
 						type: "page",
+						id: "source-tag-notes",
 						name: "Tag notes",
 						desc: "Treat notes that share a tag as children of a parent note",
 						page: imp_page("Tag notes", _add_settings_tag_note),
 					},
 					{
 						type: "page",
+						id: "source-list-notes",
 						name: "List notes",
 						desc: "Turn markdown list items in a note into child edges",
 						page: imp_page("List notes", _add_settings_list_note),
 					},
 					{
 						type: "page",
+						id: "source-dendron-notes",
 						name: "Dendron notes",
 						desc: "Build hierarchy from dot-separated note names (e.g. parent.child)",
 						page: imp_page(
@@ -163,6 +169,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						id: "source-johnny-decimal-notes",
 						name: "Johnny.Decimal notes",
 						desc: "Build hierarchy from numeric name prefixes (e.g. 01.02 title)",
 						page: imp_page(
@@ -172,12 +179,14 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						id: "source-date-notes",
 						name: "Date notes",
 						desc: "Link sequential daily and periodic notes by date",
 						page: imp_page("Date notes", _add_settings_date_note),
 					},
 					{
 						type: "page",
+						id: "source-dataview-notes",
 						name: "Dataview notes",
 						desc: "Treat the results of a Dataview query as children of a note (requires Dataview)",
 						page: imp_page(
@@ -187,12 +196,14 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						id: "source-regex-notes",
 						name: "Regex notes",
 						desc: "Build edges from a regex match on note names",
 						page: imp_page("Regex notes", _add_settings_regex_note),
 					},
 					{
 						type: "page",
+						id: "source-traverse-notes",
 						name: "Traverse notes",
 						desc: "Build edges by following links outward from a note",
 						page: imp_page(
@@ -208,6 +219,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				items: [
 					{
 						type: "page",
+						id: "view-page",
 						name: "Page",
 						desc: "Trail and previous/next bars shown inside the note",
 						page: imp_page("Page", (plugin, el) => {
@@ -223,18 +235,21 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						id: "view-matrix",
 						name: "Matrix",
 						desc: "Side panel grouping a note's edges by field",
 						page: imp_page("Matrix", _add_settings_matrix),
 					},
 					{
 						type: "page",
+						id: "view-tree",
 						name: "Tree",
 						desc: "Side panel showing a recursive tree from the active note",
 						page: imp_page("Tree", _add_settings_tree_view),
 					},
 					{
 						type: "page",
+						id: "view-codeblocks",
 						name: "Codeblocks",
 						desc: "Defaults for breadcrumbs codeblocks rendered in notes",
 						page: imp_page("Codeblocks", _add_settings_codeblocks),
@@ -247,18 +262,21 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				items: [
 					{
 						type: "page",
+						id: "command-rebuild-graph",
 						name: "Rebuild graph",
 						desc: "When and how the graph is rebuilt",
 						page: imp_page("Rebuild graph", _add_settings_rebuild_graph),
 					},
 					{
 						type: "page",
+						id: "command-list-index",
 						name: "List index",
 						desc: "Generate a nested list of the hierarchy from a note",
 						page: imp_page("List index", _add_settings_list_index),
 					},
 					{
 						type: "page",
+						id: "command-freeze-implied-edges",
 						name: "Freeze implied edges",
 						desc: "Write implied edges into notes as explicit links",
 						page: imp_page(
@@ -268,12 +286,14 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						id: "command-thread",
 						name: "Thread",
 						desc: "Create a new note along an edge field",
 						page: imp_page("Thread", _add_settings_thread),
 					},
 					{
 						type: "page",
+						id: "command-create-canvas",
 						name: "Create canvas",
 						desc: "Export a note's neighbourhood to a JSON Canvas",
 						page: imp_page(
@@ -283,6 +303,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 					},
 					{
 						type: "page",
+						id: "command-edge-audit",
 						name: "Edge audit",
 						desc: "Generate a read-only report of unused, mergeable, and orphaned edges",
 						page: imp_page("Edge audit", _add_settings_edge_audit),
@@ -295,6 +316,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				items: [
 					{
 						type: "page",
+						id: "suggestor-edge-field",
 						name: "Edge field suggestor",
 						desc: "Suggest edge fields as you type in the editor",
 						page: imp_page(
@@ -309,6 +331,7 @@ export class BreadcrumbsSettingTab extends PluginSettingTab {
 				heading: "Debug",
 				items: [
 					{
+						id: "debug-level",
 						name: "Debug level",
 						desc: "Set the level of debug logging",
 						render: (setting) => {
