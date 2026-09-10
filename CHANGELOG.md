@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.22.0-beta.2](https://github.com/michaelpporter/breadcrumbs/compare/4.22.0-beta.1...4.22.0-beta.2) (2026-09-10)
+
+### Added
+
+* Every page in the Breadcrumbs settings tab now has a stable `id`, using Obsidian 1.14's new `SettingDefinitionItem#id`. This keeps deep links and search references to a settings page working even if the page is later renamed, and disambiguates settings that share a display name.
+
 ### [4.22.0-beta.1](https://github.com/michaelpporter/breadcrumbs/compare/4.21.11...4.22.0-beta.1) (2026-09-07)
 
 ### Fixed
