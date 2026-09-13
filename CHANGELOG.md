@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.21.12](https://github.com/michaelpporter/breadcrumbs/compare/4.21.11...4.21.12) (2026-09-13)
+
+### Fixed
+
+* `list_note` builder now recognizes ordered list markers (`1.`, `2)`, etc.), not just `- * +` bullets. An ordered item's numeric prefix was previously left un-stripped and misread as an invalid field-override label, silently dropping the edge. Refs #773
+
+### Chores
+
+* Bumped the `fast-uri` override past a version flagged by the community plugin directory's vulnerability scan (build-time only; tree-shaken from the shipped bundle).
+
 ### [4.21.11](https://github.com/michaelpporter/breadcrumbs/compare/4.21.10...4.21.11) (2026-08-22)
 
 ### Fixed
