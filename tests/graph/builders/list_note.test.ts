@@ -45,6 +45,38 @@ describe("list_note builder", () => {
 		t.expect(r.edges[0]!.edge_source).toBe("list_note");
 	});
 
+	// #773: ordered list markers ("1.") were left in `text`, which then
+	// looked like a field-override label to FIELD_OVERRIDE_REGEX.
+	test("ordered list items become child edges", async (t) => {
+		const content = "1. [[A]]\n2. [[B]]";
+		const list = mock_file("list.md", {
+			frontmatter: { "BC-list-note-field": "down" },
+			listItems: [
+				{ line: 0, col: 0, parent: -1 },
+				{ line: 1, col: 0, parent: -1 },
+			],
+			links: [
+				{ line: 0, link: "A" },
+				{ line: 1, link: "B" },
+			],
+		});
+
+		const r = await _add_explicit_edges_list_note(
+			make_plugin(
+				{ edge_fields: EDGE_FIELDS, explicit_edge_sources: {} as never },
+				[],
+				link_resolver(["A", "B"]),
+				{ cachedRead: async () => content },
+			),
+			make_all_files([list]),
+		);
+
+		const pairs = r.edges.map((e) => [e.source, e.target]);
+		t.expect(pairs).toContainEqual(["list.md", "A.md"]);
+		t.expect(pairs).toContainEqual(["list.md", "B.md"]);
+		t.expect(r.errors).toHaveLength(0);
+	});
+
 	// #760: `![[Note]]` (an embed) lands in cache.embeds, not cache.links — a
 	// list item's outlink must still be picked up.
 	test("embedded wikilink list item becomes a child edge", async (t) => {
