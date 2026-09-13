@@ -81,8 +81,8 @@ function build_native_list_items(
 	for (const li of list_item_caches) {
 		const line = li.position.start.line;
 		const raw = lines[line] ?? "";
-		// Strip leading whitespace, list marker (- * +), and optional task checkbox
-		const text = raw.replace(/^\s*[-*+]\s*(?:\[.\]\s*)?/, "");
+		// Strip leading whitespace, list marker (- * + or ordered "1." / "1)"), and optional task checkbox
+		const text = raw.replace(/^\s*(?:[-*+]|\d+[.)])\s*(?:\[.\]\s*)?/, "");
 
 		const native: NativeListItem = {
 			position: { start: { line, col: li.position.start.col } },
