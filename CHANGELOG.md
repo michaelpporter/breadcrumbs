@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.22.0-beta.3](https://github.com/michaelpporter/breadcrumbs/compare/4.22.0-beta.2...4.22.0-beta.3) (2026-09-13)
+
+### Fixed
+
+* `list_note` builder now recognizes ordered list markers (`1.`, `2)`, etc.), not just `- * +` bullets. An ordered item's numeric prefix was previously left un-stripped and misread as an invalid field-override label, silently dropping the edge. Refs #773
+
 ### [4.22.0-beta.2](https://github.com/michaelpporter/breadcrumbs/compare/4.22.0-beta.1...4.22.0-beta.2) (2026-09-10)
 
 ### Added
