@@ -143,9 +143,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "2.14.0"
+version = "2.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9"
+checksum = "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855"
 dependencies = [
  "equivalent",
  "hashbrown 0.17.1",
@@ -319,9 +319,9 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "smallvec"
-version = "1.15.2"
+version = "1.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
+checksum = "ba467056f1b547ed52077911161fc86985becbc60e8e1857c8a144dab0def891"
 
 [[package]]
 name = "sorted-iter"
