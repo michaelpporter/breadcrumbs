@@ -42,15 +42,15 @@
 		"@eslint/js": "^10.0.1",
 		"@tailwindcss/cli": "^4.3.3",
 		"@tsconfig/svelte": "^5.0.8",
-		"@types/luxon": "^3.7.4",
-		"@types/node": "^26.2.0",
-		"@vitest/coverage-v8": "4.1.11",
-		"@vitest/ui": "4.1.11",
+		"@types/luxon": "^3.7.5",
+		"@types/node": "^26.5.1",
+		"@vitest/coverage-v8": "5.0.0",
+		"@vitest/ui": "5.0.0",
 		"esbuild": "^0.28.2",
 		"esbuild-svelte": "^0.9.5",
-		"eslint": "^10.8.1",
+		"eslint": "^10.10.0",
 		"eslint-plugin-import-x": "^4.17.1",
-		"eslint-plugin-obsidianmd": "^0.4.1",
+		"eslint-plugin-obsidianmd": "^0.4.2",
 		"eslint-plugin-only-warn": "^1.2.1",
 		"eslint-plugin-svelte": "^3.23.0",
 		"npm-run-all2": "^9.0.3",
@@ -58,15 +58,15 @@
 		"prettier": "^3.9.6",
 		"prettier-plugin-svelte": "^4.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"svelte": "^5.56.9",
+		"svelte": "^5.57.0",
 		"svelte-check": "4.7.6",
 		"svelte-preprocess": "6.0.5",
 		"tailwindcss": "^4.3.3",
 		"tslib": "2.8.1",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.67.0",
+		"typescript-eslint": "^8.70.0",
 		"vite-plugin-wasm": "^3.6.0",
-		"vitest": "4.1.11"
+		"vitest": "5.0.0"
 	},
 	"overrides": {
 		"vite": "8.0.16",
@@ -78,14 +78,14 @@
 		"linkify-it": "^5.0.2"
 	},
 	"dependencies": {
-		"baseline-browser-mapping": "^2.11.15",
-		"caniuse-lite": "^1.0.30001809",
+		"baseline-browser-mapping": "^2.11.23",
+		"caniuse-lite": "^1.0.30001810",
 		"lucide-svelte": "^1.0.1",
 		"luxon": "^3.7.2",
 		"markmap-lib": "^0.18.12",
 		"markmap-toolbar": "^0.18.12",
 		"markmap-view": "^0.18.12",
-		"obsidian-typings": "^6.32.0",
-		"zod": "^4.4.3"
+		"obsidian-typings": "^6.36.0",
+		"zod": "^4.6.4"
 	}
 }
