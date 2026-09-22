@@ -1,5 +1,6 @@
 import {
 	get_transitive_rule_name,
+	is_valid_transitive_rule,
 	parse_transitive_relation,
 	stringify_transitive_relation,
 } from "src/utils/transitive_rules";
@@ -177,5 +178,48 @@ describe("get_transitive_rule_name", () => {
 				close_reversed: false,
 			}),
 		).toBe("[up] -> down");
+	});
+});
+
+// ---- is_valid_transitive_rule ----
+
+describe("is_valid_transitive_rule", () => {
+	const rule = {
+		name: "",
+		rounds: 1,
+		chain: [{ field: "Пірнути" }],
+		close_field: "up",
+		close_reversed: true,
+	};
+
+	test("accepts a well-formed rule", (t) => {
+		t.expect(is_valid_transitive_rule(rule)).toBe(true);
+	});
+
+	test("accepts a rule missing only its name (pre-name settings)", (t) => {
+		t.expect(
+			is_valid_transitive_rule({ ...rule, name: undefined as never }),
+		).toBe(true);
+	});
+
+	test("rejects a missing close_field (#778)", (t) => {
+		t.expect(
+			is_valid_transitive_rule({
+				...rule,
+				close_field: undefined as never,
+			}),
+		).toBe(false);
+	});
+
+	test("rejects a chain entry without a field", (t) => {
+		t.expect(is_valid_transitive_rule({ ...rule, chain: [{}] })).toBe(
+			false,
+		);
+	});
+
+	test("rejects a missing chain", (t) => {
+		t.expect(
+			is_valid_transitive_rule({ ...rule, chain: undefined as never }),
+		).toBe(false);
 	});
 });

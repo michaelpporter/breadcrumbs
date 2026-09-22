@@ -4,6 +4,7 @@ import { META_ALIAS } from "src/const/metadata_fields";
 import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { Timer } from "src/utils/timer";
+import { is_valid_transitive_rule } from "src/utils/transitive_rules";
 import {
 	GCEdgeData,
 	GCNodeData,
@@ -128,18 +129,22 @@ export const rebuild_graph = async (plugin: BreadcrumbsPlugin) => {
 	log.debug(timer.elapsedMessage("Collecting edges and nodes"));
 	timer.reset();
 
-	const transitive_rules = plugin.settings.implied_relations.transitive.map(
-		(rule) => {
+	const transitive_rules = plugin.settings.implied_relations.transitive
+		.filter((rule) => {
+			if (is_valid_transitive_rule(rule)) return true;
+			log.error("Skipping malformed transitive rule >", rule);
+			return false;
+		})
+		.map((rule) => {
 			return new TransitiveGraphRule(
-				rule.name,
+				rule.name ?? "",
 				rule.chain.map((attr) => attr.field!),
 				rule.close_field,
 				rule.rounds,
 				false,
 				rule.close_reversed,
 			);
-		},
-	);
+		});
 
 	plugin.graph.build_graph(nodes, edges, transitive_rules);
 	log.debug(timer.elapsedMessage("WASM call"));
