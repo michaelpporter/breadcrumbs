@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.21.13](https://github.com/michaelpporter/breadcrumbs/compare/4.21.12...4.21.13) (2026-09-22)
+
+### Fixed
+
+* A malformed transitive implied-relation rule (missing its closing field or a chain field, e.g. from a hand-edited or synced `data.json`) no longer aborts the whole graph rebuild. Previously the undefined value threw inside the WASM bindings, so no page views or `breadcrumbs` codeblocks rendered and the "Rebuilding graph" notice never finished. Such rules are now skipped with a console error, and a rule missing only its name falls back to an empty name. Refs #778
+
+### Chores
+
+* Pinned the `devalue` override past a version flagged by the community plugin directory's vulnerability scan (GHSA-9rgm-9g3h-6x36; a Svelte compiler dependency).
+* Routine dependency bumps for JS, Cargo, and GitHub Actions; CI no longer runs on the frozen `1.12-compat` branch.
+
 ### [4.21.12](https://github.com/michaelpporter/breadcrumbs/compare/4.21.11...4.21.12) (2026-09-13)
 
 ### Fixed
