@@ -16,6 +16,18 @@ export const stringify_transitive_relation = (
 		.map((attr) => url_search_params(attr, { trim_lone_param: true }))
 		.join(", ")}] ${rule.close_reversed ? "<-" : "->"} ${rule.close_field}`;
 
+/**
+ * Whether a stored rule is safe to hand to WASM. Settings arrays aren't
+ * default-merged per element, so a hand-edited, synced, or very old
+ * `data.json` can hold a rule missing `close_field` or a chain field — passing
+ * `undefined` as a string throws inside the bindings and aborts the whole
+ * rebuild (#778). A missing `name` is tolerated; the caller defaults it.
+ */
+export const is_valid_transitive_rule = (rule: TransitiveRule) =>
+	typeof rule.close_field === "string" &&
+	Array.isArray(rule.chain) &&
+	rule.chain.every((attr) => typeof attr?.field === "string");
+
 const regex = /\[(.+)\]\s*(<-|->)\s*(.+)/;
 
 export const get_transitive_rule_name = (
