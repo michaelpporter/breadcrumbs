@@ -6,8 +6,28 @@ import { log } from "src/logger";
 import type BreadcrumbsPlugin from "src/main";
 import { GenericModal } from "src/modals/GenericModal";
 import { build_canvas, Canvas } from "src/utils/canvas";
+import { resolve_field_group_labels } from "src/utils/edge_fields";
 import { Paths } from "src/utils/paths";
 import { resolve_templates } from "src/utils/strings";
+
+/**
+ * Fields the export follows; `undefined` = all fields. Resolved from the
+ * selected groups at export time — the saved `fields` is a snapshot from when
+ * the groups were picked, so it misses fields added to a group later (#781).
+ */
+export function resolve_canvas_fields(
+	edge_field_groups: BreadcrumbsSettings["edge_field_groups"],
+	options: Pick<
+		BreadcrumbsSettings["commands"]["create_canvas"]["default_options"],
+		"field_group_labels" | "fields"
+	>,
+): string[] | undefined {
+	const fields = resolve_field_group_labels(
+		edge_field_groups,
+		options.field_group_labels,
+	);
+	return fields.length ? fields : undefined;
+}
 
 export async function export_to_canvas(
 	plugin: BreadcrumbsPlugin,
@@ -20,8 +40,10 @@ export async function export_to_canvas(
 		return new Notice("The active file does not exist in the graph.");
 	}
 
-	// Follow only the selected edge fields; empty selection = all fields.
-	const fields = options.fields.length ? options.fields : undefined;
+	const fields = resolve_canvas_fields(
+		plugin.settings.edge_field_groups,
+		options,
+	);
 
 	const canvas = with_traversal(
 		plugin.graph,
