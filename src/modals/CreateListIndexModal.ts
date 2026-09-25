@@ -116,7 +116,16 @@ export class CreateListIndexModal extends Modal {
 						plugin.graph,
 						this.active_file!.path,
 						plugin.settings,
-						this.options,
+						{
+							...this.options,
+							// Resolve now — the saved `fields` is a snapshot from
+							// when the groups were picked, so it misses fields
+							// added to a group later (see #781).
+							fields: resolve_field_group_labels(
+								plugin.settings.edge_field_groups,
+								this.options.field_group_labels,
+							),
+						},
 						plugin.app,
 					);
 
