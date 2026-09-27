@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.22.0-beta.4](https://github.com/michaelpporter/breadcrumbs/compare/4.22.0-beta.3...4.22.0-beta.4) (2026-09-27)
+
+Ports everything from 4.21.13 and 4.21.14 to the Obsidian 1.14 line.
+
+### Features
+
+* **Export to canvas: Semantic edge anchors.** A new toggle (off by default) in the export dialog and in Settings → Commands → Create canvas. When on, edges are anchored by the field group their field belongs to instead of by layout direction: `ups` top → bottom, `downs` bottom → top, `nexts` right → left, `prevs`/`sames` left → right. Custom field names work; fields outside those groups keep the direction default. Refs #782
+
+### Fixed
+
+* **Export to canvas** and **Create list index** now resolve fields from the selected field groups when they run, instead of from a list saved when the groups were picked. Fields added to a group later are no longer silently skipped. Refs #781
+* A malformed transitive implied-relation rule (missing its closing field or a chain field) no longer aborts the whole graph rebuild; it is skipped with a console error. Refs #778
+
+### Chores
+
+* Pinned the `devalue` override past GHSA-9rgm-9g3h-6x36; routine JS, Cargo, and GitHub Actions dependency bumps.
+
 ### [4.22.0-beta.3](https://github.com/michaelpporter/breadcrumbs/compare/4.22.0-beta.2...4.22.0-beta.3) (2026-09-13)
 
 ### Fixed
