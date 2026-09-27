@@ -55,7 +55,15 @@ export async function export_to_canvas(
 			flatten: true,
 		},
 		(result) =>
-			build_canvas(plugin.graph, result, source_path, options.direction),
+			build_canvas(
+				plugin.graph,
+				result,
+				source_path,
+				options.direction,
+				options.semantic_sides
+					? plugin.settings.edge_field_groups
+					: undefined,
+			),
 	);
 
 	// Resolve the target path template (mirrors the thread command).

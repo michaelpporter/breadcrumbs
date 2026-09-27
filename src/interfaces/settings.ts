@@ -241,6 +241,7 @@ export interface BreadcrumbsSettings {
 				fields: string[];
 				field_group_labels: string[];
 				direction: "LR" | "TB";
+				semantic_sides: boolean;
 			};
 		};
 

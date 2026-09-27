@@ -77,6 +77,17 @@ export class CreateCanvasModal extends Modal {
 			},
 		});
 
+		new_setting(contentEl, {
+			name: "Semantic edge anchors",
+			desc: "Anchor edges by field group (ups top, downs bottom, nexts right, prevs/sames left) instead of by direction. Best when you rearrange the cards by hand. Uses the default ups/downs/sames/nexts/prevs groups; other fields keep the direction default.",
+			toggle: {
+				value: this.options.semantic_sides,
+				cb: (value) => {
+					this.options.semantic_sides = value;
+				},
+			},
+		});
+
 		new Setting(contentEl).addButton((btn) =>
 			btn
 				.setButtonText("Create canvas")

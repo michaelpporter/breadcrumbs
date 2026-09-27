@@ -1,3 +1,4 @@
+import type { EdgeFieldGroup } from "src/interfaces/settings";
 import type {
 	FlatTraversalResult,
 	NoteGraph,
@@ -46,6 +47,33 @@ const STEP = {
 	TB: { depth: 200, cross: 320 },
 } as const;
 
+type EdgeSides = Pick<CanvasEdge, "fromSide" | "toSide">;
+
+// Anchor sides per default field group, for canvases the user rearranges by
+// hand: ups above, downs below, nexts right, prevs/sames left (#782).
+const SEMANTIC_SIDES: Record<string, EdgeSides> = {
+	ups: { fromSide: "top", toSide: "bottom" },
+	downs: { fromSide: "bottom", toSide: "top" },
+	nexts: { fromSide: "right", toSide: "left" },
+	prevs: { fromSide: "left", toSide: "right" },
+	sames: { fromSide: "left", toSide: "right" },
+};
+
+/**
+ * Semantic anchor sides for an edge field, looked up by the default group it
+ * belongs to (so custom field names work). `undefined` if it's in none.
+ */
+export function semantic_edge_sides(
+	field: string,
+	edge_field_groups: EdgeFieldGroup[],
+): EdgeSides | undefined {
+	const group = edge_field_groups.find(
+		(g) =>
+			Object.hasOwn(SEMANTIC_SIDES, g.label) && g.fields.includes(field),
+	);
+	return group && SEMANTIC_SIDES[group.label];
+}
+
 /** depth + cross-axis slot for one node, resolved into x/y per direction. */
 interface Placement {
 	depth: number;
@@ -56,13 +84,15 @@ interface Placement {
  * Lays out a traversal result as a JSON Canvas. Nodes are placed as a tidy
  * tree: depth sets the level, and each parent is centred over the span of its
  * children (leaves get sequential cross-axis slots). Each traversed edge
- * becomes a labelled canvas edge.
+ * becomes a labelled canvas edge. Pass `semantic_groups` to anchor edges by
+ * field group instead of by layout direction.
  */
 export function build_canvas(
 	graph: NoteGraph,
 	result: FlatTraversalResult,
 	source_path: string,
 	direction: CanvasDirection = "LR",
+	semantic_groups?: EdgeFieldGroup[],
 ): JSONCanvas {
 	// LR: depth runs along x; TB: depth runs along y.
 	const lr = direction === "LR";
@@ -142,12 +172,17 @@ export function build_canvas(
 		if (edge_ids.has(edge_id)) continue;
 		edge_ids.add(edge_id);
 
+		const sides = (semantic_groups &&
+			semantic_edge_sides(datum.edge.edge_type, semantic_groups)) ?? {
+			fromSide: from_side,
+			toSide: to_side,
+		};
+
 		edges.push({
 			id: edge_id,
 			fromNode: from,
 			toNode: to,
-			fromSide: from_side,
-			toSide: to_side,
+			...sides,
 			label: datum.edge.edge_type,
 		});
 	}

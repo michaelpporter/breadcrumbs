@@ -264,6 +264,7 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 				fields: [],
 				field_group_labels: [],
 				direction: "LR",
+				semantic_sides: false,
 			},
 		},
 
