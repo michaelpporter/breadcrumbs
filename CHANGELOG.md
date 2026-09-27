@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.21.14-beta.1](https://github.com/michaelpporter/breadcrumbs/compare/4.21.13...4.21.14-beta.1) (2026-09-27)
+
+### Fixed
+
+* **Export to canvas** now follows every field in the selected field groups. The command used a list of fields saved when the groups were picked, so a field added to a group later (e.g. a custom `same` field) was silently skipped — the group still showed as selected, but those edges and notes were missing from the canvas. Fields are now resolved from the selected groups at export time. Refs #781
+* **Create list index** had the same stale field list and now resolves fields from the selected groups when building. The `create_list_index` API still uses the `fields` passed to it. Refs #781
+
 ### [4.21.13](https://github.com/michaelpporter/breadcrumbs/compare/4.21.12...4.21.13) (2026-09-22)
 
 ### Fixed
