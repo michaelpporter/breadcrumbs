@@ -60,6 +60,18 @@ export const _add_settings_create_canvas = (
 	});
 
 	new_setting(contentEl, {
+		name: "Semantic edge anchors",
+		desc: "Anchor edges by field group (ups top, downs bottom, nexts right, prevs/sames left) instead of by direction. Best when you rearrange the cards by hand. Uses the default ups/downs/sames/nexts/prevs groups; other fields keep the direction default.",
+		toggle: {
+			value: options.semantic_sides,
+			cb: async (value) => {
+				options.semantic_sides = value;
+				await plugin.commitSettings("none");
+			},
+		},
+	});
+
+	new_setting(contentEl, {
 		name: "Target path template",
 		desc: "Where to write the canvas. You don't need to add the .canvas extension.",
 		input: {
