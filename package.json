@@ -43,9 +43,9 @@
 		"@tailwindcss/cli": "^4.3.3",
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/luxon": "^3.7.5",
-		"@types/node": "^26.6.2",
-		"@vitest/coverage-v8": "5.0.1",
-		"@vitest/ui": "5.0.1",
+		"@types/node": "^26.6.3",
+		"@vitest/coverage-v8": "5.0.2",
+		"@vitest/ui": "5.0.2",
 		"esbuild": "^0.28.2",
 		"esbuild-svelte": "^0.9.5",
 		"eslint": "^10.11.0",
@@ -55,7 +55,7 @@
 		"eslint-plugin-svelte": "^3.23.0",
 		"npm-run-all2": "^9.0.3",
 		"obsidian": "1.13.1",
-		"prettier": "^3.9.8",
+		"prettier": "^3.9.9",
 		"prettier-plugin-svelte": "^4.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"svelte": "^5.57.1",
@@ -64,9 +64,9 @@
 		"tailwindcss": "^4.3.3",
 		"tslib": "2.8.1",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.70.0",
+		"typescript-eslint": "^8.70.1",
 		"vite-plugin-wasm": "^3.6.0",
-		"vitest": "5.0.1"
+		"vitest": "5.0.2"
 	},
 	"overrides": {
 		"vite": "8.0.16",
@@ -79,14 +79,14 @@
 		"devalue": "^5.9.1"
 	},
 	"dependencies": {
-		"baseline-browser-mapping": "^2.11.25",
-		"caniuse-lite": "^1.0.30001810",
+		"baseline-browser-mapping": "^2.11.26",
+		"caniuse-lite": "^1.0.30001812",
 		"lucide-svelte": "^1.0.1",
 		"luxon": "^3.7.2",
 		"markmap-lib": "^0.18.12",
 		"markmap-toolbar": "^0.18.12",
 		"markmap-view": "^0.18.12",
-		"obsidian-typings": "^6.37.0",
+		"obsidian-typings": "^6.38.0",
 		"zod": "^4.6.5"
 	}
 }
