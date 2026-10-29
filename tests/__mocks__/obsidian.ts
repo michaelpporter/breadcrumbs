@@ -49,6 +49,8 @@ export function getAllTags(cache: {
 	return tags.length ? tags : null;
 }
 
+export const Platform = { isMobileApp: false };
+
 export class Plugin {}
 export class PluginSettingTab {}
 export class Modal {}
