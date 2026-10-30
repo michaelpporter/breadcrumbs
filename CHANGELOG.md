@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.22.2-beta.1](https://github.com/michaelpporter/breadcrumbs/compare/4.22.1...4.22.2-beta.1) (2026-10-30)
+
+### Fixed
+
+* **Mobile: opening a note no longer stalls for 10+ seconds right after launch.** During the startup graph build, the typed-link inline-field scan (`field:: [[link]]`) and the list-note builder read every candidate note at once. On mobile those reads finish one at a time, so a note you opened waited behind thousands of them. Mobile now keeps at most 8 reads in flight; desktop is unchanged. Refs #799
+
+### Chores
+
+* Raised dependency overrides to clear advisories flagged by the community directory scan: `vite` 8.1.6, `undici` 6.29.1, `fast-uri` 4.2.3, `markdown-it` 14.3.3. All are build tooling or tree-shaken out of the plugin.
+* Dependency updates: the JS dependency group (including `obsidian` types 1.14.4) and the WASM crates `smallvec` / `indoc`.
+* Node base version bumped to 24.22 for local development (security release).
+
 ### [4.22.1](https://github.com/michaelpporter/breadcrumbs/compare/4.22.0...4.22.1) (2026-10-11)
 
 ### Fixed
