@@ -49,10 +49,6 @@ export type CrumbDestination = "frontmatter" | "dataview-inline";
 export interface BreadcrumbsSettings {
 	is_dirty: boolean;
 
-	// Once I've reach settings parity with old BC, I can add this flag to skip over all the checks in migrate_old_settings
-	// But for now, as I add new (old) settings, I don't want to skip migrating them
-	// V4_MIGRATED: boolean;
-
 	edge_fields: EdgeField[];
 	edge_field_groups: EdgeFieldGroup[];
 
@@ -282,10 +278,6 @@ export interface OLD_HIERARCHY {
 }
 
 export interface BreadcrumbsSettingsWithDirection {
-	// Once I've reach settings parity with old BC, I can add this flag to skip over all the checks in migrate_old_settings
-	// But for now, as I add new (old) settings, I don't want to skip migrating them
-	// V4_MIGRATED: boolean;
-
 	hierarchies: OLD_HIERARCHY[];
 
 	custom_implied_relations: {
