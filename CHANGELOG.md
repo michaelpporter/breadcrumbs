@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.22.3](https://github.com/michaelpporter/breadcrumbs/compare/4.22.2...4.22.3) (2026-11-01)
+
+### Fixed
+
+* **Trail and Prev/Next views no longer go stale after the graph rebuilds.** Page views in open notes kept showing paths from the old graph until you switched notes, and using the trail's depth controls on one threw a "Revision mismatch" error. Page views now refresh whenever the graph changes. They still skip the remount on cursor and scroll layout changes (#698). Refs #810
+* **Renaming an edge field group now updates every setting that uses it.** Before, only the Trail, Prev/Next and Matrix views were updated. The Tree view's groups and "find root" groups, and the List index and Export to canvas defaults, kept the old name. Deleting a group now also removes it from all of those settings. Removing a field from several groups in a row in the Edge fields settings works reliably. Refs #806
+* **A failed incremental graph update no longer drops all implied edges.** If a file create, rename or delete didn't match the graph, the update stopped partway and left the graph without implied edges until the next full rebuild. Implied edges are now always rebuilt. Refs #809
+
+### Chores
+
+* Removed the deprecated legacy `BCEdgeAttributes` type, which clears the community directory scan's "deprecated" recommendation, along with dead commented-out code.
+
 ### [4.22.2](https://github.com/michaelpporter/breadcrumbs/compare/4.22.1...4.22.2) (2026-11-01)
 
 Stable release of 4.22.2-beta.1.
