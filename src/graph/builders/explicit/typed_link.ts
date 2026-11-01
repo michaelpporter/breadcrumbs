@@ -3,6 +3,10 @@ import type {
 	ExplicitEdgeBuilder,
 } from "src/interfaces/graph";
 import { resolve_relative_target_path } from "src/utils/obsidian";
+import {
+	for_each_with_concurrency,
+	vault_read_concurrency,
+} from "src/utils/promises";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 
 /** A Dataview inline field found on a line, with the span its value occupies. */
@@ -152,58 +156,59 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 		},
 	);
 
-	// Pass 2: body inline fields — `field:: [[value]]` on any line
-	await Promise.all(
-		(all_files.obsidian ?? []).map(
-			async ({ file, cache }) => {
-				if (file.extension !== "md") return;
+	// Pass 2: body inline fields — `field:: [[value]]` on any line. Reads are
+	// capped on mobile so they do not queue the user's own reads (#799).
+	await for_each_with_concurrency(
+		all_files.obsidian ?? [],
+		vault_read_concurrency(),
+		async ({ file, cache }) => {
+			if (file.extension !== "md") return;
 
-				// `[[wikilink]]` and `![[embed]]` land in separate cache arrays, but
-				// a Dataview field can hold either (e.g. `down:: ![[note]]`).
-				const links = [...(cache?.links ?? []), ...(cache?.embeds ?? [])];
-				if (!links.length) return;
+			// `[[wikilink]]` and `![[embed]]` land in separate cache arrays, but
+			// a Dataview field can hold either (e.g. `down:: ![[note]]`).
+			const links = [...(cache?.links ?? []), ...(cache?.embeds ?? [])];
+			if (!links.length) return;
 
-				const content = await plugin.app.vault.cachedRead(file);
-				const lines = content.split("\n");
+			const content = await plugin.app.vault.cachedRead(file);
+			const lines = content.split("\n");
 
-				const fields_by_line = new Map<number, InlineField[]>();
+			const fields_by_line = new Map<number, InlineField[]>();
 
-				for (const link_cache of links) {
-					const line_num = link_cache.position.start.line;
+			for (const link_cache of links) {
+				const line_num = link_cache.position.start.line;
 
-					let fields = fields_by_line.get(line_num);
-					if (!fields) {
-						fields = parse_inline_fields(lines[line_num] ?? "");
-						fields_by_line.set(line_num, fields);
-					}
+				let fields = fields_by_line.get(line_num);
+				if (!fields) {
+					fields = parse_inline_fields(lines[line_num] ?? "");
+					fields_by_line.set(line_num, fields);
+				}
 
-					const field = field_at_column(
-						fields,
-						link_cache.position.start.col,
-					);
-					if (!field) continue;
-					if (!field_labels.has(field)) continue;
+				const field = field_at_column(
+					fields,
+					link_cache.position.start.col,
+				);
+				if (!field) continue;
+				if (!field_labels.has(field)) continue;
 
-					const resolved = resolve_relative_target_path(
-						plugin.app,
-						link_cache.link,
-						file.path,
-					);
-					if (!resolved) continue;
-					const [target_id, target_file] = resolved;
+				const resolved = resolve_relative_target_path(
+					plugin.app,
+					link_cache.link,
+					file.path,
+				);
+				if (!resolved) continue;
+				const [target_id, target_file] = resolved;
 
-					if (!target_file) {
-						results.nodes.push(
-							new GCNodeData(target_id, [], false, false, false),
-						);
-					}
-
-					results.edges.push(
-						new GCEdgeData(file.path, target_id, field, "typed_link"),
+				if (!target_file) {
+					results.nodes.push(
+						new GCNodeData(target_id, [], false, false, false),
 					);
 				}
-			},
-		),
+
+				results.edges.push(
+					new GCEdgeData(file.path, target_id, field, "typed_link"),
+				);
+			}
+		},
 	);
 
 	return results;

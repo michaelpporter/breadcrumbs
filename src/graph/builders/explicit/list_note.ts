@@ -6,6 +6,10 @@ import type {
 } from "src/interfaces/graph";
 import type BreadcrumbsPlugin from "src/main";
 import { resolve_relative_target_path } from "src/utils/obsidian";
+import {
+	for_each_with_concurrency,
+	vault_read_concurrency,
+} from "src/utils/promises";
 import { fail, graph_build_fail, succ } from "src/utils/result";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
 import { read_edge_field } from "./read_edge_field";
@@ -257,162 +261,159 @@ export const _add_explicit_edges_list_note: ExplicitEdgeBuilder = async (
 ) => {
 	const results: EdgeBuilderResults = { nodes: [], edges: [], errors: [] };
 
-	await Promise.all(
-		(all_files.obsidian ?? []).map(
-			async ({ file: list_note_file, cache: list_note_cache }) => {
-				if (!list_note_cache) return;
+	await for_each_with_concurrency(
+		all_files.obsidian ?? [],
+		vault_read_concurrency(),
+		async ({ file: list_note_file, cache: list_note_cache }) => {
+			if (!list_note_cache) return;
 
-				const list_note_info = get_list_note_info(
-					plugin,
-					list_note_cache.frontmatter,
-					list_note_file.path,
-				);
-				if (!list_note_info.ok) {
-					if (list_note_info.error) {
-						results.errors.push(list_note_info.error);
-					}
+			const list_note_info = get_list_note_info(
+				plugin,
+				list_note_cache.frontmatter,
+				list_note_file.path,
+			);
+			if (!list_note_info.ok) {
+				if (list_note_info.error) {
+					results.errors.push(list_note_info.error);
+				}
+				return;
+			}
+
+			const content = await plugin.app.vault.cachedRead(list_note_file);
+			const flat_items = build_native_list_items(
+				list_note_cache,
+				content,
+				list_note_info.data.section,
+			);
+
+			// BC-list-note-exclude: targets that should not become children.
+			// Read from frontmatterLinks so wikilinks resolve like typed_link.
+			const exclude_paths = new Set<string>();
+			list_note_cache.frontmatterLinks?.forEach((fl) => {
+				if (fl.key.split(".")[0] !== META_ALIAS["list-note-exclude"]) {
 					return;
 				}
 
-				const content = await plugin.app.vault.cachedRead(list_note_file);
-				const flat_items = build_native_list_items(
-					list_note_cache,
-					content,
-					list_note_info.data.section,
+				const resolved = resolve_relative_target_path(
+					plugin.app,
+					fl.link,
+					list_note_file.path,
 				);
+				if (resolved) exclude_paths.add(resolved[0]);
+			});
 
-				// BC-list-note-exclude: targets that should not become children.
-				// Read from frontmatterLinks so wikilinks resolve like typed_link.
-				const exclude_paths = new Set<string>();
-				list_note_cache.frontmatterLinks?.forEach((fl) => {
-					if (
-						fl.key.split(".")[0] !==
-						META_ALIAS["list-note-exclude"]
-					) {
+			flat_items.forEach((source_list_item, source_list_item_i) => {
+				const source_link = source_list_item.outlinks.at(0);
+				if (!source_link) return;
+
+				const resolved_source = resolve_relative_target_path(
+					plugin.app,
+					source_link.path,
+					list_note_file.path,
+				);
+				if (!resolved_source) return;
+				const [source_path, source_file] = resolved_source;
+
+				if (!source_file) {
+					results.nodes.push(
+						new GCNodeData(source_path, [], false, false, false),
+					);
+				}
+
+				if (
+					!list_note_info.data.exclude_index &&
+					source_list_item.position.start.col === 0
+				) {
+					const source_override_field = resolve_field_override(
+						plugin,
+						source_list_item,
+						list_note_file.path,
+					);
+
+					if (!source_override_field.ok) {
+						if (source_override_field.error) {
+							results.errors.push(source_override_field.error);
+						}
 						return;
 					}
 
-					const resolved = resolve_relative_target_path(
-						plugin.app,
-						fl.link,
-						list_note_file.path,
-					);
-					if (resolved) exclude_paths.add(resolved[0]);
-				});
-
-				flat_items.forEach((source_list_item, source_list_item_i) => {
-					const source_link = source_list_item.outlinks.at(0);
-					if (!source_link) return;
-
-					const resolved_source = resolve_relative_target_path(
-						plugin.app,
-						source_link.path,
-						list_note_file.path,
-					);
-					if (!resolved_source) return;
-					const [source_path, source_file] = resolved_source;
-
-					if (!source_file) {
-						results.nodes.push(
-							new GCNodeData(source_path, [], false, false, false),
-						);
-					}
-
-					if (
-						!list_note_info.data.exclude_index &&
-						source_list_item.position.start.col === 0
-					) {
-						const source_override_field = resolve_field_override(
-							plugin,
-							source_list_item,
-							list_note_file.path,
-						);
-
-						if (!source_override_field.ok) {
-							if (source_override_field.error) {
-								results.errors.push(source_override_field.error);
-							}
-							return;
-						}
-
-						if (!exclude_paths.has(source_path)) {
-							results.edges.push(
-								new GCEdgeData(
-									list_note_file.path,
-									source_path,
-									source_override_field.data?.field ??
-										list_note_info.data.field,
-									"list_note",
-								),
-							);
-						}
-					}
-
-					if (list_note_info.data.neighbour_field) {
-						handle_neighbour_list_item({
-							plugin,
-							results,
-							flat_items,
-							list_note_path: list_note_file.path,
-							list_note_info,
-							source_list_item_i,
-							source_id: source_path,
-							exclude_paths,
-						});
-					}
-
-					source_list_item.children.forEach((target_list_item) => {
-						const target_link = target_list_item.outlinks.at(0);
-						if (!target_link) return;
-
-						const target_override_field = resolve_field_override(
-							plugin,
-							target_list_item,
-							list_note_file.path,
-						);
-
-						if (!target_override_field.ok) {
-							if (target_override_field.error) {
-								results.errors.push(target_override_field.error);
-							}
-							return;
-						}
-
-						const resolved_target = resolve_relative_target_path(
-							plugin.app,
-							target_link.path,
-							list_note_file.path,
-						);
-						if (!resolved_target) return;
-						const [target_path, target_file] = resolved_target;
-
-						if (exclude_paths.has(target_path)) return;
-
-						if (!target_file) {
-							results.nodes.push(
-								new GCNodeData(
-									target_path,
-									[],
-									false,
-									false,
-									false,
-								),
-							);
-						}
-
+					if (!exclude_paths.has(source_path)) {
 						results.edges.push(
 							new GCEdgeData(
+								list_note_file.path,
 								source_path,
-								target_path,
-								target_override_field.data?.field ??
+								source_override_field.data?.field ??
 									list_note_info.data.field,
 								"list_note",
 							),
 						);
+					}
+				}
+
+				if (list_note_info.data.neighbour_field) {
+					handle_neighbour_list_item({
+						plugin,
+						results,
+						flat_items,
+						list_note_path: list_note_file.path,
+						list_note_info,
+						source_list_item_i,
+						source_id: source_path,
+						exclude_paths,
 					});
+				}
+
+				source_list_item.children.forEach((target_list_item) => {
+					const target_link = target_list_item.outlinks.at(0);
+					if (!target_link) return;
+
+					const target_override_field = resolve_field_override(
+						plugin,
+						target_list_item,
+						list_note_file.path,
+					);
+
+					if (!target_override_field.ok) {
+						if (target_override_field.error) {
+							results.errors.push(target_override_field.error);
+						}
+						return;
+					}
+
+					const resolved_target = resolve_relative_target_path(
+						plugin.app,
+						target_link.path,
+						list_note_file.path,
+					);
+					if (!resolved_target) return;
+					const [target_path, target_file] = resolved_target;
+
+					if (exclude_paths.has(target_path)) return;
+
+					if (!target_file) {
+						results.nodes.push(
+							new GCNodeData(
+								target_path,
+								[],
+								false,
+								false,
+								false,
+							),
+						);
+					}
+
+					results.edges.push(
+						new GCEdgeData(
+							source_path,
+							target_path,
+							target_override_field.data?.field ??
+								list_note_info.data.field,
+							"list_note",
+						),
+					);
 				});
-			},
-		),
+			});
+		},
 	);
 
 	return results;
