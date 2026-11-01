@@ -237,3 +237,71 @@ export const rename_field_references = (
 		rule.close_field = rule.close_field === from ? to : rule.close_field;
 	});
 };
+
+/**
+ * Every place in settings that references an edge-field group by label, used
+ * by the group rename/remove cascade so a reference can never be silently
+ * missed. Add new `field_group_labels`-style settings here.
+ */
+const collect_group_references = (
+	settings: BreadcrumbsSettings,
+): ArrayFieldRef[] => {
+	const { page, side } = settings.views;
+	const { list_index, create_canvas } = settings.commands;
+
+	return [
+		{
+			get: () => page.trail.field_group_labels,
+			set: (v) => (page.trail.field_group_labels = v),
+		},
+		{
+			get: () => page.prev_next.field_group_labels.prev,
+			set: (v) => (page.prev_next.field_group_labels.prev = v),
+		},
+		{
+			get: () => page.prev_next.field_group_labels.next,
+			set: (v) => (page.prev_next.field_group_labels.next = v),
+		},
+		{
+			get: () => side.matrix.field_group_labels,
+			set: (v) => (side.matrix.field_group_labels = v),
+		},
+		{
+			get: () => side.tree.field_group_labels,
+			set: (v) => (side.tree.field_group_labels = v),
+		},
+		{
+			get: () => side.tree.find_root_field_group_labels,
+			set: (v) => (side.tree.find_root_field_group_labels = v),
+		},
+		{
+			get: () => list_index.default_options.field_group_labels,
+			set: (v) => (list_index.default_options.field_group_labels = v),
+		},
+		{
+			get: () => create_canvas.default_options.field_group_labels,
+			set: (v) => (create_canvas.default_options.field_group_labels = v),
+		},
+	];
+};
+
+/** Remove every reference to group `label` after the group is deleted. */
+export const remove_group_references = (
+	settings: BreadcrumbsSettings,
+	label: string,
+) => {
+	collect_group_references(settings).forEach((ref) =>
+		ref.set(ref.get().filter((l) => l !== label)),
+	);
+};
+
+/** Point every reference to group `from` at `to` after the group is renamed. */
+export const rename_group_references = (
+	settings: BreadcrumbsSettings,
+	from: string,
+	to: string,
+) => {
+	collect_group_references(settings).forEach((ref) =>
+		ref.set(ref.get().map((l) => (l === from ? to : l))),
+	);
+};

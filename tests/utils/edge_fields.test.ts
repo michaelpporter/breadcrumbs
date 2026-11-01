@@ -2,7 +2,9 @@ import { DEFAULT_SETTINGS } from "src/const/settings";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
 import {
 	remove_field_references,
+	remove_group_references,
 	rename_field_references,
+	rename_group_references,
 	resolve_field_group_labels,
 } from "src/utils/edge_fields";
 import { describe, test } from "vitest";
@@ -159,5 +161,64 @@ describe("remove_field_references", () => {
 		t.expect(
 			settings.explicit_edge_sources.dataview_note.default_field,
 		).toBe("");
+	});
+});
+
+/** Every settings slot that holds a list of edge-field-group labels. */
+const every_group_slot = (settings: BreadcrumbsSettings): string[][] => [
+	settings.views.page.trail.field_group_labels,
+	settings.views.page.prev_next.field_group_labels.prev,
+	settings.views.page.prev_next.field_group_labels.next,
+	settings.views.side.matrix.field_group_labels,
+	settings.views.side.tree.field_group_labels,
+	settings.views.side.tree.find_root_field_group_labels,
+	settings.commands.list_index.default_options.field_group_labels,
+	settings.commands.create_canvas.default_options.field_group_labels,
+];
+
+const set_every_group_slot = (
+	settings: BreadcrumbsSettings,
+	labels: string[],
+): void => {
+	settings.views.page.trail.field_group_labels = [...labels];
+	settings.views.page.prev_next.field_group_labels.prev = [...labels];
+	settings.views.page.prev_next.field_group_labels.next = [...labels];
+	settings.views.side.matrix.field_group_labels = [...labels];
+	settings.views.side.tree.field_group_labels = [...labels];
+	settings.views.side.tree.find_root_field_group_labels = [...labels];
+	settings.commands.list_index.default_options.field_group_labels = [
+		...labels,
+	];
+	settings.commands.create_canvas.default_options.field_group_labels = [
+		...labels,
+	];
+};
+
+describe("rename_group_references", () => {
+	// Regression: the settings UI only renamed trail, prev/next and matrix
+	// (twice), so renaming e.g. "ups" left the Tree view's find-root groups and
+	// the list-index / canvas defaults pointing at a group that no longer exists.
+	test("updates every group-label slot", (t) => {
+		const settings = clone_settings();
+		set_every_group_slot(settings, ["old", "keep"]);
+
+		rename_group_references(settings, "old", "new");
+
+		for (const labels of every_group_slot(settings)) {
+			t.expect(labels).toEqual(["new", "keep"]);
+		}
+	});
+});
+
+describe("remove_group_references", () => {
+	test("drops the label from every group-label slot", (t) => {
+		const settings = clone_settings();
+		set_every_group_slot(settings, ["gone", "keep"]);
+
+		remove_group_references(settings, "gone");
+
+		for (const labels of every_group_slot(settings)) {
+			t.expect(labels).toEqual(["keep"]);
+		}
 	});
 });
