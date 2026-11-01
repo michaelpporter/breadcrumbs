@@ -12,7 +12,9 @@
 	import { reactive_settings } from "src/stores/reactive_settings.svelte";
 	import {
 		remove_field_references,
+		remove_group_references,
 		rename_field_references,
+		rename_group_references,
 	} from "src/utils/edge_fields";
 	import Tag from "../obsidian/tag.svelte";
 	import EdgeFieldSelector from "../selector/EdgeFieldSelector.svelte";
@@ -167,36 +169,19 @@
 					(g) => g.label !== group.label,
 				);
 
+				// Drop every view/command reference to the removed group. See
+				// remove_group_references for the full list of slots covered.
+				remove_group_references(settings, group.label);
+
 				autosave();
 			},
 
 			rename: (group: EdgeFieldGroup, new_label: string) => {
 				if (group.label === new_label) return;
 
-				settings.views.page.trail.field_group_labels =
-					settings.views.page.trail.field_group_labels.map((label) =>
-						label === group.label ? new_label : label,
-					);
-
-				settings.views.page.prev_next.field_group_labels.prev =
-					settings.views.page.prev_next.field_group_labels.prev.map(
-						(label) => (label === group.label ? new_label : label),
-					);
-
-				settings.views.page.prev_next.field_group_labels.next =
-					settings.views.page.prev_next.field_group_labels.next.map(
-						(label) => (label === group.label ? new_label : label),
-					);
-
-				settings.views.side.matrix.field_group_labels =
-					settings.views.side.matrix.field_group_labels.map(
-						(label) => (label === group.label ? new_label : label),
-					);
-
-				settings.views.side.matrix.field_group_labels =
-					settings.views.side.matrix.field_group_labels.map(
-						(label) => (label === group.label ? new_label : label),
-					);
+				// Point every reference at the new label. See
+				// rename_group_references for the full list of slots covered.
+				rename_group_references(settings, group.label, new_label);
 
 				group.label = new_label;
 
@@ -353,97 +338,92 @@
 				<hr class="bc:my-1 bc:opacity-20" />
 			{/if}
 
-			<!-- TODO: I don't think this key even does what I'm looking for
-			The intention is to update the groups_label references when the groups themselves change
-			To replicate an issue this cause, context-menu > remove field from group, then do that again. It doesn't remove the second time -->
-			{#key settings.edge_field_groups}
-				<div class="bc:flex bc:flex-wrap bc:items-center bc:gap-1">
-					<input
-						id={actions.fields.make_id(field.label)}
-						type="text"
-						class="bc:w-48 bc:scroll-mt-40"
-						placeholder="Field Label"
-						value={field.label}
-						onblur={(e) =>
-							actions.fields.rename(field, e.currentTarget.value)}
-					/>
-					<button
-						class="bc:w-8"
-						title="Remove field"
-						onclick={() => actions.fields.remove(field)}
-					>
-						X
-					</button>
-					<button
-						disabled={field_i === 0}
-						title="Move up"
-						onclick={() =>
-							actions.fields.reorder(field_i, field_i - 1)}
-					>
-						<ArrowUp size={ICON_SIZE} />
-					</button>
-					<button
-						disabled={field_i === settings.edge_fields.length - 1}
-						title="Move down"
-						onclick={() =>
-							actions.fields.reorder(field_i, field_i + 1)}
-					>
-						<ArrowDown size={ICON_SIZE} />
-					</button>
-					<select
-						class="dropdown"
-						title="Mermaid arrow shape for this field"
-						value={field.mermaid_arrow ?? ""}
-						onchange={(e) =>
-							actions.fields.set_arrow(
-								field,
-								e.currentTarget.value,
-							)}
-					>
-						<option value="">Default arrow</option>
-						{#each MERMAID_ARROW_TYPES as arrow}
-							<option value={arrow}>{arrow}</option>
-						{/each}
-					</select>
-
-					<label
-						class="bc:flex bc:items-center bc:gap-1"
-						title="Hide this field from the Matrix and Tree side views"
-					>
-						<input
-							type="checkbox"
-							checked={field.hide_in_views ?? false}
-							onchange={(e) =>
-								actions.fields.set_hidden(
-									field,
-									e.currentTarget.checked,
-								)}
-						/>
-						Hide in side views
-					</label>
-
-					{#each group_labels as group_label}
-						<Tag
-							tag={group_label}
-							title="Jump to group. Right click to remove."
-							onclick={() =>
-								actions.groups.scroll_to(group_label)}
-							oncontextmenu={context_menus.field_group(
-								field,
-								group_label,
-							)}
-						/>
+			<div class="bc:flex bc:flex-wrap bc:items-center bc:gap-1">
+				<input
+					id={actions.fields.make_id(field.label)}
+					type="text"
+					class="bc:w-48 bc:scroll-mt-40"
+					placeholder="Field Label"
+					value={field.label}
+					onblur={(e) =>
+						actions.fields.rename(field, e.currentTarget.value)}
+				/>
+				<button
+					class="bc:w-8"
+					title="Remove field"
+					onclick={() => actions.fields.remove(field)}
+				>
+					X
+				</button>
+				<button
+					disabled={field_i === 0}
+					title="Move up"
+					onclick={() =>
+						actions.fields.reorder(field_i, field_i - 1)}
+				>
+					<ArrowUp size={ICON_SIZE} />
+				</button>
+				<button
+					disabled={field_i === settings.edge_fields.length - 1}
+					title="Move down"
+					onclick={() =>
+						actions.fields.reorder(field_i, field_i + 1)}
+				>
+					<ArrowDown size={ICON_SIZE} />
+				</button>
+				<select
+					class="dropdown"
+					title="Mermaid arrow shape for this field"
+					value={field.mermaid_arrow ?? ""}
+					onchange={(e) =>
+						actions.fields.set_arrow(
+							field,
+							e.currentTarget.value,
+						)}
+				>
+					<option value="">Default arrow</option>
+					{#each MERMAID_ARROW_TYPES as arrow}
+						<option value={arrow}>{arrow}</option>
 					{/each}
+				</select>
 
-					<button
-						class="bc:w-6"
-						title="Add to group"
-						onclick={context_menus.add_to_group(field)}
-					>
-						<PlusIcon size={ICON_SIZE} />
-					</button>
-				</div>
-			{/key}
+				<label
+					class="bc:flex bc:items-center bc:gap-1"
+					title="Hide this field from the Matrix and Tree side views"
+				>
+					<input
+						type="checkbox"
+						checked={field.hide_in_views ?? false}
+						onchange={(e) =>
+							actions.fields.set_hidden(
+								field,
+								e.currentTarget.checked,
+							)}
+					/>
+					Hide in side views
+				</label>
+
+				{#each group_labels as group_label}
+					<Tag
+						tag={group_label}
+						title="Jump to group. Right click to remove."
+						onclick={() =>
+							actions.groups.scroll_to(group_label)}
+						oncontextmenu={context_menus.field_group(
+							field,
+							group_label,
+						)}
+					/>
+				{/each}
+
+				<button
+					class="bc:w-6"
+					title="Add to group"
+					onclick={context_menus.add_to_group(field)}
+				>
+					<PlusIcon size={ICON_SIZE} />
+				</button>
+			</div>
 		{/each}
 
 		<button
