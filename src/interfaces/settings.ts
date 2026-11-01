@@ -1,7 +1,6 @@
 import type { ListIndexOptions } from "src/commands/list_index";
 import type { EdgeSortId } from "src/const/graph";
-import type { BCEdgeAttributes, EdgeAttribute } from "src/graph/utils";
-import type { EdgeAttrFilters } from "src/graph/utils";
+import type { EdgeAttrFilters, EdgeAttribute } from "src/graph/utils";
 import type { LogLevels } from "src/logger";
 
 export const MERMAID_ARROW_TYPES = [
@@ -292,7 +291,7 @@ export interface BreadcrumbsSettingsWithDirection {
 	custom_implied_relations: {
 		transitive: {
 			rounds: number;
-			chain: Partial<BCEdgeAttributes>[];
+			chain: EdgeAttrFilters[];
 			/** The transitive closure field */
 			close_field: string;
 		}[];
