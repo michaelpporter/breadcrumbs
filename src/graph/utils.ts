@@ -1,4 +1,3 @@
-import type { ExplicitEdgeSource } from "src/const/graph";
 import type {
 	BreadcrumbsSettings,
 	ShowNodeOptions,
@@ -25,11 +24,6 @@ export function to_node_stringify_options(
 
 /**
  * The filter shape stored in `implied_relations.transitive[].chain`.
- *
- * Spelled out rather than `Pick`ed from the deprecated {@link BCEdgeAttributes}:
- * this is live settings data, so it should not be defined in terms of a legacy
- * type. Resolves identically to the previous `Partial<Pick<BCEdgeAttributes,
- * "explicit" | "field">>`.
  */
 export type EdgeAttrFilters = Partial<{
 	field: string;
@@ -49,27 +43,3 @@ export const EDGE_ATTRIBUTES = [
 ] as const;
 
 export type EdgeAttribute = (typeof EDGE_ATTRIBUTES)[number];
-
-/**
- * Legacy type
- *
- * @deprecated
- */
-export type BCEdgeAttributes = {
-	field: string;
-} & (
-	| {
-			explicit: true;
-			source: ExplicitEdgeSource;
-	  }
-	| {
-			explicit: false;
-			implied_kind: `transitive:${string}`;
-			/** Which round of implied_building this edge got added in.
-			 * Starts at 1 - you can think of real edges as being added in round 0.
-			 * The way {@link BCGraph.safe_add_directed_edge} works, currently only the first instance of an edge will be added.
-			 *   If the same edge tries again in a future round, _that_ one will be blocked.
-			 */
-			round: number;
-	  }
-);

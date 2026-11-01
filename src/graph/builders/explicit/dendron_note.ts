@@ -1,6 +1,5 @@
 import { normalizePath } from "obsidian";
 import { META_ALIAS } from "src/const/metadata_fields";
-// import type { BCGraph } from "src/graph/MyMultiGraph";
 import type {
 	EdgeBuilderResults,
 	ExplicitEdgeBuilder,

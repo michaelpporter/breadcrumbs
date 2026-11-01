@@ -1,4 +1,3 @@
-// import type { BCEdgeAttributes, BCNode } from "src/graph/MyMultiGraph";
 import type { AllFiles } from "src/graph/builders/explicit/files";
 import type BreadcrumbsPlugin from "src/main";
 import type { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";

@@ -1,4 +1,3 @@
-// import type { TFile } from "obsidian";
 import type { TFolder } from "obsidian";
 import { TFile, Vault, Notice } from "obsidian";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
