@@ -10,7 +10,26 @@ interface PageViewMountState {
 	mode: string;
 	sticky: boolean;
 	file_path: string;
+	/** {@link BreadcrumbsPlugin.graph_version} when this view was mounted. */
+	graph_version: number;
 }
+
+/**
+ * Whether an existing page view can be kept instead of remounted.
+ *
+ * layout-change fires on every CM6 cursor/scroll update; remounting on each one
+ * causes DOM thrash inside .cm-scroller (#698). But the views read the graph
+ * non-reactively, so after a graph update they must remount, or they keep
+ * results from the old revision (stale trail, "Revision mismatch" errors).
+ */
+export const can_reuse_page_view = (
+	existing: Omit<PageViewMountState, "view"> | undefined,
+	next: Omit<PageViewMountState, "view">,
+) =>
+	existing?.mode === next.mode &&
+	existing.sticky === next.sticky &&
+	existing.file_path === next.file_path &&
+	existing.graph_version === next.graph_version;
 
 const mounted_page_views = new WeakMap<MarkdownView, PageViewMountState>();
 
@@ -55,13 +74,17 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			return;
 		}
 
-		// Skip remount if mode, sticky, and file_path haven't changed and the element is still in the DOM.
-		// layout-change fires on every CM6 cursor/scroll update; remounting on each one
-		// causes DOM thrash inside .cm-scroller which makes CM6 re-measure and skip cursor positions.
+		const graph_version = plugin.graph_version;
+
+		// Skip remount if nothing changed and the element is still in the DOM.
+		// See can_reuse_page_view.
 		if (
-			existing?.mode === mode &&
-			existing.sticky === sticky &&
-			existing.file_path === file_path
+			can_reuse_page_view(existing, {
+				mode,
+				sticky,
+				file_path,
+				graph_version,
+			})
 		) {
 			const page_views_el =
 				markdown_view.containerEl.querySelector<HTMLElement>(
@@ -202,6 +225,7 @@ export function redraw_page_views(plugin: BreadcrumbsPlugin) {
 			mode,
 			sticky,
 			file_path,
+			graph_version,
 		});
 	});
 }

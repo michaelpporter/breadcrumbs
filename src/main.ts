@@ -47,6 +47,8 @@ export enum BCEvent {
 export default class BreadcrumbsPlugin extends Plugin {
 	declare settings: BreadcrumbsSettings;
 	graph!: NoteGraph;
+	/** Bumped on every graph update, so views can tell their data is stale. */
+	graph_version = 0;
 	api!: BCAPI;
 	events!: Events;
 
@@ -110,6 +112,7 @@ export default class BreadcrumbsPlugin extends Plugin {
 		this.events = new Events();
 		// A graph update triggers a redraw of all views
 		this.events.on(BCEvent.GRAPH_UPDATE, () => {
+			this.graph_version++;
 			this.refreshViews();
 		});
 		this.events.on(BCEvent.REDRAW_PAGE_VIEWS, () => {
