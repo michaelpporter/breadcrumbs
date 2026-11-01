@@ -124,11 +124,9 @@ impl NoteGraph {
     }
 
     /// Applies a batch update to the graph.
-    /// Throws an error if the update fails, and leave the graph in an
-    /// inconsistent state.
-    ///
-    /// TODO: some security against errors leaving the graph in an inconsistent
-    /// state. Maybe safely clear the entire graph.
+    /// Throws an error if an update in the batch fails. Updates before the
+    /// failing one stay applied, but implied edges and trackers are still
+    /// rebuilt, so the graph stays internally consistent.
     pub fn apply_update(&mut self, update: BatchGraphUpdate) -> Result<()> {
         let mut perf_logger = PerfLogger::new("Applying Update".to_owned());
         perf_logger.start_split("Removing implied edges".to_owned());
@@ -137,9 +135,9 @@ impl NoteGraph {
 
         perf_logger.start_split("Applying updates".to_owned());
 
-        // self.log();
-        update.apply(self)?;
-        // self.log();
+        // Don't return early on failure: the implied edges were removed above
+        // and must be rebuilt either way.
+        let result = update.apply(self);
 
         perf_logger.start_split("Rebuilding edge type tracker".to_owned());
 
@@ -154,7 +152,7 @@ impl NoteGraph {
 
         perf_logger.log();
 
-        Ok(())
+        result
     }
 
     /// Iterate all nodes in the graph and call the provided function with each

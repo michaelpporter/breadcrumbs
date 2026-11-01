@@ -213,11 +213,9 @@ export class NoteGraph {
     [Symbol.dispose](): void;
     /**
      * Applies a batch update to the graph.
-     * Throws an error if the update fails, and leave the graph in an
-     * inconsistent state.
-     *
-     * TODO: some security against errors leaving the graph in an inconsistent
-     * state. Maybe safely clear the entire graph.
+     * Throws an error if an update in the batch fails. Updates before the
+     * failing one stay applied, but implied edges and trackers are still
+     * rebuilt, so the graph stays internally consistent.
      */
     apply_update(update: BatchGraphUpdate): void;
     /**

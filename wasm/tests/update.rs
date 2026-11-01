@@ -269,3 +269,37 @@ fn test_unresolved_node_can_have_outgoing_edges() {
     assert_eq!(graph.graph.node_count(), 0);
     assert_eq!(graph.graph.edge_count(), 0);
 }
+
+// Regression: apply_update removed every implied edge before applying the
+// batch, so a failing update returned early and left the graph without any
+// implied edges until the next full rebuild.
+#[wasm_bindgen_test]
+fn test_failed_update_keeps_graph_consistent() {
+    let rules = || {
+        vec![TransitiveGraphRule::new(
+            "".to_string(),
+            vec!["down".to_string()],
+            "up".to_string(),
+            5,
+            false,
+            true,
+        )]
+    };
+    let data = common::tdata_generate_tree(2, 2);
+
+    let mut graph_1 = NoteGraph::new();
+    graph_1.build_graph(data.0.clone(), data.1.clone(), rules()).unwrap();
+    let mut graph_2 = NoteGraph::new();
+    graph_2.build_graph(data.0, data.1, rules()).unwrap();
+    // Rebuilding implied edges reorders them, so compare against a graph that
+    // went through an empty update rather than a freshly built one.
+    graph_2.apply_update(BatchGraphUpdate::new()).unwrap();
+
+    let mut batch = BatchGraphUpdate::new();
+    RemoveNoteGraphUpdate::new("does-not-exist".to_string()).add_to_batch(&mut batch);
+    assert!(graph_1.apply_update(batch).is_err());
+
+    assert!(graph_1.int_has_edge_by_name(&"0".to_string(), &"root".to_string(), &"up".to_string()));
+    assert!(graph_eq(&graph_1.graph, &graph_2.graph));
+    graph_1.assert_correct_trackers();
+}
