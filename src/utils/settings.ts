@@ -91,11 +91,8 @@ export function new_setting<
 				.createEl("input", { attr }, (el) => {
 					el.classList.add("bc:shrink");
 
-					el.onchange = (e) => {
-						if (!(e.target instanceof HTMLInputElement)) return;
-
-						state[key as keyof CL] = e.target
-							.checked as CL[keyof CL];
+					el.onchange = () => {
+						state[key as keyof CL] = el.checked as CL[keyof CL];
 
 						void config.checklist!.cb(state);
 					};
