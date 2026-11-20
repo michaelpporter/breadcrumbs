@@ -5,6 +5,7 @@ import { debounce, Events, Notice, Plugin, TFile } from "obsidian";
 import { DEFAULT_SETTINGS } from "src/const/settings";
 import { VIEW_IDS } from "src/const/views";
 import { rebuild_graph } from "src/graph/builders";
+import { InlineFieldCache } from "src/graph/builders/explicit/inline_field_cache";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
 import { BreadcrumbsSettingTab } from "src/settings/SettingsTab";
 import { active_file_store } from "src/stores/active_file";
@@ -51,6 +52,8 @@ export default class BreadcrumbsPlugin extends Plugin {
 	graph_version = 0;
 	api!: BCAPI;
 	events!: Events;
+	/** Parsed inline fields per note, so rebuilds skip unchanged notes (#802). */
+	inline_field_cache = new InlineFieldCache();
 
 	private _save_debouncer: Debouncer<[], void> = debounce(
 		() => {
@@ -98,6 +101,13 @@ export default class BreadcrumbsPlugin extends Plugin {
 		await this.loadSettings();
 
 		await this.backup_old_settings();
+
+		if (this.settings.commands.rebuild_graph.cache_inline_fields) {
+			this.inline_field_cache = await InlineFieldCache.load(
+				this.app.vault.adapter,
+				this.inline_field_cache_path,
+			);
+		}
 
 		/// Migrations
 		migrate_old_settings(this.settings);
@@ -355,6 +365,19 @@ export default class BreadcrumbsPlugin extends Plugin {
 		return commit_setting(this, policy);
 	}
 
+	/** Drop the inline-field cache from memory and disk (on opt-out). */
+	async clearInlineFieldCache() {
+		this.inline_field_cache = new InlineFieldCache();
+		const path = this.inline_field_cache_path;
+		if (await this.app.vault.adapter.exists(path)) {
+			await this.app.vault.adapter.remove(path);
+		}
+	}
+
+	private get inline_field_cache_path() {
+		return `${this.app.vault.configDir}/plugins/${this.manifest.id}/inline-field-cache.json`;
+	}
+
 	async backup_old_settings(): Promise<void> {
 		const backup_path = `${this.app.vault.configDir}/plugins/${this.manifest.id}/data-backup__no-directions-migration.json`;
 		if (!(await this.app.vault.adapter.exists(backup_path))) {
@@ -377,6 +400,16 @@ export default class BreadcrumbsPlugin extends Plugin {
 			: null;
 
 		const rebuild_results = await rebuild_graph(this);
+
+		if (
+			this.settings.commands.rebuild_graph.cache_inline_fields &&
+			this.inline_field_cache.commit()
+		) {
+			await this.app.vault.adapter.write(
+				this.inline_field_cache_path,
+				this.inline_field_cache.to_json(),
+			);
+		}
 
 		const explicit_edge_errors = rebuild_results.explicit_edge_results
 			.filter(({ results }) => results.errors.length)

@@ -203,6 +203,9 @@ export interface BreadcrumbsSettings {
 	commands: {
 		rebuild_graph: {
 			notify: boolean;
+			/** Opt-in: cache parsed inline fields per note in
+			 *  `inline-field-cache.json`, so rebuilds skip unchanged notes (#802). */
+			cache_inline_fields: boolean;
 
 			trigger: {
 				note_save: boolean;

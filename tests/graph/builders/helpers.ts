@@ -6,6 +6,7 @@
  * used by the builder functions under test.
  */
 import { DEFAULT_SETTINGS } from "src/const/settings";
+import { InlineFieldCache } from "src/graph/builders/explicit/inline_field_cache";
 import type { AllFiles } from "src/graph/builders/explicit/files";
 import type { BreadcrumbsSettings } from "src/interfaces/settings";
 import type BreadcrumbsPlugin from "src/main";
@@ -142,6 +143,7 @@ export function make_plugin(
 
 	return {
 		settings,
+		inline_field_cache: new InlineFieldCache(),
 		app: {
 			plugins: app_extra.dataview_pages
 				? {

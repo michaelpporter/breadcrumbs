@@ -229,6 +229,7 @@ export const DEFAULT_SETTINGS: BreadcrumbsSettings = {
 	commands: {
 		rebuild_graph: {
 			notify: true,
+			cache_inline_fields: false,
 
 			trigger: {
 				note_save: false,

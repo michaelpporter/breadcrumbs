@@ -1,3 +1,4 @@
+import type { LinkCache } from "obsidian";
 import type {
 	EdgeBuilderResults,
 	ExplicitEdgeBuilder,
@@ -8,6 +9,7 @@ import {
 	vault_read_concurrency,
 } from "src/utils/promises";
 import { GCEdgeData, GCNodeData } from "wasm/pkg/breadcrumbs_graph_wasm";
+import type { InlineFieldLink } from "./inline_field_cache";
 
 /** A Dataview inline field found on a line, with the span its value occupies. */
 export interface InlineField {
@@ -80,23 +82,49 @@ export const parse_inline_fields = (line: string): InlineField[] => {
  * outside every field. Ties go to the narrowest span, so a wrapped field wins
  * over a bare line-level field that happens to enclose it.
  */
-const field_at_column = (
-	fields: InlineField[],
-	col: number,
-): string | null => {
+const field_at_column = (fields: InlineField[], col: number): string | null => {
 	let best: InlineField | null = null;
 
 	for (const field of fields) {
 		if (col < field.value_start || col >= field.value_end) continue;
 		if (
 			!best ||
-			field.value_end - field.value_start < best.value_end - best.value_start
+			field.value_end - field.value_start <
+				best.value_end - best.value_start
 		) {
 			best = field;
 		}
 	}
 
 	return best?.field ?? null;
+};
+
+/**
+ * Pair each body link with the inline field whose value contains it, for
+ * every field name (unfiltered — see {@link InlineFieldLink}). Links outside
+ * any field are dropped.
+ */
+const link_fields = (
+	lines: string[],
+	links: LinkCache[],
+): InlineFieldLink[] => {
+	const fields_by_line = new Map<number, InlineField[]>();
+	const field_links: InlineFieldLink[] = [];
+
+	for (const link_cache of links) {
+		const line_num = link_cache.position.start.line;
+
+		let fields = fields_by_line.get(line_num);
+		if (!fields) {
+			fields = parse_inline_fields(lines[line_num] ?? "");
+			fields_by_line.set(line_num, fields);
+		}
+
+		const field = field_at_column(fields, link_cache.position.start.col);
+		if (field) field_links.push([field, link_cache.link]);
+	}
+
+	return field_links;
 };
 
 /**
@@ -107,7 +135,9 @@ const field_at_column = (
  *   for `[[wikilink]]` values in YAML frontmatter.
  * - **Inline fields** (`cache.links` + `vault.cachedRead`): reads body-level
  *   `field:: [[value]]` syntax (Dataview inline format) natively, without
- *   requiring the Dataview plugin.
+ *   requiring the Dataview plugin. Parse results are cached per note by
+ *   `mtime` + `size` (`InlineFieldCache`) when opted in, so unchanged notes
+ *   aren't re-read.
  *
  * Unresolved link targets are added as unresolved nodes so they still appear
  * in the graph even without a corresponding vault file.
@@ -117,6 +147,11 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 	all_files,
 ) => {
 	const results: EdgeBuilderResults = { nodes: [], edges: [], errors: [] };
+
+	const field_cache = plugin.settings.commands.rebuild_graph
+		.cache_inline_fields
+		? plugin.inline_field_cache
+		: null;
 
 	const field_labels = new Set(
 		plugin.settings.edge_fields.map((f) => f.label),
@@ -169,30 +204,19 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 			const links = [...(cache?.links ?? []), ...(cache?.embeds ?? [])];
 			if (!links.length) return;
 
-			const content = await plugin.app.vault.cachedRead(file);
-			const lines = content.split("\n");
+			let field_links = field_cache?.get(file);
+			if (!field_links) {
+				const content = await plugin.app.vault.cachedRead(file);
+				field_links = link_fields(content.split("\n"), links);
+				field_cache?.set(file, field_links);
+			}
 
-			const fields_by_line = new Map<number, InlineField[]>();
-
-			for (const link_cache of links) {
-				const line_num = link_cache.position.start.line;
-
-				let fields = fields_by_line.get(line_num);
-				if (!fields) {
-					fields = parse_inline_fields(lines[line_num] ?? "");
-					fields_by_line.set(line_num, fields);
-				}
-
-				const field = field_at_column(
-					fields,
-					link_cache.position.start.col,
-				);
-				if (!field) continue;
+			for (const [field, link] of field_links) {
 				if (!field_labels.has(field)) continue;
 
 				const resolved = resolve_relative_target_path(
 					plugin.app,
-					link_cache.link,
+					link,
 					file.path,
 				);
 				if (!resolved) continue;
