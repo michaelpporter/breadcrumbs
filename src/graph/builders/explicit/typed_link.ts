@@ -136,7 +136,8 @@ const link_fields = (
  * - **Inline fields** (`cache.links` + `vault.cachedRead`): reads body-level
  *   `field:: [[value]]` syntax (Dataview inline format) natively, without
  *   requiring the Dataview plugin. Parse results are cached per note by
- *   `mtime` + `size` (`InlineFieldCache`), so unchanged notes aren't re-read.
+ *   `mtime` + `size` (`InlineFieldCache`) when opted in, so unchanged notes
+ *   aren't re-read.
  *
  * Unresolved link targets are added as unresolved nodes so they still appear
  * in the graph even without a corresponding vault file.
@@ -146,6 +147,11 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 	all_files,
 ) => {
 	const results: EdgeBuilderResults = { nodes: [], edges: [], errors: [] };
+
+	const field_cache = plugin.settings.commands.rebuild_graph
+		.cache_inline_fields
+		? plugin.inline_field_cache
+		: null;
 
 	const field_labels = new Set(
 		plugin.settings.edge_fields.map((f) => f.label),
@@ -198,11 +204,11 @@ export const _add_explicit_edges_typed_link: ExplicitEdgeBuilder = async (
 			const links = [...(cache?.links ?? []), ...(cache?.embeds ?? [])];
 			if (!links.length) return;
 
-			let field_links = plugin.inline_field_cache.get(file);
+			let field_links = field_cache?.get(file);
 			if (!field_links) {
 				const content = await plugin.app.vault.cachedRead(file);
 				field_links = link_fields(content.split("\n"), links);
-				plugin.inline_field_cache.set(file, field_links);
+				field_cache?.set(file, field_links);
 			}
 
 			for (const [field, link] of field_links) {

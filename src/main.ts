@@ -102,10 +102,12 @@ export default class BreadcrumbsPlugin extends Plugin {
 
 		await this.backup_old_settings();
 
-		this.inline_field_cache = await InlineFieldCache.load(
-			this.app.vault.adapter,
-			this.inline_field_cache_path,
-		);
+		if (this.settings.commands.rebuild_graph.cache_inline_fields) {
+			this.inline_field_cache = await InlineFieldCache.load(
+				this.app.vault.adapter,
+				this.inline_field_cache_path,
+			);
+		}
 
 		/// Migrations
 		migrate_old_settings(this.settings);
@@ -363,6 +365,15 @@ export default class BreadcrumbsPlugin extends Plugin {
 		return commit_setting(this, policy);
 	}
 
+	/** Drop the inline-field cache from memory and disk (on opt-out). */
+	async clearInlineFieldCache() {
+		this.inline_field_cache = new InlineFieldCache();
+		const path = this.inline_field_cache_path;
+		if (await this.app.vault.adapter.exists(path)) {
+			await this.app.vault.adapter.remove(path);
+		}
+	}
+
 	private get inline_field_cache_path() {
 		return `${this.app.vault.configDir}/plugins/${this.manifest.id}/inline-field-cache.json`;
 	}
@@ -390,7 +401,10 @@ export default class BreadcrumbsPlugin extends Plugin {
 
 		const rebuild_results = await rebuild_graph(this);
 
-		if (this.inline_field_cache.commit()) {
+		if (
+			this.settings.commands.rebuild_graph.cache_inline_fields &&
+			this.inline_field_cache.commit()
+		) {
 			await this.app.vault.adapter.write(
 				this.inline_field_cache_path,
 				this.inline_field_cache.to_json(),

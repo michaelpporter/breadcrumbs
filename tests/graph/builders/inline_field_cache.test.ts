@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "src/const/settings";
 import { InlineFieldCache } from "src/graph/builders/explicit/inline_field_cache";
 import { _add_explicit_edges_typed_link } from "src/graph/builders/explicit/typed_link";
 import { describe, expect, test, vi } from "vitest";
@@ -10,10 +11,19 @@ const LINKS = [
 ];
 
 /** A vault of one note, `a.md`, with BODY as its content and a mutable stat. */
-function setup(labels = ["up"]) {
+function setup(labels = ["up"], cache_inline_fields = true) {
 	const cachedRead = vi.fn(async () => BODY);
 	const plugin = make_plugin(
-		{ edge_fields: labels.map((label) => ({ label })) },
+		{
+			edge_fields: labels.map((label) => ({ label })),
+			commands: {
+				...DEFAULT_SETTINGS.commands,
+				rebuild_graph: {
+					...DEFAULT_SETTINGS.commands.rebuild_graph,
+					cache_inline_fields,
+				},
+			},
+		},
 		[],
 		undefined,
 		{ cachedRead },
@@ -33,6 +43,17 @@ function setup(labels = ["up"]) {
 }
 
 describe("inline-field cache in the typed_link builder", () => {
+	test("setting off (default) → every rebuild reads, nothing cached", async () => {
+		const { plugin, cachedRead, build } = setup(["up"], false);
+
+		await build();
+		plugin.inline_field_cache.commit();
+		await build();
+
+		expect(cachedRead).toHaveBeenCalledTimes(2);
+		expect(plugin.inline_field_cache.commit()).toBe(false);
+	});
+
 	test("unchanged note → second rebuild skips the read, same edges", async () => {
 		const { plugin, cachedRead, build } = setup();
 
