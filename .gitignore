@@ -44,3 +44,6 @@ plans/
 
 # rust-analyzer flycheck output (runs cargo check from the repo root)
 /target/
+
+# Inline-field parse cache (#802), regenerated on rebuild
+inline-field-cache.json
