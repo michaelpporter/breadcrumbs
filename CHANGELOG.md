@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 4.X
 
+### [4.23.0](https://github.com/michaelpporter/breadcrumbs/compare/4.22.3...4.23.0) (2026-11-20)
+
+### Added
+
+* **New opt-in setting: Cache inline fields** (Settings > Commands > Rebuild Graph, off by default). On every rebuild, including startup, Breadcrumbs reads each note that has a body link to find inline fields (`field:: [[link]]`). With this on, it remembers what it found in each note and re-reads only the notes that changed since the last rebuild. On a large vault, especially on mobile, startup no longer waits on thousands of reads. The cache is saved as `inline-field-cache.json` in the plugin folder and rebuilt from your notes if it's missing. Changing your edge fields doesn't invalidate it, and turning the setting off deletes it. If your vault is in git, add `.obsidian/plugins/breadcrumbs/inline-field-cache.json` to its `.gitignore`. Refs #802
+
+### Fixed
+
+* Settings checkboxes (for example, rebuild triggers) now read their state from the checkbox element itself rather than from the event target, so they work in popout windows.
+
+### Chores
+
+* Dependency updates: the JS dependency group (19 packages, including `eslint-plugin-obsidianmd` 0.6, `vitest` 5.1 and `markmap-*` 0.18.13) and the WASM crate `smallvec` 1.16.5.
+
 ### [4.22.3](https://github.com/michaelpporter/breadcrumbs/compare/4.22.2...4.22.3) (2026-11-01)
 
 ### Fixed
