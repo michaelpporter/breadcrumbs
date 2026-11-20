@@ -21,7 +21,7 @@ export const _add_settings_rebuild_graph = (
 
 	new_setting(containerEl, {
 		name: "Cache inline fields",
-		desc: "Remember the inline fields (field:: [[link]]) found in each note, so rebuilds only re-read notes that changed. Speeds up startup on large vaults, especially on mobile. Stored in the plugin folder.",
+		desc: "Remember the inline fields (field:: [[link]]) found in each note, so rebuilds only re-read notes that changed. Speeds up startup on large vaults, especially on mobile. Stored in the plugin folder as inline-field-cache.json; if your vault is in git, add that file to .gitignore.",
 		toggle: {
 			value: plugin.settings.commands.rebuild_graph.cache_inline_fields,
 			cb: async (value) => {
