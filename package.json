@@ -44,8 +44,8 @@
 		"@tsconfig/svelte": "^5.0.9",
 		"@types/luxon": "^3.7.6",
 		"@types/node": "^26.6.6",
-		"@vitest/coverage-v8": "5.1.0",
-		"@vitest/ui": "5.1.0",
+		"@vitest/coverage-v8": "5.1.1",
+		"@vitest/ui": "5.1.1",
 		"esbuild": "^0.28.2",
 		"esbuild-svelte": "^0.9.5",
 		"eslint": "^10.15.0",
@@ -53,20 +53,20 @@
 		"eslint-plugin-obsidianmd": "^0.6.0",
 		"eslint-plugin-only-warn": "^1.2.1",
 		"eslint-plugin-svelte": "^3.24.1",
-		"npm-run-all2": "^9.0.4",
+		"npm-run-all2": "^9.1.0",
 		"obsidian": "1.14.4",
 		"prettier": "^3.10.1",
-		"prettier-plugin-svelte": "^4.1.1",
+		"prettier-plugin-svelte": "^4.2.0",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"svelte": "^5.57.3",
+		"svelte": "^5.59.1",
 		"svelte-check": "4.7.8",
 		"svelte-preprocess": "6.0.5",
 		"tailwindcss": "^4.3.5",
 		"tslib": "2.9.1",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.72.2",
+		"typescript-eslint": "^8.73.0",
 		"vite-plugin-wasm": "^3.6.0",
-		"vitest": "5.1.0"
+		"vitest": "5.1.1"
 	},
 	"overrides": {
 		"vite": "8.1.6",
@@ -86,14 +86,14 @@
 		"@parcel/watcher": "^2.6.0"
 	},
 	"dependencies": {
-		"baseline-browser-mapping": "^2.11.37",
+		"baseline-browser-mapping": "^2.11.39",
 		"caniuse-lite": "^1.0.30001826",
 		"lucide-svelte": "^1.0.1",
 		"luxon": "^3.7.2",
 		"markmap-lib": "^0.18.13",
 		"markmap-toolbar": "^0.18.13",
 		"markmap-view": "^0.18.13",
-		"obsidian-typings": "^6.61.0",
+		"obsidian-typings": "^6.64.0",
 		"zod": "^4.6.7"
 	}
 }
