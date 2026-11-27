@@ -166,6 +166,16 @@ export default class BreadcrumbsPlugin extends Plugin {
 			this.registerEditorSuggest(new EdgeFieldSuggestor(this));
 		}
 
+		// Views
+		this.registerView(
+			VIEW_IDS.matrix,
+			(leaf) => new MatrixView(leaf, this),
+		);
+		this.registerView(
+			VIEW_IDS.tree,
+			(leaf) => new TreeView(leaf, this)
+		);
+
 		this.app.workspace.onLayoutReady(async () => {
 			// Set the edge_fields & BC-meta-fields to the right Properties type
 			try {
@@ -298,16 +308,6 @@ export default class BreadcrumbsPlugin extends Plugin {
 						this.rebuildGraphDebounced();
 					}
 				}),
-			);
-
-			// Views
-			this.registerView(
-				VIEW_IDS.matrix,
-				(leaf) => new MatrixView(leaf, this),
-			);
-			this.registerView(
-				VIEW_IDS.tree,
-				(leaf) => new TreeView(leaf, this),
 			);
 		});
 

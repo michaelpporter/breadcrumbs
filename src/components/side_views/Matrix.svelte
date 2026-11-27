@@ -60,8 +60,8 @@
 	);
 
 	let grouped_out_edges = $derived.by(() => {
-		// Even tho we ensure the graph is built before the views are registered,
-		// Existing views still try render before the graph is built.
+		// The view can mount before the first graph build (views are registered
+		// in onload), so the graph may not contain this note yet.
 		if (effective_path && plugin.graph.has_node(effective_path)) {
 			log.debug("Using path for MatrixView:", effective_path);
 			return plugin.graph.get_filtered_grouped_outgoing_edges(
